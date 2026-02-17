@@ -1,0 +1,142 @@
+<% content_for(:title, t("titles.form_show")) %>
+
+<div class="mb-6">
+  <%= link_to forms_path, class: "text-sm text-earth-500 hover:text-earth-700 inline-flex items-center gap-1" do %>
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+    </svg>
+    <%= t("forms.back_to_forms") %>
+  <% end %>
+</div>
+
+<%# Farm Info Summary %>
+<div class="bg-white border border-earth-200 rounded-lg p-6 mb-8">
+  <div class="flex items-start justify-between mb-4">
+    <div>
+      <h1 class="text-2xl font-bold text-earth-900"><%= @form.name %></h1>
+      <p class="text-sm text-earth-500 mt-1">
+        <% if @form.country.present? || @form.region.present? %>
+          <%= [@form.locality, @form.region, @form.country].compact.join(", ") %>
+          &middot;
+        <% end %>
+        <%= t("results.completed_on", date: @form.completed_at&.strftime("%B %d, %Y")) %>
+      </p>
+    </div>
+    <span class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full bg-forest-100 text-forest-700">
+      <%= t("states.completed") %>
+    </span>
+  </div>
+
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+    <% if @form.land_area.present? %>
+      <div>
+        <span class="text-earth-500"><%= t("results.land_area") %></span>
+        <p class="font-medium text-earth-800"><%= @form.land_area %> ha</p>
+      </div>
+    <% end %>
+    <% if @form.work_force.present? %>
+      <div>
+        <span class="text-earth-500"><%= t("results.workforce") %></span>
+        <p class="font-medium text-earth-800"><%= @form.work_force %> <%= t("results.people") %></p>
+      </div>
+    <% end %>
+    <% if @form.system_types.present? && @form.system_types.reject(&:blank?).any? %>
+      <div class="col-span-2">
+        <span class="text-earth-500"><%= t("results.system_types") %></span>
+        <p class="font-medium text-earth-800"><%= @form.system_types.reject(&:blank?).map(&:humanize).join(", ") %></p>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<%# L1 Category Overview — Radar Chart %>
+<section class="mb-8">
+  <h2 class="text-lg font-semibold text-earth-800 mb-4"><%= t("results.category_overview") %></h2>
+  <% categories = QuestionnaireConfig.l1_categories %>
+  <% chart_labels = categories.map { |cat| t(cat[:i18n_key]) } %>
+  <% chart_scores = categories.map { |cat| @calculator[:l1_scores][cat[:key]] || 0 } %>
+  <div class="bg-white border border-earth-200 rounded-lg p-6"
+       data-controller="radar-chart"
+       data-radar-chart-labels-value="<%= chart_labels.to_json %>"
+       data-radar-chart-scores-value="<%= chart_scores.to_json %>">
+    <div class="max-w-md mx-auto">
+      <canvas data-radar-chart-target="canvas"></canvas>
+    </div>
+  </div>
+</section>
+
+<%# Detailed Dimension Scores %>
+<section class="mb-8">
+  <h2 class="text-lg font-semibold text-earth-800 mb-4"><%= t("results.dimension_scores") %></h2>
+  <div class="bg-white border border-earth-200 rounded-lg divide-y divide-earth-100">
+    <% QuestionnaireConfig.dimensions.each do |dim| %>
+      <% score = @calculator[:l2_scores][dim[:key]] || 0 %>
+      <div class="flex items-center gap-4 px-5 py-3">
+        <span class="text-sm text-earth-700 w-48 shrink-0"><%= t(dim[:i18n_key]) %></span>
+        <div class="flex-1 bg-earth-100 rounded-full h-3">
+          <% bar_color = if score >= 7
+                           "bg-forest-500"
+                         elsif score >= 4
+                           "bg-mustard-500"
+                         else
+                           "bg-rose-500"
+                         end %>
+          <div class="<%= bar_color %> h-3 rounded-full transition-all" style="width: <%= score * 10 %>%"></div>
+        </div>
+        <span class="text-sm font-semibold text-earth-800 w-10 text-right"><%= score.positive? ? format("%.1f", score) : "-" %></span>
+      </div>
+    <% end %>
+  </div>
+</section>
+
+<%# All Indicators by Dimension %>
+<section class="mb-8">
+  <h2 class="text-lg font-semibold text-earth-800 mb-4"><%= t("results.all_indicators") %></h2>
+  <div class="space-y-4">
+    <% QuestionnaireConfig.l1_categories.each do |cat| %>
+      <% cat_dimensions = QuestionnaireConfig.dimensions.select { |d| d[:category] == cat[:key] } %>
+      <% cat_dimensions.each do |dim| %>
+        <div class="bg-white border border-earth-200 rounded-lg" data-controller="collapsible">
+          <button type="button" data-action="collapsible#toggle" class="flex items-center justify-between w-full px-5 py-3 text-left">
+            <span class="font-medium text-earth-800"><%= t(dim[:i18n_key]) %></span>
+            <svg data-collapsible-target="icon" class="w-5 h-5 text-earth-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+
+          <div data-collapsible-target="content" class="hidden border-t border-earth-100">
+            <% dim_indicators = QuestionnaireConfig.core_indicators.select { |i| i[:dimension] == dim[:key] } %>
+            <% dim_indicators.each do |ind| %>
+              <% value = @calculator[:indicator_scores][ind[:key]] %>
+              <div class="flex items-center gap-4 px-5 py-2.5 text-sm">
+                <span class="text-earth-600 flex-1"><%= t("#{ind[:i18n_key]}.name") %></span>
+                <% if value %>
+                  <% badge_class = if value >= 8
+                                     "bg-forest-100 text-forest-700"
+                                   elsif value >= 4
+                                     "bg-mustard-100 text-mustard-700"
+                                   else
+                                     "bg-rose-100 text-rose-700"
+                                   end %>
+                  <span class="inline-flex items-center justify-center w-8 h-8 rounded-md text-sm font-semibold <%= badge_class %>">
+                    <%= value %>
+                  </span>
+                <% else %>
+                  <span class="text-earth-300">-</span>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</section>
+
+<%# Actions %>
+<div class="flex items-center gap-4 py-4 border-t border-earth-200">
+  <button type="button" disabled class="px-5 py-2.5 bg-earth-300 text-white font-medium rounded-lg cursor-not-allowed opacity-60">
+    <%= t("buttons.generate_pdf") %>
+  </button>
+  <%= link_to t("forms.back_to_forms"), forms_path, class: "text-sm text-earth-500 hover:text-earth-700" %>
+</div>

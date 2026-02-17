@@ -1,0 +1,637 @@
+en:
+  questionnaire:
+    # ── L1 Categories ─────────────────────────────────────
+    categories:
+      soil: "Soil"
+      water: "Water"
+      biodiversity: "Biodiversity"
+      management: "Management"
+      socioeconomic: "Socioeconomic"
+      resilience: "Resilience"
+
+    # ── Dimensions ────────────────────────────────────────
+    dimensions:
+      soil_health: "Soil Health"
+      soil_management: "Soil Management"
+      water_availability: "Water Availability"
+      water_quality: "Water Quality"
+      water_management: "Water Management"
+      crop_diversity: "Crop Diversity"
+      ecosystem_diversity: "Ecosystem Diversity"
+      farm_planning: "Farm Planning"
+      input_management: "Input Management"
+      animal_management: "Animal Management"
+      economic_viability: "Economic Viability"
+      social_wellbeing: "Social Wellbeing"
+      climate_adaptation: "Climate Adaptation"
+      system_resilience: "System Resilience"
+
+    # ── Indicators ────────────────────────────────────────
+    indicators:
+      # ── Soil > Soil Health ──────────────────────────────
+      soil_coverage:
+        name: "Soil Coverage"
+        description: "Percentage of soil covered by vegetation or mulch"
+        scoring:
+          low: "Less than 30% of soil is covered; bare soil predominates"
+          medium: "30-70% coverage through mulch, crop residue, or living plants"
+          high: "Over 70% coverage year-round with diverse living or dead ground cover"
+      organic_matter_content:
+        name: "Organic Matter Content"
+        description: "Level of organic matter in the topsoil"
+        scoring:
+          low: "Soil appears light-colored and powdery; low humus content"
+          medium: "Moderate organic matter; some decomposing material visible"
+          high: "Rich, dark soil with high humus content and visible decomposition activity"
+      soil_structure:
+        name: "Soil Structure"
+        description: "Aggregation and porosity of the soil"
+        scoring:
+          low: "Soil is compacted or powdery with no visible aggregates"
+          medium: "Some soil aggregation present; moderate porosity"
+          high: "Well-aggregated crumb structure; excellent porosity and water infiltration"
+      soil_erosion:
+        name: "Soil Erosion"
+        description: "Degree of soil loss from wind or water erosion"
+        scoring:
+          low: "Visible erosion channels, exposed roots, or sediment deposits"
+          medium: "Minor erosion signs; some preventive measures in place"
+          high: "No visible erosion; effective conservation practices prevent soil loss"
+      biological_activity:
+        name: "Biological Activity"
+        description: "Presence and diversity of soil organisms"
+        scoring:
+          low: "Few or no visible soil organisms; little decomposition activity"
+          medium: "Some earthworms and organisms present; moderate decomposition"
+          high: "Abundant earthworms, fungi, and microorganism activity; rapid decomposition"
+      soil_compaction:
+        name: "Soil Compaction"
+        description: "Degree of soil compaction affecting root growth and water movement"
+        scoring:
+          low: "Hard, compacted layers present; poor water infiltration and root penetration"
+          medium: "Some compaction in high-traffic areas; moderate infiltration"
+          high: "No compaction; soil is loose with excellent infiltration and root penetration"
+      soil_ph_balance:
+        name: "Soil pH Balance"
+        description: "Soil acidity or alkalinity relative to crop requirements"
+        scoring:
+          low: "Extreme pH levels limiting nutrient availability; no correction measures"
+          medium: "pH somewhat outside optimal range; some amendments applied"
+          high: "pH within optimal range for cultivated crops; regular monitoring and adjustment"
+
+      # ── Soil > Soil Management ──────────────────────────
+      tillage_practices:
+        name: "Tillage Practices"
+        description: "Type and intensity of soil tillage"
+        scoring:
+          low: "Intensive conventional tillage with full inversion of soil layers"
+          medium: "Reduced tillage or minimum tillage in some fields"
+          high: "No-till or conservation tillage across all cultivated areas"
+      cover_cropping:
+        name: "Cover Cropping"
+        description: "Use of cover crops between main crop seasons"
+        scoring:
+          low: "No cover crops used; fields left bare between seasons"
+          medium: "Cover crops on some fields or during some seasons"
+          high: "Systematic cover cropping on all fields with diverse species selection"
+      crop_rotation:
+        name: "Crop Rotation"
+        description: "Diversity and frequency of crop rotation"
+        scoring:
+          low: "Monoculture or minimal rotation with same crop family"
+          medium: "2-3 crop rotation with some diversity"
+          high: "Complex rotation with 4+ crops including legumes and different plant families"
+      composting_practices:
+        name: "Composting Practices"
+        description: "On-farm composting and organic matter recycling"
+        scoring:
+          low: "No composting; organic waste is burned or discarded"
+          medium: "Some composting but irregular or small-scale"
+          high: "Systematic composting of all organic waste with quality monitoring"
+      green_manure_use:
+        name: "Green Manure Use"
+        description: "Incorporation of green manure crops to improve soil fertility"
+        scoring:
+          low: "No green manure crops used"
+          medium: "Occasional green manure in some fields"
+          high: "Regular green manure integrated into rotation with leguminous species"
+
+      # ── Water > Water Availability ──────────────────────
+      water_source_diversity:
+        name: "Water Source Diversity"
+        description: "Number and variety of water sources available"
+        scoring:
+          low: "Single water source; highly dependent on one supply"
+          medium: "Two water sources available for farm use"
+          high: "Three or more diverse sources including wells, springs, rainwater, and surface water"
+      irrigation_system:
+        name: "Irrigation System"
+        description: "Efficiency and appropriateness of irrigation infrastructure"
+        scoring:
+          low: "No irrigation or flood irrigation with high water loss"
+          medium: "Sprinkler or basic furrow irrigation with moderate efficiency"
+          high: "Drip or precision irrigation matched to crop needs with scheduling"
+      water_storage_capacity:
+        name: "Water Storage Capacity"
+        description: "Ability to store water for dry periods"
+        scoring:
+          low: "No water storage; fully dependent on real-time supply"
+          medium: "Some storage capacity covering days to a week of needs"
+          high: "Adequate storage for extended dry periods; ponds, tanks, or reservoirs"
+      rainfall_dependency:
+        name: "Rainfall Dependency"
+        description: "Reliance on rainfall versus managed water sources"
+        scoring:
+          low: "Fully rain-dependent with no supplemental water"
+          medium: "Primarily rain-fed with some supplemental irrigation"
+          high: "Balanced water strategy combining rainfall capture with managed sources"
+
+      # ── Water > Water Quality ───────────────────────────
+      water_contamination_risk:
+        name: "Water Contamination Risk"
+        description: "Risk of water pollution from agricultural or external sources"
+        scoring:
+          low: "High contamination risk; proximity to pollution sources with no protection"
+          medium: "Moderate risk; some protective measures but gaps remain"
+          high: "Low risk; comprehensive protection of water sources from contamination"
+      riparian_buffer_zones:
+        name: "Riparian Buffer Zones"
+        description: "Vegetated areas along waterways that filter runoff"
+        scoring:
+          low: "No buffer zones; crops or livestock extend to water edges"
+          medium: "Narrow buffer zones on some waterways"
+          high: "Wide, diverse buffer zones along all waterways with native vegetation"
+      agrochemical_runoff:
+        name: "Agrochemical Runoff"
+        description: "Risk of fertilizer and pesticide reaching water bodies"
+        scoring:
+          low: "High agrochemical use near waterways with no runoff prevention"
+          medium: "Some measures to reduce runoff; moderate chemical use"
+          high: "Minimal or no agrochemical use; effective runoff prevention measures"
+      water_testing_frequency:
+        name: "Water Testing Frequency"
+        description: "Regularity of water quality monitoring"
+        scoring:
+          low: "No water testing performed"
+          medium: "Occasional testing when problems are suspected"
+          high: "Regular scheduled testing of all water sources with record-keeping"
+
+      # ── Water > Water Management ────────────────────────
+      water_use_efficiency:
+        name: "Water Use Efficiency"
+        description: "How efficiently water is used relative to crop production"
+        scoring:
+          low: "High water waste; no measurement or optimization of water use"
+          medium: "Some water efficiency measures; basic monitoring"
+          high: "Optimized water use with measurement, scheduling, and continuous improvement"
+      drainage_management:
+        name: "Drainage Management"
+        description: "Management of excess water and drainage systems"
+        scoring:
+          low: "Poor drainage causing waterlogging; no drainage infrastructure"
+          medium: "Basic drainage in place; some waterlogging issues persist"
+          high: "Well-designed drainage system preventing waterlogging and managing excess water"
+      water_harvesting:
+        name: "Water Harvesting"
+        description: "Collection and storage of rainwater and runoff"
+        scoring:
+          low: "No water harvesting practices"
+          medium: "Some rainwater collection from buildings or small catchments"
+          high: "Comprehensive water harvesting system with multiple collection points and storage"
+      watershed_participation:
+        name: "Watershed Participation"
+        description: "Engagement in watershed-level water management"
+        scoring:
+          low: "No participation in watershed management activities"
+          medium: "Awareness of watershed issues; occasional participation"
+          high: "Active participation in watershed management organizations and collective actions"
+
+      # ── Biodiversity > Crop Diversity ───────────────────
+      cultivated_species_richness:
+        name: "Cultivated Species Richness"
+        description: "Number of different crop species cultivated"
+        scoring:
+          low: "1-3 crop species grown"
+          medium: "4-8 crop species including some from different families"
+          high: "9+ crop species from diverse plant families throughout the year"
+      varietal_diversity:
+        name: "Varietal Diversity"
+        description: "Use of multiple varieties within crop species"
+        scoring:
+          low: "Single commercial variety per crop"
+          medium: "2-3 varieties per major crop"
+          high: "Multiple varieties per crop including local and adapted selections"
+      native_crop_varieties:
+        name: "Native Crop Varieties"
+        description: "Cultivation of locally adapted and heritage varieties"
+        scoring:
+          low: "No native or heritage varieties cultivated"
+          medium: "Some native varieties maintained alongside commercial ones"
+          high: "Active conservation and cultivation of diverse native and heritage varieties"
+      polyculture_practices:
+        name: "Polyculture Practices"
+        description: "Growing multiple crops together in the same space"
+        scoring:
+          low: "Strict monoculture in all fields"
+          medium: "Some intercropping or companion planting in parts of the farm"
+          high: "Widespread polyculture with designed plant associations and synergies"
+      seed_sovereignty:
+        name: "Seed Sovereignty"
+        description: "Ability to save, select, and produce own seeds"
+        scoring:
+          low: "All seeds purchased; no on-farm seed saving"
+          medium: "Some seeds saved for a few crops"
+          high: "Systematic seed saving and selection for most crops; participates in seed networks"
+
+      # ── Biodiversity > Ecosystem Diversity ──────────────
+      natural_habitat_area:
+        name: "Natural Habitat Area"
+        description: "Proportion of farm maintained as natural or semi-natural habitat"
+        scoring:
+          low: "Less than 5% of farm area in natural habitat"
+          medium: "5-15% of farm area maintained as natural habitat"
+          high: "Over 15% of farm in diverse natural habitats including forest, wetland, and grassland"
+      habitat_connectivity:
+        name: "Habitat Connectivity"
+        description: "Linkages between habitat patches on and around the farm"
+        scoring:
+          low: "Isolated habitat fragments with no connecting corridors"
+          medium: "Some hedgerows or strips connecting habitat areas"
+          high: "Well-connected habitat network with diverse corridors linking farm and landscape"
+      pollinator_presence:
+        name: "Pollinator Presence"
+        description: "Abundance and diversity of pollinating insects"
+        scoring:
+          low: "Few pollinators observed; limited flowering resources"
+          medium: "Moderate pollinator activity; some flowering plants present"
+          high: "Abundant and diverse pollinators; year-round flowering resources provided"
+      beneficial_insect_habitat:
+        name: "Beneficial Insect Habitat"
+        description: "Provision of habitat for pest-controlling insects"
+        scoring:
+          low: "No dedicated habitat for beneficial insects"
+          medium: "Some flower strips or refugia for beneficial insects"
+          high: "Diverse insectary plantings and habitat features throughout the farm"
+      agroforestry_integration:
+        name: "Agroforestry Integration"
+        description: "Integration of trees and shrubs into the farming system"
+        scoring:
+          low: "No trees on cultivated land; cleared landscape"
+          medium: "Some scattered trees or boundary plantings"
+          high: "Designed agroforestry system with productive and ecological tree integration"
+      wildlife_corridors:
+        name: "Wildlife Corridors"
+        description: "Presence of pathways for wildlife movement across the farm"
+        scoring:
+          low: "No wildlife corridors; fencing or cultivation blocks animal movement"
+          medium: "Some unmanaged areas allow limited wildlife passage"
+          high: "Planned wildlife corridors connecting habitats with appropriate vegetation"
+
+      # ── Management > Farm Planning ─────────────────────
+      production_planning:
+        name: "Production Planning"
+        description: "Systematic planning of crop cycles and production goals"
+        scoring:
+          low: "No written plan; decisions made reactively"
+          medium: "Basic seasonal plan with some documented goals"
+          high: "Comprehensive annual plan with crop calendars, goals, and regular review"
+      record_keeping:
+        name: "Record Keeping"
+        description: "Documentation of farm activities, inputs, and outputs"
+        scoring:
+          low: "No records kept of farm activities"
+          medium: "Some records of main activities and expenses"
+          high: "Detailed records of all activities, inputs, outputs, and observations"
+      financial_management:
+        name: "Financial Management"
+        description: "Tracking and management of farm finances"
+        scoring:
+          low: "No financial tracking; unable to assess profitability"
+          medium: "Basic income and expense tracking"
+          high: "Complete financial records with cost analysis per crop and enterprise"
+      risk_assessment:
+        name: "Risk Assessment"
+        description: "Identification and management of farm risks"
+        scoring:
+          low: "No risk assessment; unaware of major vulnerabilities"
+          medium: "Some risks identified but no formal mitigation plan"
+          high: "Systematic risk assessment with documented mitigation strategies"
+      technology_adoption:
+        name: "Technology Adoption"
+        description: "Appropriate use of technology to improve farm operations"
+        scoring:
+          low: "No technology use; reliance on traditional methods only"
+          medium: "Some appropriate technology adopted for key operations"
+          high: "Strategic technology use improving efficiency while maintaining ecological practices"
+
+      # ── Management > Input Management ───────────────────
+      synthetic_fertilizer_dependency:
+        name: "Synthetic Fertilizer Dependency"
+        description: "Reliance on synthetic fertilizers versus organic alternatives"
+        scoring:
+          low: "Heavy reliance on synthetic fertilizers for all crops"
+          medium: "Mixed use of synthetic and organic fertilizers"
+          high: "No synthetic fertilizers; fertility managed through organic and biological means"
+      pesticide_use:
+        name: "Pesticide Use"
+        description: "Type and extent of pesticide application"
+        scoring:
+          low: "Routine calendar-based application of synthetic pesticides"
+          medium: "Reduced pesticide use with some integrated pest management"
+          high: "No synthetic pesticides; fully integrated pest management approach"
+      biological_pest_control:
+        name: "Biological Pest Control"
+        description: "Use of biological organisms for pest management"
+        scoring:
+          low: "No biological pest control methods used"
+          medium: "Some biological control agents or practices used"
+          high: "Comprehensive biological control program with habitat management for beneficials"
+      local_input_sourcing:
+        name: "Local Input Sourcing"
+        description: "Proportion of farm inputs sourced locally"
+        scoring:
+          low: "Most inputs purchased from distant suppliers"
+          medium: "Some inputs sourced locally or produced on-farm"
+          high: "Majority of inputs sourced locally or produced on-farm; minimal external dependency"
+      energy_efficiency:
+        name: "Energy Efficiency"
+        description: "Efficiency of energy use on the farm"
+        scoring:
+          low: "High energy consumption with no efficiency measures"
+          medium: "Some energy-saving practices; moderate fossil fuel use"
+          high: "Optimized energy use with renewable sources and efficient equipment"
+
+      # ── Management > Animal Management ──────────────────
+      livestock_integration:
+        name: "Livestock Integration"
+        description: "Integration of animals into the cropping system"
+        scoring:
+          low: "No livestock or livestock completely separated from crops"
+          medium: "Some integration of livestock with crop production"
+          high: "Well-designed crop-livestock integration with nutrient cycling and mutual benefits"
+      animal_welfare:
+        name: "Animal Welfare"
+        description: "Standard of care and living conditions for farm animals"
+        scoring:
+          low: "Confined conditions; limited access to outdoors or natural behavior"
+          medium: "Adequate space and some access to outdoor areas"
+          high: "High welfare standards; free-range, natural behavior, and stress-free management"
+      grazing_management:
+        name: "Grazing Management"
+        description: "Management of grazing patterns and pasture health"
+        scoring:
+          low: "Continuous grazing leading to overgrazing and degradation"
+          medium: "Some rotational grazing with basic pasture management"
+          high: "Planned rotational grazing with rest periods optimizing pasture health"
+      animal_health_practices:
+        name: "Animal Health Practices"
+        description: "Approach to maintaining animal health"
+        scoring:
+          low: "Reactive treatment only; routine antibiotic use; no preventive care"
+          medium: "Basic preventive care; reduced antibiotic use"
+          high: "Holistic health management emphasizing prevention, nutrition, and natural remedies"
+      manure_management:
+        name: "Manure Management"
+        description: "Handling and utilization of animal manure"
+        scoring:
+          low: "Manure causes pollution; no composting or management system"
+          medium: "Basic manure collection with some composting"
+          high: "Systematic manure composting and application optimizing nutrient cycling"
+
+      # ── Socioeconomic > Economic Viability ──────────────
+      income_diversification:
+        name: "Income Diversification"
+        description: "Variety of income sources from the farm"
+        scoring:
+          low: "Single crop or product as the only income source"
+          medium: "2-3 income sources from different farm products"
+          high: "Multiple diversified income streams including products, services, and value-added goods"
+      market_access:
+        name: "Market Access"
+        description: "Ability to reach and sell in different markets"
+        scoring:
+          low: "Limited to a single buyer or middleman"
+          medium: "Access to 2-3 market channels"
+          high: "Multiple market channels including direct, wholesale, and specialty markets"
+      value_added_products:
+        name: "Value-Added Products"
+        description: "Processing or transformation of raw products for higher value"
+        scoring:
+          low: "All products sold as raw commodities"
+          medium: "Some basic processing or packaging of products"
+          high: "Diverse value-added products with branding and direct market relationships"
+      fair_pricing:
+        name: "Fair Pricing"
+        description: "Ability to receive fair prices that cover production costs"
+        scoring:
+          low: "Prices dictated by buyers; often below production costs"
+          medium: "Prices generally cover costs with small margins"
+          high: "Consistently fair prices through direct sales, contracts, or certification premiums"
+      direct_sales_channels:
+        name: "Direct Sales Channels"
+        description: "Ability to sell directly to consumers"
+        scoring:
+          low: "No direct sales; fully dependent on intermediaries"
+          medium: "Some direct sales at markets or farm gate"
+          high: "Established direct sales channels including farm store, CSA, or online sales"
+      production_cost_management:
+        name: "Production Cost Management"
+        description: "Tracking and optimization of production costs"
+        scoring:
+          low: "No cost tracking; unaware of per-unit production costs"
+          medium: "Basic cost awareness; some measures to reduce expenses"
+          high: "Detailed cost tracking per enterprise with continuous optimization"
+
+      # ── Socioeconomic > Social Wellbeing ────────────────
+      labor_conditions:
+        name: "Labor Conditions"
+        description: "Working conditions for farm workers"
+        scoring:
+          low: "Poor working conditions; no formal agreements or safety measures"
+          medium: "Basic labor standards met; some formal agreements"
+          high: "Excellent conditions with fair wages, safety measures, and worker development"
+      gender_equity:
+        name: "Gender Equity"
+        description: "Equal participation and decision-making across genders"
+        scoring:
+          low: "Decision-making concentrated in one gender; unequal access to resources"
+          medium: "Some gender balance in participation but gaps in decision-making"
+          high: "Equal participation, decision-making, and access to resources across genders"
+      community_engagement:
+        name: "Community Engagement"
+        description: "Participation in and contribution to the local community"
+        scoring:
+          low: "Isolated farm with no community involvement"
+          medium: "Some participation in community activities or organizations"
+          high: "Active community leadership; farm hosts events, education, or shared resources"
+      knowledge_sharing:
+        name: "Knowledge Sharing"
+        description: "Exchange of knowledge with other farmers and institutions"
+        scoring:
+          low: "No knowledge exchange with other farmers or institutions"
+          medium: "Occasional participation in workshops or farmer groups"
+          high: "Active in farmer networks; teaches and learns regularly; hosts farm visits"
+      food_sovereignty:
+        name: "Food Sovereignty"
+        description: "Contribution to local food security and self-sufficiency"
+        scoring:
+          low: "Farm produces only export or cash crops; household buys all food"
+          medium: "Some food produced for household consumption"
+          high: "Significant food production for household and local community; diverse food crops"
+      youth_involvement:
+        name: "Youth Involvement"
+        description: "Engagement of young people in farm activities and decision-making"
+        scoring:
+          low: "No youth interest or involvement; no succession plan"
+          medium: "Some youth participation in farm activities"
+          high: "Active youth engagement with training, responsibility, and interest in continuation"
+
+      # ── Resilience > Climate Adaptation ─────────────────
+      drought_preparedness:
+        name: "Drought Preparedness"
+        description: "Ability to cope with and recover from drought conditions"
+        scoring:
+          low: "No drought preparation; severe impacts during dry periods"
+          medium: "Some water reserves and drought-tolerant crops"
+          high: "Comprehensive drought strategy including water storage, tolerant varieties, and soil management"
+      flood_management:
+        name: "Flood Management"
+        description: "Preparedness for and management of excess water events"
+        scoring:
+          low: "No flood preparedness; significant crop loss during heavy rains"
+          medium: "Basic drainage and some flood mitigation measures"
+          high: "Designed landscape and infrastructure managing excess water effectively"
+      microclimate_management:
+        name: "Microclimate Management"
+        description: "Use of landscape features to moderate climate extremes"
+        scoring:
+          low: "No microclimate management; exposed and unprotected fields"
+          medium: "Some windbreaks or shade structures in place"
+          high: "Designed microclimate management with windbreaks, shade, and thermal buffers"
+      climate_observation:
+        name: "Climate Observation"
+        description: "Monitoring and recording of climate patterns"
+        scoring:
+          low: "No climate monitoring or weather awareness"
+          medium: "Basic weather awareness; some seasonal planning"
+          high: "Systematic climate monitoring with data-driven adaptive management"
+      adaptive_capacity:
+        name: "Adaptive Capacity"
+        description: "Ability to adjust farming practices in response to change"
+        scoring:
+          low: "Rigid practices; unable or unwilling to change approach"
+          medium: "Some willingness to adapt; slow response to changes"
+          high: "Proactive adaptation; continuously experimenting and adjusting to conditions"
+      heat_stress_management:
+        name: "Heat Stress Management"
+        description: "Protection of crops and animals from extreme heat"
+        scoring:
+          low: "No measures to mitigate heat stress on crops or livestock"
+          medium: "Some shade or cooling measures for animals; heat-tolerant varieties"
+          high: "Comprehensive heat management with shade, mulching, scheduling, and adapted varieties"
+
+      # ── Resilience > System Resilience ──────────────────
+      supply_chain_independence:
+        name: "Supply Chain Independence"
+        description: "Degree of self-sufficiency in farm inputs"
+        scoring:
+          low: "Fully dependent on external supply chains for critical inputs"
+          medium: "Some on-farm production of inputs; moderate external dependency"
+          high: "High self-sufficiency in seeds, fertility, pest management, and energy"
+      resource_recycling:
+        name: "Resource Recycling"
+        description: "On-farm cycling of nutrients, water, and organic matter"
+        scoring:
+          low: "Linear resource use; waste exported or discarded"
+          medium: "Some resource recycling and reuse on farm"
+          high: "Closed-loop systems maximizing nutrient cycling and waste reduction"
+      ecosystem_services:
+        name: "Ecosystem Services"
+        description: "Farm contribution to broader ecosystem functions"
+        scoring:
+          low: "Farm degrades ecosystem services; net negative environmental impact"
+          medium: "Some positive contributions alongside negative impacts"
+          high: "Farm enhances carbon storage, water regulation, pollination, and biodiversity"
+      disaster_recovery_plan:
+        name: "Disaster Recovery Plan"
+        description: "Preparedness for recovering from natural disasters"
+        scoring:
+          low: "No disaster plan; recovery is slow and financially devastating"
+          medium: "Basic insurance or savings; some recovery planning"
+          high: "Comprehensive plan with insurance, diversified income, and community support network"
+      infrastructure_resilience:
+        name: "Infrastructure Resilience"
+        description: "Durability of farm infrastructure against extreme events"
+        scoring:
+          low: "Fragile infrastructure frequently damaged by weather events"
+          medium: "Moderate infrastructure quality; some vulnerability to extremes"
+          high: "Robust infrastructure designed to withstand local climate extremes"
+      succession_planning:
+        name: "Succession Planning"
+        description: "Plans for farm continuity across generations"
+        scoring:
+          low: "No succession plan; farm future uncertain"
+          medium: "Informal discussions about farm succession"
+          high: "Clear succession plan with next generation prepared and engaged"
+
+      # ── Chile Extension Indicators ──────────────────────
+      water_rights_status:
+        name: "Water Rights Status"
+        description: "Legal status and security of water access rights"
+        scoring:
+          low: "No formal water rights; access is informal or disputed"
+          medium: "Some water rights secured but incomplete or contested"
+          high: "All necessary water rights legally secured and registered"
+      indigenous_land_recognition:
+        name: "Indigenous Land Recognition"
+        description: "Recognition of and respect for indigenous territorial rights"
+        scoring:
+          low: "No awareness of indigenous land claims or cultural significance"
+          medium: "Awareness of indigenous context; some engagement with communities"
+          high: "Active respect for indigenous rights; collaborative relationships with indigenous communities"
+      native_forest_protection:
+        name: "Native Forest Protection"
+        description: "Conservation of native forest areas on or near the farm"
+        scoring:
+          low: "Native forest cleared or degraded; no protection measures"
+          medium: "Some native forest retained with basic protection"
+          high: "Native forest actively conserved and expanded in compliance with regulations"
+      sag_compliance:
+        name: "SAG Compliance"
+        description: "Compliance with Chile's Agricultural and Livestock Service regulations"
+        scoring:
+          low: "Non-compliant with SAG regulations; no registrations"
+          medium: "Basic compliance with major SAG requirements"
+          high: "Full SAG compliance including registrations, inspections, and record-keeping"
+      indap_program_participation:
+        name: "INDAP Program Participation"
+        description: "Engagement with Chile's smallholder agricultural development agency"
+        scoring:
+          low: "No engagement with INDAP programs or support"
+          medium: "Received some INDAP support or participated in programs"
+          high: "Active participant in INDAP programs with ongoing technical assistance"
+      desertification_mitigation:
+        name: "Desertification Mitigation"
+        description: "Actions to prevent and reverse land degradation in dry zones"
+        scoring:
+          low: "No measures against desertification; land degradation advancing"
+          medium: "Some soil conservation and vegetation measures in place"
+          high: "Comprehensive desertification prevention with revegetation and soil restoration"
+      campesino_seed_networks:
+        name: "Campesino Seed Networks"
+        description: "Participation in traditional farmer seed exchange networks"
+        scoring:
+          low: "No participation in seed networks; all seeds commercially purchased"
+          medium: "Occasional seed exchange with neighboring farmers"
+          high: "Active member of campesino seed networks; contributes to seed fairs and exchanges"
+      earthquake_preparedness:
+        name: "Earthquake Preparedness"
+        description: "Readiness of farm infrastructure for seismic events"
+        scoring:
+          low: "No seismic preparedness; infrastructure highly vulnerable"
+          medium: "Some structural reinforcements; basic emergency supplies"
+          high: "Infrastructure built to seismic standards; emergency plan and supplies in place"
+
+    # ── Extensions ────────────────────────────────────────
+    extensions:
+      chile: "Chile"

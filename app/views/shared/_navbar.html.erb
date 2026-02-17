@@ -1,0 +1,84 @@
+<nav class="bg-white border-b border-earth-200" data-controller="navbar">
+  <div class="max-w-5xl mx-auto px-4">
+    <div class="flex items-center justify-between h-14">
+      <!-- Logo -->
+      <div class="flex items-center space-x-6">
+        <%= link_to "Predium", root_path, class: "text-forest-700 font-bold text-xl tracking-tight" %>
+
+        <div class="hidden md:flex items-center space-x-4">
+          <%= link_to t("nav.my_forms"), root_path,
+              class: "text-sm text-earth-700 hover:text-forest-600 transition-colors #{request.path == root_path ? 'text-forest-700 font-medium' : ''}" %>
+          <%= link_to t("nav.profile"), profile_path,
+              class: "text-sm text-earth-700 hover:text-forest-600 transition-colors #{request.path == profile_path ? 'text-forest-700 font-medium' : ''}" %>
+          <% if current_user.super_admin? %>
+            <%= link_to t("nav.admin"), admin_root_path,
+                class: "text-sm text-earth-700 hover:text-forest-600 transition-colors" %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Right side -->
+      <div class="hidden md:flex items-center space-x-4">
+        <!-- Locale switcher -->
+        <div class="flex items-center space-x-1 text-sm text-earth-500">
+          <% I18n.available_locales.each_with_index do |loc, i| %>
+            <% if i > 0 %><span class="text-earth-300">|</span><% end %>
+            <% if loc == I18n.locale %>
+              <span class="font-medium text-forest-700"><%= loc.to_s.upcase %></span>
+            <% else %>
+              <%= link_to loc.to_s.upcase, url_for(locale: loc),
+                  class: "hover:text-forest-600 transition-colors" %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <span class="text-sm text-earth-600"><%= current_user.first_name %></span>
+
+        <%= button_to t("nav.sign_out"), destroy_user_session_path,
+            method: :delete,
+            class: "text-sm text-earth-500 hover:text-forest-600 transition-colors cursor-pointer" %>
+      </div>
+
+      <!-- Mobile hamburger -->
+      <button class="md:hidden text-earth-600 hover:text-forest-700"
+              data-action="navbar#toggle"
+              aria-label="Toggle menu">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  <div class="md:hidden hidden" data-navbar-target="menu">
+    <div class="px-4 py-3 space-y-2 border-t border-earth-200 bg-white">
+      <%= link_to t("nav.my_forms"), root_path,
+          class: "block text-sm text-earth-700 hover:text-forest-600 py-1" %>
+      <%= link_to t("nav.profile"), profile_path,
+          class: "block text-sm text-earth-700 hover:text-forest-600 py-1" %>
+      <% if current_user.super_admin? %>
+        <%= link_to t("nav.admin"), admin_root_path,
+            class: "block text-sm text-earth-700 hover:text-forest-600 py-1" %>
+      <% end %>
+
+      <div class="pt-2 border-t border-earth-100 flex items-center justify-between">
+        <div class="flex items-center space-x-1 text-sm text-earth-500">
+          <% I18n.available_locales.each_with_index do |loc, i| %>
+            <% if i > 0 %><span class="text-earth-300">|</span><% end %>
+            <% if loc == I18n.locale %>
+              <span class="font-medium text-forest-700"><%= loc.to_s.upcase %></span>
+            <% else %>
+              <%= link_to loc.to_s.upcase, url_for(locale: loc),
+                  class: "hover:text-forest-600 transition-colors" %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <%= button_to t("nav.sign_out"), destroy_user_session_path,
+            method: :delete,
+            class: "text-sm text-earth-500 hover:text-forest-600 cursor-pointer" %>
+      </div>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,31 @@
+<% content_for(:title, t("labels.invite_member")) %>
+
+<div class="max-w-lg mx-auto">
+  <h1 class="text-xl font-bold text-earth-900 mb-6"><%= t("labels.invite_to_org", org: @organization.name) %></h1>
+
+  <div class="bg-white rounded-lg shadow-sm border border-earth-200 p-6">
+    <%= form_with url: organization_invitations_path(@organization), scope: :invitation, method: :post do |f| %>
+      <div class="space-y-4">
+        <div>
+          <%= f.label :email, t("labels.email"), class: "block text-sm font-medium text-earth-700 mb-1" %>
+          <%= f.email_field :email, required: true, autofocus: true, autocomplete: "email",
+              placeholder: "user@example.com",
+              class: "w-full rounded-md border border-earth-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-forest-500" %>
+        </div>
+
+        <div>
+          <%= f.label :role, t("labels.role"), class: "block text-sm font-medium text-earth-700 mb-1" %>
+          <%= f.select :role, [[t("roles.member"), "member"], [t("roles.admin"), "admin"]], {},
+              class: "w-full rounded-md border border-earth-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-forest-500" %>
+        </div>
+
+        <div class="flex items-center justify-between pt-2">
+          <%= link_to t("buttons.cancel"), organization_memberships_path(@organization),
+              class: "text-sm text-earth-500 hover:text-earth-700 transition-colors" %>
+          <%= f.submit t("labels.send_invitation"),
+              class: "bg-forest-600 text-white py-2 px-6 rounded-md text-sm font-medium hover:bg-forest-700 transition-colors cursor-pointer" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

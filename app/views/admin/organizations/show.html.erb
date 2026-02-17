@@ -1,0 +1,96 @@
+<% content_for(:page_title, @organization.name) %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-earth-900"><%= @organization.name %></h1>
+    <div class="flex items-center gap-3">
+      <%= link_to t("buttons.edit"), edit_admin_organization_path(@organization),
+          class: "bg-forest-500 hover:bg-forest-600 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors" %>
+      <%= link_to t("buttons.back"), admin_organizations_path,
+          class: "text-sm text-earth-600 hover:text-earth-800" %>
+    </div>
+  </div>
+
+  <!-- Stats cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+    <%= render "admin/shared/stat_card", title: t("admin.members"), value: @members.size %>
+    <%= render "admin/shared/stat_card", title: t("admin.forms"), value: @forms_count %>
+    <%= render "admin/shared/stat_card", title: t("admin.table_created"), value: format_admin_date(@organization.created_at) %>
+  </div>
+
+  <!-- Members -->
+  <div class="bg-white rounded-lg shadow-sm border border-earth-200">
+    <div class="px-6 py-4 border-b border-earth-200">
+      <h2 class="text-lg font-semibold text-earth-900"><%= t("admin.members") %></h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="bg-earth-100">
+            <th class="text-left text-xs font-medium text-earth-700 uppercase tracking-wider px-6 py-3"><%= t("admin.table_name") %></th>
+            <th class="text-left text-xs font-medium text-earth-700 uppercase tracking-wider px-6 py-3"><%= t("admin.table_email") %></th>
+            <th class="text-left text-xs font-medium text-earth-700 uppercase tracking-wider px-6 py-3"><%= t("admin.table_role") %></th>
+            <th class="text-left text-xs font-medium text-earth-700 uppercase tracking-wider px-6 py-3"><%= t("admin.table_joined") %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @members.each do |membership| %>
+            <tr class="hover:bg-earth-50 transition-colors">
+              <td class="px-6 py-3 border-b border-earth-100">
+                <%= link_to "#{membership.user.first_name} #{membership.user.last_name}",
+                    admin_user_path(membership.user),
+                    class: "text-forest-600 hover:text-forest-800 font-medium" %>
+              </td>
+              <td class="px-6 py-3 border-b border-earth-100 text-sm text-earth-700"><%= membership.user.email %></td>
+              <td class="px-6 py-3 border-b border-earth-100"><%= role_badge(membership.role) %></td>
+              <td class="px-6 py-3 border-b border-earth-100 text-sm text-earth-700"><%= format_admin_date(membership.created_at) %></td>
+            </tr>
+          <% end %>
+          <% if @members.empty? %>
+            <tr>
+              <td colspan="4" class="px-6 py-8 text-center text-sm text-earth-500"><%= t("admin.no_members") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Recent Forms -->
+  <div class="bg-white rounded-lg shadow-sm border border-earth-200">
+    <div class="px-6 py-4 border-b border-earth-200">
+      <h2 class="text-lg font-semibold text-earth-900"><%= t("admin.recent_forms") %></h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="bg-earth-100">
+            <th class="text-left text-xs font-medium text-earth-700 uppercase tracking-wider px-6 py-3"><%= t("admin.table_farm_name") %></th>
+            <th class="text-left text-xs font-medium text-earth-700 uppercase tracking-wider px-6 py-3"><%= t("admin.table_user") %></th>
+            <th class="text-left text-xs font-medium text-earth-700 uppercase tracking-wider px-6 py-3"><%= t("admin.table_state") %></th>
+            <th class="text-left text-xs font-medium text-earth-700 uppercase tracking-wider px-6 py-3"><%= t("admin.table_completed") %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @recent_forms.each do |form| %>
+            <tr class="hover:bg-earth-50 transition-colors">
+              <td class="px-6 py-3 border-b border-earth-100">
+                <%= link_to form.name, form_path(form), class: "text-forest-600 hover:text-forest-800 font-medium" %>
+              </td>
+              <td class="px-6 py-3 border-b border-earth-100 text-sm text-earth-700">
+                <%= form.user.first_name %> <%= form.user.last_name %>
+              </td>
+              <td class="px-6 py-3 border-b border-earth-100"><%= role_badge(form.state) %></td>
+              <td class="px-6 py-3 border-b border-earth-100 text-sm text-earth-700"><%= format_admin_date(form.completed_at) %></td>
+            </tr>
+          <% end %>
+          <% if @recent_forms.empty? %>
+            <tr>
+              <td colspan="4" class="px-6 py-8 text-center text-sm text-earth-500"><%= t("admin.no_forms") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

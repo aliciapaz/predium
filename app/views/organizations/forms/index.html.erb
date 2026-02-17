@@ -1,0 +1,75 @@
+<% content_for(:title, "#{@organization.name} — #{t('navigation.forms')}") %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-xl font-bold text-earth-900"><%= @organization.name %> &mdash; <%= t("titles.org_forms") %></h1>
+      <p class="text-sm text-earth-500 mt-1"><%= t("common.total") %>: <%= @forms.size %></p>
+    </div>
+  </div>
+
+  <%# Filter tabs %>
+  <div class="flex items-center space-x-2">
+    <%= link_to t("labels.all"), organization_forms_path(@organization),
+        class: "px-3 py-1.5 text-sm rounded-md font-medium transition-colors #{params[:state].blank? ? 'bg-forest-600 text-white' : 'bg-earth-100 text-earth-600 hover:bg-earth-200'}" %>
+    <%= link_to t("states.draft"), organization_forms_path(@organization, state: "draft"),
+        class: "px-3 py-1.5 text-sm rounded-md font-medium transition-colors #{params[:state] == 'draft' ? 'bg-mustard-400 text-white' : 'bg-earth-100 text-earth-600 hover:bg-earth-200'}" %>
+    <%= link_to t("states.completed"), organization_forms_path(@organization, state: "completed"),
+        class: "px-3 py-1.5 text-sm rounded-md font-medium transition-colors #{params[:state] == 'completed' ? 'bg-forest-600 text-white' : 'bg-earth-100 text-earth-600 hover:bg-earth-200'}" %>
+  </div>
+
+  <%# Search %>
+  <turbo-frame id="org_forms_search">
+    <%= form_with url: organization_forms_path(@organization), method: :get, data: { turbo_frame: "org_forms_results" } do |f| %>
+      <div class="flex items-center space-x-2">
+        <%= f.text_field :search, value: params[:search],
+            placeholder: t("labels.search_farm"),
+            class: "flex-1 rounded-md border border-earth-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-forest-500" %>
+        <%= f.hidden_field :state, value: params[:state] %>
+        <%= f.submit t("labels.search"),
+            class: "bg-forest-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-forest-700 transition-colors cursor-pointer" %>
+      </div>
+    <% end %>
+  </turbo-frame>
+
+  <%# Results %>
+  <turbo-frame id="org_forms_results">
+    <% if @forms.any? %>
+      <div class="bg-white rounded-lg shadow-sm border border-earth-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-earth-200">
+            <thead class="bg-earth-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-earth-500 uppercase tracking-wide"><%= t("labels.name") %></th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-earth-500 uppercase tracking-wide"><%= t("labels.farm_name") %></th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-earth-500 uppercase tracking-wide"><%= t("labels.status") %></th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-earth-500 uppercase tracking-wide"><%= t("labels.location") %></th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-earth-500 uppercase tracking-wide"><%= t("labels.date") %></th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-earth-100">
+              <% @forms.each do |form| %>
+                <tr class="hover:bg-earth-50 transition-colors">
+                  <td class="px-4 py-3 text-sm text-earth-700"><%= form.user.first_name %> <%= form.user.last_name %></td>
+                  <td class="px-4 py-3">
+                    <%= link_to form.name, form_path(form), class: "text-sm font-medium text-forest-700 hover:text-forest-800" %>
+                  </td>
+                  <td class="px-4 py-3">
+                    <% badge_class = form.state == "completed" ? "bg-forest-100 text-forest-800" : "bg-mustard-100 text-mustard-800" %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium <%= badge_class %>">
+                      <%= t("states.#{form.state}") %>
+                    </span>
+                  </td>
+                  <td class="px-4 py-3 text-sm text-earth-600"><%= [form.locality, form.region].compact_blank.join(", ").presence || "—" %></td>
+                  <td class="px-4 py-3 text-sm text-earth-500"><%= l(form.updated_at, format: :short, default: form.updated_at.strftime("%b %d, %Y")) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% else %>
+      <%= render "shared/empty_state", message: t("common.no_results") %>
+    <% end %>
+  </turbo-frame>
+</div>

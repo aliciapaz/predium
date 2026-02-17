@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@theme {
+  /* Earth tones */
+  --color-earth-50: #faf6f1;
+  --color-earth-100: #f0e8db;
+  --color-earth-200: #e0d0b8;
+  --color-earth-300: #c9ad87;
+  --color-earth-400: #b38d5e;
+  --color-earth-500: #9a7548;
+  --color-earth-600: #7d5d3a;
+  --color-earth-700: #5f4630;
+  --color-earth-800: #4a3728;
+  --color-earth-900: #3d2e22;
+
+  /* Forest greens */
+  --color-forest-50: #f0f7f0;
+  --color-forest-100: #dceddc;
+  --color-forest-200: #bcdabc;
+  --color-forest-300: #8bbe8b;
+  --color-forest-400: #5ea05e;
+  --color-forest-500: #348f41;
+  --color-forest-600: #2a7335;
+  --color-forest-700: #225c2b;
+  --color-forest-800: #1d4a24;
+  --color-forest-900: #163d1d;
+
+  /* Mustard accents */
+  --color-mustard-50: #fef9e7;
+  --color-mustard-100: #fdf0c4;
+  --color-mustard-200: #fce791;
+  --color-mustard-300: #f9d85a;
+  --color-mustard-400: #f4b223;
+  --color-mustard-500: #d9960e;
+  --color-mustard-600: #b87509;
+  --color-mustard-700: #8f570b;
+  --color-mustard-800: #754510;
+  --color-mustard-900: #613a12;
+}

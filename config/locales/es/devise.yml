@@ -1,0 +1,62 @@
+es:
+  devise:
+    confirmations:
+      confirmed: "Tu cuenta ha sido confirmada exitosamente."
+      send_instructions: "Recibiras un correo con instrucciones sobre como confirmar tu cuenta en unos minutos."
+      send_paranoid_instructions: "Si tu correo existe en nuestra base de datos, recibiras un correo con instrucciones para confirmar tu cuenta en unos minutos."
+    failure:
+      already_authenticated: "Ya has iniciado sesion."
+      inactive: "Tu cuenta aun no ha sido activada."
+      invalid: "%{authentication_keys} o contrasena invalidos."
+      locked: "Tu cuenta esta bloqueada."
+      last_attempt: "Tienes un intento mas antes de que tu cuenta sea bloqueada."
+      not_found_in_database: "%{authentication_keys} o contrasena invalidos."
+      timeout: "Tu sesion ha expirado. Por favor inicia sesion nuevamente para continuar."
+      unauthenticated: "Necesitas iniciar sesion o registrarte antes de continuar."
+      unconfirmed: "Debes confirmar tu cuenta antes de continuar."
+    mailer:
+      confirmation_instructions:
+        subject: "Instrucciones de confirmacion"
+      reset_password_instructions:
+        subject: "Instrucciones para restablecer tu contrasena"
+      unlock_instructions:
+        subject: "Instrucciones para desbloquear tu cuenta"
+      email_changed:
+        subject: "Correo electronico cambiado"
+      password_change:
+        subject: "Contrasena cambiada"
+    omniauth_callbacks:
+      failure: "No pudimos autenticarte desde %{kind} porque \"%{reason}\"."
+      success: "Autenticado exitosamente desde tu cuenta de %{kind}."
+    passwords:
+      no_token: "No puedes acceder a esta pagina sin venir de un correo de restablecimiento de contrasena. Si vienes de un correo de restablecimiento, asegurate de usar la URL completa proporcionada."
+      send_instructions: "Recibiras un correo con instrucciones sobre como restablecer tu contrasena en unos minutos."
+      send_paranoid_instructions: "Si tu correo existe en nuestra base de datos, recibiras un enlace de recuperacion de contrasena en unos minutos."
+      updated: "Tu contrasena ha sido cambiada exitosamente. Has iniciado sesion."
+      updated_not_active: "Tu contrasena ha sido cambiada exitosamente."
+    registrations:
+      destroyed: "Tu cuenta ha sido cancelada exitosamente. Esperamos verte pronto."
+      signed_up: "Bienvenido! Te has registrado exitosamente."
+      signed_up_but_inactive: "Te has registrado exitosamente. Sin embargo, no pudimos iniciar tu sesion porque tu cuenta aun no esta activada."
+      signed_up_but_locked: "Te has registrado exitosamente. Sin embargo, no pudimos iniciar tu sesion porque tu cuenta esta bloqueada."
+      signed_up_but_unconfirmed: "Se ha enviado un mensaje con un enlace de confirmacion a tu correo. Por favor sigue el enlace para activar tu cuenta."
+      update_needs_confirmation: "Tu cuenta ha sido actualizada exitosamente, pero necesitamos verificar tu nuevo correo. Por favor revisa tu correo y sigue el enlace de confirmacion."
+      updated: "Tu cuenta ha sido actualizada exitosamente."
+    sessions:
+      signed_in: "Sesion iniciada exitosamente."
+      signed_out: "Sesion cerrada exitosamente."
+      already_signed_out: "Sesion cerrada exitosamente."
+    unlocks:
+      send_instructions: "Recibiras un correo con instrucciones sobre como desbloquear tu cuenta en unos minutos."
+      send_paranoid_instructions: "Si tu cuenta existe, recibiras un correo con instrucciones para desbloquearla en unos minutos."
+      unlocked: "Tu cuenta ha sido desbloqueada exitosamente. Por favor inicia sesion para continuar."
+  errors:
+    messages:
+      already_confirmed: "ya fue confirmado, por favor intenta iniciar sesion"
+      confirmation_period_expired: "necesita ser confirmado en un periodo de %{period}, por favor solicita uno nuevo"
+      expired: "ha expirado, por favor solicita uno nuevo"
+      not_found: "no encontrado"
+      not_locked: "no estaba bloqueado"
+      not_saved:
+        one: "1 error impidio guardar este %{resource}:"
+        other: "%{count} errores impidieron guardar este %{resource}:"

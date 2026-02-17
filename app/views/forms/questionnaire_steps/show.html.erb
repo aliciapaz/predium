@@ -1,0 +1,109 @@
+<% content_for(:title, t(@dimension[:i18n_key])) %>
+
+<div class="mb-6">
+  <%= link_to edit_form_path(@form), class: "text-sm text-earth-500 hover:text-earth-700 inline-flex items-center gap-1" do %>
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+    </svg>
+    <%= t("questionnaire.back_to_farm_info") %>
+  <% end %>
+</div>
+
+<%# Progress Bar %>
+<div class="mb-6" data-controller="progress" data-progress-total-value="<%= @total_indicators %>" data-progress-completed-value="<%= @scored_indicators %>">
+  <div class="flex items-center justify-between mb-1.5">
+    <span class="text-sm font-medium text-earth-700"><%= t("questionnaire.overall_progress") %></span>
+    <span class="text-sm text-earth-500" data-progress-target="text"><%= t("questionnaire.indicators_count", answered: @scored_indicators, total: @total_indicators) %></span>
+  </div>
+  <div class="w-full bg-earth-100 rounded-full h-2.5">
+    <div class="bg-forest-500 h-2.5 rounded-full transition-all" data-progress-target="bar"
+         style="width: <%= @total_indicators.positive? ? (@scored_indicators * 100.0 / @total_indicators).round : 0 %>%"></div>
+  </div>
+</div>
+
+<%# Dimension Navigation %>
+<div class="mb-6 overflow-x-auto snap-x snap-mandatory">
+  <nav class="flex gap-1 min-w-max pb-2">
+    <% @all_dimensions.each_with_index do |dim, idx| %>
+      <% completion = @dimension_completion[dim[:key]] %>
+      <% is_current = dim[:key] == @dimension[:key] %>
+      <% all_done = completion[:answered] == completion[:total] %>
+      <% partially_done = completion[:answered] > 0 && !all_done %>
+      <%
+        cls = "snap-start flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap transition-colors "
+        if is_current
+          cls += "bg-forest-600 text-white"
+        elsif all_done
+          cls += "bg-forest-50 text-forest-700 hover:bg-forest-100"
+        elsif partially_done
+          cls += "bg-mustard-50 text-mustard-700 hover:bg-mustard-100"
+        else
+          cls += "bg-earth-100 text-earth-500 hover:bg-earth-200"
+        end
+      %>
+      <%= link_to form_questionnaire_step_path(@form, dim[:key]), class: cls do %>
+        <% if all_done %>
+          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+          </svg>
+        <% elsif partially_done %>
+          <span class="w-2 h-2 rounded-full bg-current"></span>
+        <% end %>
+        <%= t(dim[:i18n_key]) %>
+      <% end %>
+    <% end %>
+  </nav>
+</div>
+
+<%# Dimension Content %>
+<%= form_with url: form_questionnaire_step_path(@form, @dimension[:key]), method: :patch, class: "space-y-6" do %>
+  <h2 class="text-xl font-bold text-earth-900"><%= t(@dimension[:i18n_key]) %></h2>
+  <p class="text-sm text-earth-500">
+    <%= t("questionnaire.dimension_of", current: @current_index + 1, total: @all_dimensions.size) %>
+    &middot;
+    <% dim_completion = @dimension_completion[@dimension[:key]] %>
+    <%= t("questionnaire.answered_count", answered: dim_completion[:answered], total: dim_completion[:total]) %>
+  </p>
+
+  <div class="space-y-8">
+    <% @indicators.each do |indicator| %>
+      <%= render "forms/questionnaire_steps/indicator_field",
+          indicator: indicator,
+          response: @responses[indicator[:key]] %>
+    <% end %>
+  </div>
+
+  <%# Bottom Navigation %>
+  <div class="sticky bottom-0 z-10 bg-earth-50 border-t border-earth-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] -mx-4 px-4 py-4 mt-8 flex items-center justify-between">
+    <div>
+      <% if prev_dimension %>
+        <%= link_to form_questionnaire_step_path(@form, prev_dimension[:key]),
+            class: "inline-flex items-center gap-1 text-sm text-earth-600 hover:text-earth-800" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          <%= t("questionnaire.previous") %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-center gap-3">
+      <% if next_dimension %>
+        <button type="submit" class="inline-flex items-center gap-1 px-5 py-2.5 bg-forest-600 text-white font-medium rounded-lg hover:bg-forest-700 transition-colors shadow-sm cursor-pointer">
+          <%= t("questionnaire.save_continue") %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+      <% else %>
+        <button type="submit" formaction="<%= form_questionnaire_step_path(@form, @dimension[:key]) %>" class="inline-flex items-center gap-1 px-5 py-2.5 bg-earth-600 text-white font-medium rounded-lg hover:bg-earth-700 transition-colors shadow-sm cursor-pointer">
+          <%= t("buttons.save") %>
+        </button>
+        <%= button_to t("questionnaire.complete"),
+            form_completion_path(@form),
+            method: :post,
+            class: "inline-flex items-center gap-1 px-5 py-2.5 bg-forest-600 text-white font-medium rounded-lg hover:bg-forest-700 transition-colors shadow-sm cursor-pointer" %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

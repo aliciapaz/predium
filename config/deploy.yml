@@ -1,0 +1,66 @@
+service: predium
+
+image: ghcr.io/your-org/predium
+
+servers:
+  web:
+    hosts:
+      - YOUR_DROPLET_IP
+    labels:
+      traefik.http.routers.predium.rule: Host(`predium.cl`)
+    options:
+      memory: 512m
+
+proxy:
+  ssl: true
+  host: predium.cl
+
+registry:
+  server: ghcr.io
+  username:
+    - KAMAL_REGISTRY_USERNAME
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+builder:
+  arch: amd64
+
+env:
+  clear:
+    RAILS_ENV: production
+    RAILS_LOG_TO_STDOUT: "1"
+    RAILS_SERVE_STATIC_FILES: "1"
+    SOLID_QUEUE_IN_PUMA: "1"
+  secret:
+    - RAILS_MASTER_KEY
+    - DATABASE_URL
+    - SECRET_KEY_BASE
+
+volumes:
+  - "predium_storage:/rails/storage"
+
+asset_path: /rails/public/assets
+
+readiness_delay: 5
+
+aliases:
+  console: app exec --interactive --reuse "bin/rails console"
+  shell: app exec --interactive --reuse "bash"
+  logs: app logs -f
+  dbc: app exec --interactive --reuse "bin/rails dbconsole --include-password"
+
+accessories:
+  db:
+    image: postgres:16
+    host: YOUR_DROPLET_IP
+    port: "127.0.0.1:5432:5432"
+    env:
+      clear:
+        POSTGRES_DB: predium_production
+      secret:
+        - POSTGRES_USER
+        - POSTGRES_PASSWORD
+    directories:
+      - data:/var/lib/postgresql/data
+    volumes:
+      - "predium_db:/var/lib/postgresql/data"

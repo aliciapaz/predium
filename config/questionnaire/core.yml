@@ -1,0 +1,392 @@
+# Predium v2 — Core Questionnaire Configuration
+# 6 L1 categories, 15 dimensions, 74 L2 indicators
+# See docs/architecture.md ADR-2 for rationale.
+
+categories:
+  # ── L1: Soil ──────────────────────────────────────────────
+  - key: soil
+    i18n_key: questionnaire.categories.soil
+    level: 1
+    position: 1
+    dimensions:
+      - key: soil_health
+        i18n_key: questionnaire.dimensions.soil_health
+        indicators:
+          - key: soil_coverage
+            i18n_key: questionnaire.indicators.soil_coverage
+            level: 2
+            position: 1
+          - key: organic_matter_content
+            i18n_key: questionnaire.indicators.organic_matter_content
+            level: 2
+            position: 2
+          - key: soil_structure
+            i18n_key: questionnaire.indicators.soil_structure
+            level: 2
+            position: 3
+          - key: soil_erosion
+            i18n_key: questionnaire.indicators.soil_erosion
+            level: 2
+            position: 4
+          - key: biological_activity
+            i18n_key: questionnaire.indicators.biological_activity
+            level: 2
+            position: 5
+          - key: soil_compaction
+            i18n_key: questionnaire.indicators.soil_compaction
+            level: 2
+            position: 6
+          - key: soil_ph_balance
+            i18n_key: questionnaire.indicators.soil_ph_balance
+            level: 2
+            position: 7
+
+      - key: soil_management
+        i18n_key: questionnaire.dimensions.soil_management
+        indicators:
+          - key: tillage_practices
+            i18n_key: questionnaire.indicators.tillage_practices
+            level: 2
+            position: 1
+          - key: cover_cropping
+            i18n_key: questionnaire.indicators.cover_cropping
+            level: 2
+            position: 2
+          - key: crop_rotation
+            i18n_key: questionnaire.indicators.crop_rotation
+            level: 2
+            position: 3
+          - key: composting_practices
+            i18n_key: questionnaire.indicators.composting_practices
+            level: 2
+            position: 4
+          - key: green_manure_use
+            i18n_key: questionnaire.indicators.green_manure_use
+            level: 2
+            position: 5
+
+  # ── L1: Water ─────────────────────────────────────────────
+  - key: water
+    i18n_key: questionnaire.categories.water
+    level: 1
+    position: 2
+    dimensions:
+      - key: water_availability
+        i18n_key: questionnaire.dimensions.water_availability
+        indicators:
+          - key: water_source_diversity
+            i18n_key: questionnaire.indicators.water_source_diversity
+            level: 2
+            position: 1
+          - key: irrigation_system
+            i18n_key: questionnaire.indicators.irrigation_system
+            level: 2
+            position: 2
+          - key: water_storage_capacity
+            i18n_key: questionnaire.indicators.water_storage_capacity
+            level: 2
+            position: 3
+          - key: rainfall_dependency
+            i18n_key: questionnaire.indicators.rainfall_dependency
+            level: 2
+            position: 4
+
+      - key: water_quality
+        i18n_key: questionnaire.dimensions.water_quality
+        indicators:
+          - key: water_contamination_risk
+            i18n_key: questionnaire.indicators.water_contamination_risk
+            level: 2
+            position: 1
+          - key: riparian_buffer_zones
+            i18n_key: questionnaire.indicators.riparian_buffer_zones
+            level: 2
+            position: 2
+          - key: agrochemical_runoff
+            i18n_key: questionnaire.indicators.agrochemical_runoff
+            level: 2
+            position: 3
+          - key: water_testing_frequency
+            i18n_key: questionnaire.indicators.water_testing_frequency
+            level: 2
+            position: 4
+
+      - key: water_management
+        i18n_key: questionnaire.dimensions.water_management
+        indicators:
+          - key: water_use_efficiency
+            i18n_key: questionnaire.indicators.water_use_efficiency
+            level: 2
+            position: 1
+          - key: drainage_management
+            i18n_key: questionnaire.indicators.drainage_management
+            level: 2
+            position: 2
+          - key: water_harvesting
+            i18n_key: questionnaire.indicators.water_harvesting
+            level: 2
+            position: 3
+          - key: watershed_participation
+            i18n_key: questionnaire.indicators.watershed_participation
+            level: 2
+            position: 4
+
+  # ── L1: Biodiversity ──────────────────────────────────────
+  - key: biodiversity
+    i18n_key: questionnaire.categories.biodiversity
+    level: 1
+    position: 3
+    dimensions:
+      - key: crop_diversity
+        i18n_key: questionnaire.dimensions.crop_diversity
+        indicators:
+          - key: cultivated_species_richness
+            i18n_key: questionnaire.indicators.cultivated_species_richness
+            level: 2
+            position: 1
+          - key: varietal_diversity
+            i18n_key: questionnaire.indicators.varietal_diversity
+            level: 2
+            position: 2
+          - key: native_crop_varieties
+            i18n_key: questionnaire.indicators.native_crop_varieties
+            level: 2
+            position: 3
+          - key: polyculture_practices
+            i18n_key: questionnaire.indicators.polyculture_practices
+            level: 2
+            position: 4
+          - key: seed_sovereignty
+            i18n_key: questionnaire.indicators.seed_sovereignty
+            level: 2
+            position: 5
+
+      - key: ecosystem_diversity
+        i18n_key: questionnaire.dimensions.ecosystem_diversity
+        indicators:
+          - key: natural_habitat_area
+            i18n_key: questionnaire.indicators.natural_habitat_area
+            level: 2
+            position: 1
+          - key: habitat_connectivity
+            i18n_key: questionnaire.indicators.habitat_connectivity
+            level: 2
+            position: 2
+          - key: pollinator_presence
+            i18n_key: questionnaire.indicators.pollinator_presence
+            level: 2
+            position: 3
+          - key: beneficial_insect_habitat
+            i18n_key: questionnaire.indicators.beneficial_insect_habitat
+            level: 2
+            position: 4
+          - key: agroforestry_integration
+            i18n_key: questionnaire.indicators.agroforestry_integration
+            level: 2
+            position: 5
+          - key: wildlife_corridors
+            i18n_key: questionnaire.indicators.wildlife_corridors
+            level: 2
+            position: 6
+
+  # ── L1: Management ────────────────────────────────────────
+  - key: management
+    i18n_key: questionnaire.categories.management
+    level: 1
+    position: 4
+    dimensions:
+      - key: farm_planning
+        i18n_key: questionnaire.dimensions.farm_planning
+        indicators:
+          - key: production_planning
+            i18n_key: questionnaire.indicators.production_planning
+            level: 2
+            position: 1
+          - key: record_keeping
+            i18n_key: questionnaire.indicators.record_keeping
+            level: 2
+            position: 2
+          - key: financial_management
+            i18n_key: questionnaire.indicators.financial_management
+            level: 2
+            position: 3
+          - key: risk_assessment
+            i18n_key: questionnaire.indicators.risk_assessment
+            level: 2
+            position: 4
+          - key: technology_adoption
+            i18n_key: questionnaire.indicators.technology_adoption
+            level: 2
+            position: 5
+
+      - key: input_management
+        i18n_key: questionnaire.dimensions.input_management
+        indicators:
+          - key: synthetic_fertilizer_dependency
+            i18n_key: questionnaire.indicators.synthetic_fertilizer_dependency
+            level: 2
+            position: 1
+          - key: pesticide_use
+            i18n_key: questionnaire.indicators.pesticide_use
+            level: 2
+            position: 2
+          - key: biological_pest_control
+            i18n_key: questionnaire.indicators.biological_pest_control
+            level: 2
+            position: 3
+          - key: local_input_sourcing
+            i18n_key: questionnaire.indicators.local_input_sourcing
+            level: 2
+            position: 4
+          - key: energy_efficiency
+            i18n_key: questionnaire.indicators.energy_efficiency
+            level: 2
+            position: 5
+
+      - key: animal_management
+        i18n_key: questionnaire.dimensions.animal_management
+        indicators:
+          - key: livestock_integration
+            i18n_key: questionnaire.indicators.livestock_integration
+            level: 2
+            position: 1
+          - key: animal_welfare
+            i18n_key: questionnaire.indicators.animal_welfare
+            level: 2
+            position: 2
+          - key: grazing_management
+            i18n_key: questionnaire.indicators.grazing_management
+            level: 2
+            position: 3
+          - key: animal_health_practices
+            i18n_key: questionnaire.indicators.animal_health_practices
+            level: 2
+            position: 4
+          - key: manure_management
+            i18n_key: questionnaire.indicators.manure_management
+            level: 2
+            position: 5
+
+  # ── L1: Socioeconomic ─────────────────────────────────────
+  - key: socioeconomic
+    i18n_key: questionnaire.categories.socioeconomic
+    level: 1
+    position: 5
+    dimensions:
+      - key: economic_viability
+        i18n_key: questionnaire.dimensions.economic_viability
+        indicators:
+          - key: income_diversification
+            i18n_key: questionnaire.indicators.income_diversification
+            level: 2
+            position: 1
+          - key: market_access
+            i18n_key: questionnaire.indicators.market_access
+            level: 2
+            position: 2
+          - key: value_added_products
+            i18n_key: questionnaire.indicators.value_added_products
+            level: 2
+            position: 3
+          - key: fair_pricing
+            i18n_key: questionnaire.indicators.fair_pricing
+            level: 2
+            position: 4
+          - key: direct_sales_channels
+            i18n_key: questionnaire.indicators.direct_sales_channels
+            level: 2
+            position: 5
+          - key: production_cost_management
+            i18n_key: questionnaire.indicators.production_cost_management
+            level: 2
+            position: 6
+
+      - key: social_wellbeing
+        i18n_key: questionnaire.dimensions.social_wellbeing
+        indicators:
+          - key: labor_conditions
+            i18n_key: questionnaire.indicators.labor_conditions
+            level: 2
+            position: 1
+          - key: gender_equity
+            i18n_key: questionnaire.indicators.gender_equity
+            level: 2
+            position: 2
+          - key: community_engagement
+            i18n_key: questionnaire.indicators.community_engagement
+            level: 2
+            position: 3
+          - key: knowledge_sharing
+            i18n_key: questionnaire.indicators.knowledge_sharing
+            level: 2
+            position: 4
+          - key: food_sovereignty
+            i18n_key: questionnaire.indicators.food_sovereignty
+            level: 2
+            position: 5
+          - key: youth_involvement
+            i18n_key: questionnaire.indicators.youth_involvement
+            level: 2
+            position: 6
+
+  # ── L1: Resilience ────────────────────────────────────────
+  - key: resilience
+    i18n_key: questionnaire.categories.resilience
+    level: 1
+    position: 6
+    dimensions:
+      - key: climate_adaptation
+        i18n_key: questionnaire.dimensions.climate_adaptation
+        indicators:
+          - key: drought_preparedness
+            i18n_key: questionnaire.indicators.drought_preparedness
+            level: 2
+            position: 1
+          - key: flood_management
+            i18n_key: questionnaire.indicators.flood_management
+            level: 2
+            position: 2
+          - key: microclimate_management
+            i18n_key: questionnaire.indicators.microclimate_management
+            level: 2
+            position: 3
+          - key: climate_observation
+            i18n_key: questionnaire.indicators.climate_observation
+            level: 2
+            position: 4
+          - key: adaptive_capacity
+            i18n_key: questionnaire.indicators.adaptive_capacity
+            level: 2
+            position: 5
+          - key: heat_stress_management
+            i18n_key: questionnaire.indicators.heat_stress_management
+            level: 2
+            position: 6
+
+      - key: system_resilience
+        i18n_key: questionnaire.dimensions.system_resilience
+        indicators:
+          - key: supply_chain_independence
+            i18n_key: questionnaire.indicators.supply_chain_independence
+            level: 2
+            position: 1
+          - key: resource_recycling
+            i18n_key: questionnaire.indicators.resource_recycling
+            level: 2
+            position: 2
+          - key: ecosystem_services
+            i18n_key: questionnaire.indicators.ecosystem_services
+            level: 2
+            position: 3
+          - key: disaster_recovery_plan
+            i18n_key: questionnaire.indicators.disaster_recovery_plan
+            level: 2
+            position: 4
+          - key: infrastructure_resilience
+            i18n_key: questionnaire.indicators.infrastructure_resilience
+            level: 2
+            position: 5
+          - key: succession_planning
+            i18n_key: questionnaire.indicators.succession_planning
+            level: 2
+            position: 6

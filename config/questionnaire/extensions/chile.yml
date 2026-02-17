@@ -1,0 +1,54 @@
+# Chile Territory Extension
+# Additional indicators specific to Chilean agricultural context.
+
+territory: chile
+i18n_key: questionnaire.extensions.chile
+
+indicators:
+  - key: water_rights_status
+    dimension: water_availability
+    i18n_key: questionnaire.indicators.water_rights_status
+    level: 2
+    position: 1
+
+  - key: indigenous_land_recognition
+    dimension: social_wellbeing
+    i18n_key: questionnaire.indicators.indigenous_land_recognition
+    level: 2
+    position: 2
+
+  - key: native_forest_protection
+    dimension: ecosystem_diversity
+    i18n_key: questionnaire.indicators.native_forest_protection
+    level: 2
+    position: 3
+
+  - key: sag_compliance
+    dimension: input_management
+    i18n_key: questionnaire.indicators.sag_compliance
+    level: 2
+    position: 4
+
+  - key: indap_program_participation
+    dimension: economic_viability
+    i18n_key: questionnaire.indicators.indap_program_participation
+    level: 2
+    position: 5
+
+  - key: desertification_mitigation
+    dimension: climate_adaptation
+    i18n_key: questionnaire.indicators.desertification_mitigation
+    level: 2
+    position: 6
+
+  - key: campesino_seed_networks
+    dimension: crop_diversity
+    i18n_key: questionnaire.indicators.campesino_seed_networks
+    level: 2
+    position: 7
+
+  - key: earthquake_preparedness
+    dimension: system_resilience
+    i18n_key: questionnaire.indicators.earthquake_preparedness
+    level: 2
+    position: 8

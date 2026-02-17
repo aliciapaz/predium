@@ -1,0 +1,637 @@
+es:
+  questionnaire:
+    # ── Categorias L1 ─────────────────────────────────────
+    categories:
+      soil: "Suelo"
+      water: "Agua"
+      biodiversity: "Biodiversidad"
+      management: "Manejo"
+      socioeconomic: "Socioeconomico"
+      resilience: "Resiliencia"
+
+    # ── Dimensiones ───────────────────────────────────────
+    dimensions:
+      soil_health: "Salud del Suelo"
+      soil_management: "Manejo del Suelo"
+      water_availability: "Disponibilidad de Agua"
+      water_quality: "Calidad del Agua"
+      water_management: "Gestion del Agua"
+      crop_diversity: "Diversidad de Cultivos"
+      ecosystem_diversity: "Diversidad del Ecosistema"
+      farm_planning: "Planificacion del Predio"
+      input_management: "Gestion de Insumos"
+      animal_management: "Manejo Animal"
+      economic_viability: "Viabilidad Economica"
+      social_wellbeing: "Bienestar Social"
+      climate_adaptation: "Adaptacion Climatica"
+      system_resilience: "Resiliencia del Sistema"
+
+    # ── Indicadores ───────────────────────────────────────
+    indicators:
+      # ── Suelo > Salud del Suelo ─────────────────────────
+      soil_coverage:
+        name: "Cobertura del Suelo"
+        description: "Porcentaje de suelo cubierto por vegetacion o mulch"
+        scoring:
+          low: "Menos del 30% del suelo esta cubierto; predomina suelo desnudo"
+          medium: "30-70% de cobertura mediante mulch, rastrojo o plantas vivas"
+          high: "Mas del 70% de cobertura durante todo el ano con cobertura viva o muerta diversa"
+      organic_matter_content:
+        name: "Contenido de Materia Organica"
+        description: "Nivel de materia organica en la capa superficial del suelo"
+        scoring:
+          low: "El suelo se ve claro y polvoriento; bajo contenido de humus"
+          medium: "Materia organica moderada; algo de material en descomposicion visible"
+          high: "Suelo rico y oscuro con alto contenido de humus y actividad de descomposicion visible"
+      soil_structure:
+        name: "Estructura del Suelo"
+        description: "Agregacion y porosidad del suelo"
+        scoring:
+          low: "El suelo esta compactado o polvoriento sin agregados visibles"
+          medium: "Algo de agregacion presente; porosidad moderada"
+          high: "Estructura granular bien agregada; excelente porosidad e infiltracion de agua"
+      soil_erosion:
+        name: "Erosion del Suelo"
+        description: "Grado de perdida de suelo por erosion hidrica o eolica"
+        scoring:
+          low: "Canales de erosion visibles, raices expuestas o depositos de sedimento"
+          medium: "Signos menores de erosion; algunas medidas preventivas implementadas"
+          high: "Sin erosion visible; practicas de conservacion efectivas previenen la perdida de suelo"
+      biological_activity:
+        name: "Actividad Biologica"
+        description: "Presencia y diversidad de organismos del suelo"
+        scoring:
+          low: "Pocos o ningun organismo visible en el suelo; poca actividad de descomposicion"
+          medium: "Algunas lombrices y organismos presentes; descomposicion moderada"
+          high: "Abundantes lombrices, hongos y actividad de microorganismos; descomposicion rapida"
+      soil_compaction:
+        name: "Compactacion del Suelo"
+        description: "Grado de compactacion que afecta el crecimiento de raices y movimiento del agua"
+        scoring:
+          low: "Capas duras y compactadas presentes; mala infiltracion y penetracion de raices"
+          medium: "Algo de compactacion en areas de alto trafico; infiltracion moderada"
+          high: "Sin compactacion; suelo suelto con excelente infiltracion y penetracion de raices"
+      soil_ph_balance:
+        name: "Balance de pH del Suelo"
+        description: "Acidez o alcalinidad del suelo en relacion a los requerimientos de los cultivos"
+        scoring:
+          low: "Niveles extremos de pH limitando la disponibilidad de nutrientes; sin medidas correctivas"
+          medium: "pH algo fuera del rango optimo; algunas enmiendas aplicadas"
+          high: "pH dentro del rango optimo para los cultivos; monitoreo y ajuste regular"
+
+      # ── Suelo > Manejo del Suelo ────────────────────────
+      tillage_practices:
+        name: "Practicas de Labranza"
+        description: "Tipo e intensidad de labranza del suelo"
+        scoring:
+          low: "Labranza convencional intensiva con inversion completa de capas del suelo"
+          medium: "Labranza reducida o minima en algunos campos"
+          high: "Cero labranza o labranza de conservacion en todas las areas cultivadas"
+      cover_cropping:
+        name: "Cultivos de Cobertura"
+        description: "Uso de cultivos de cobertura entre temporadas principales"
+        scoring:
+          low: "No se usan cultivos de cobertura; campos desnudos entre temporadas"
+          medium: "Cultivos de cobertura en algunos campos o durante algunas temporadas"
+          high: "Cobertura sistematica en todos los campos con seleccion diversa de especies"
+      crop_rotation:
+        name: "Rotacion de Cultivos"
+        description: "Diversidad y frecuencia de la rotacion de cultivos"
+        scoring:
+          low: "Monocultivo o rotacion minima con la misma familia de cultivos"
+          medium: "Rotacion de 2-3 cultivos con algo de diversidad"
+          high: "Rotacion compleja con 4+ cultivos incluyendo leguminosas y diferentes familias"
+      composting_practices:
+        name: "Practicas de Compostaje"
+        description: "Compostaje en el predio y reciclaje de materia organica"
+        scoring:
+          low: "Sin compostaje; residuos organicos quemados o descartados"
+          medium: "Algo de compostaje pero irregular o a pequena escala"
+          high: "Compostaje sistematico de todos los residuos organicos con monitoreo de calidad"
+      green_manure_use:
+        name: "Uso de Abono Verde"
+        description: "Incorporacion de cultivos de abono verde para mejorar la fertilidad del suelo"
+        scoring:
+          low: "No se usan cultivos de abono verde"
+          medium: "Abono verde ocasional en algunos campos"
+          high: "Abono verde regular integrado en la rotacion con especies leguminosas"
+
+      # ── Agua > Disponibilidad de Agua ───────────────────
+      water_source_diversity:
+        name: "Diversidad de Fuentes de Agua"
+        description: "Numero y variedad de fuentes de agua disponibles"
+        scoring:
+          low: "Fuente unica de agua; alta dependencia de un solo suministro"
+          medium: "Dos fuentes de agua disponibles para uso del predio"
+          high: "Tres o mas fuentes diversas incluyendo pozos, vertientes, agua lluvia y agua superficial"
+      irrigation_system:
+        name: "Sistema de Riego"
+        description: "Eficiencia e idoneidad de la infraestructura de riego"
+        scoring:
+          low: "Sin riego o riego por inundacion con alta perdida de agua"
+          medium: "Riego por aspersion o surco basico con eficiencia moderada"
+          high: "Riego por goteo o precision ajustado a las necesidades del cultivo con programacion"
+      water_storage_capacity:
+        name: "Capacidad de Almacenamiento de Agua"
+        description: "Capacidad de almacenar agua para periodos secos"
+        scoring:
+          low: "Sin almacenamiento de agua; totalmente dependiente del suministro en tiempo real"
+          medium: "Algo de capacidad de almacenamiento cubriendo dias a una semana de necesidades"
+          high: "Almacenamiento adecuado para periodos secos prolongados; estanques, tanques o embalses"
+      rainfall_dependency:
+        name: "Dependencia de Lluvia"
+        description: "Dependencia de la lluvia versus fuentes de agua manejadas"
+        scoring:
+          low: "Totalmente dependiente de la lluvia sin agua suplementaria"
+          medium: "Principalmente secano con algo de riego suplementario"
+          high: "Estrategia equilibrada combinando captura de lluvia con fuentes manejadas"
+
+      # ── Agua > Calidad del Agua ─────────────────────────
+      water_contamination_risk:
+        name: "Riesgo de Contaminacion del Agua"
+        description: "Riesgo de contaminacion del agua por fuentes agricolas o externas"
+        scoring:
+          low: "Alto riesgo de contaminacion; proximidad a fuentes de polucion sin proteccion"
+          medium: "Riesgo moderado; algunas medidas protectoras pero con brechas"
+          high: "Bajo riesgo; proteccion integral de fuentes de agua contra contaminacion"
+      riparian_buffer_zones:
+        name: "Zonas de Amortiguamiento Riparianas"
+        description: "Areas vegetadas a lo largo de cursos de agua que filtran escorrentia"
+        scoring:
+          low: "Sin zonas de amortiguamiento; cultivos o ganado hasta el borde del agua"
+          medium: "Zonas de amortiguamiento angostas en algunos cursos de agua"
+          high: "Zonas amplias y diversas a lo largo de todos los cursos de agua con vegetacion nativa"
+      agrochemical_runoff:
+        name: "Escorrentia de Agroquimicos"
+        description: "Riesgo de que fertilizantes y pesticidas lleguen a cuerpos de agua"
+        scoring:
+          low: "Alto uso de agroquimicos cerca de cursos de agua sin prevencion de escorrentia"
+          medium: "Algunas medidas para reducir escorrentia; uso moderado de quimicos"
+          high: "Uso minimo o nulo de agroquimicos; medidas efectivas de prevencion de escorrentia"
+      water_testing_frequency:
+        name: "Frecuencia de Analisis de Agua"
+        description: "Regularidad del monitoreo de calidad del agua"
+        scoring:
+          low: "No se realizan analisis de agua"
+          medium: "Analisis ocasional cuando se sospechan problemas"
+          high: "Analisis regular programado de todas las fuentes de agua con registro"
+
+      # ── Agua > Gestion del Agua ─────────────────────────
+      water_use_efficiency:
+        name: "Eficiencia en el Uso del Agua"
+        description: "Eficiencia del uso del agua en relacion a la produccion"
+        scoring:
+          low: "Alto desperdicio de agua; sin medicion ni optimizacion del uso"
+          medium: "Algunas medidas de eficiencia; monitoreo basico"
+          high: "Uso optimizado con medicion, programacion y mejora continua"
+      drainage_management:
+        name: "Gestion de Drenaje"
+        description: "Manejo del exceso de agua y sistemas de drenaje"
+        scoring:
+          low: "Mal drenaje causando anegamiento; sin infraestructura de drenaje"
+          medium: "Drenaje basico instalado; algunos problemas de anegamiento persisten"
+          high: "Sistema de drenaje bien disenado previniendo anegamiento y manejando exceso de agua"
+      water_harvesting:
+        name: "Cosecha de Agua"
+        description: "Recoleccion y almacenamiento de agua lluvia y escorrentia"
+        scoring:
+          low: "Sin practicas de cosecha de agua"
+          medium: "Algo de recoleccion de agua lluvia de edificios o pequenas captaciones"
+          high: "Sistema integral de cosecha de agua con multiples puntos de recoleccion y almacenamiento"
+      watershed_participation:
+        name: "Participacion en Cuenca"
+        description: "Participacion en la gestion del agua a nivel de cuenca"
+        scoring:
+          low: "Sin participacion en actividades de gestion de cuenca"
+          medium: "Conocimiento de temas de cuenca; participacion ocasional"
+          high: "Participacion activa en organizaciones de cuenca y acciones colectivas"
+
+      # ── Biodiversidad > Diversidad de Cultivos ──────────
+      cultivated_species_richness:
+        name: "Riqueza de Especies Cultivadas"
+        description: "Numero de diferentes especies de cultivos"
+        scoring:
+          low: "1-3 especies de cultivos"
+          medium: "4-8 especies de cultivos incluyendo algunas de diferentes familias"
+          high: "9+ especies de diversas familias botanicas durante todo el ano"
+      varietal_diversity:
+        name: "Diversidad Varietal"
+        description: "Uso de multiples variedades dentro de las especies de cultivos"
+        scoring:
+          low: "Una sola variedad comercial por cultivo"
+          medium: "2-3 variedades por cultivo principal"
+          high: "Multiples variedades por cultivo incluyendo selecciones locales y adaptadas"
+      native_crop_varieties:
+        name: "Variedades Nativas de Cultivos"
+        description: "Cultivo de variedades localmente adaptadas y patrimoniales"
+        scoring:
+          low: "No se cultivan variedades nativas o patrimoniales"
+          medium: "Algunas variedades nativas mantenidas junto a las comerciales"
+          high: "Conservacion y cultivo activo de diversas variedades nativas y patrimoniales"
+      polyculture_practices:
+        name: "Practicas de Policultivo"
+        description: "Cultivo de multiples especies juntas en el mismo espacio"
+        scoring:
+          low: "Monocultivo estricto en todos los campos"
+          medium: "Algo de cultivo intercalado o asociado en partes del predio"
+          high: "Policultivo extendido con asociaciones disenadas y sinergias entre plantas"
+      seed_sovereignty:
+        name: "Soberania de Semillas"
+        description: "Capacidad de guardar, seleccionar y producir semillas propias"
+        scoring:
+          low: "Todas las semillas compradas; sin guarda de semillas en el predio"
+          medium: "Algunas semillas guardadas para algunos cultivos"
+          high: "Guarda y seleccion sistematica de semillas para la mayoria de los cultivos; participa en redes"
+
+      # ── Biodiversidad > Diversidad del Ecosistema ───────
+      natural_habitat_area:
+        name: "Area de Habitat Natural"
+        description: "Proporcion del predio mantenida como habitat natural o semi-natural"
+        scoring:
+          low: "Menos del 5% del area del predio en habitat natural"
+          medium: "5-15% del area del predio mantenida como habitat natural"
+          high: "Mas del 15% del predio en habitats naturales diversos incluyendo bosque, humedal y pradera"
+      habitat_connectivity:
+        name: "Conectividad de Habitat"
+        description: "Enlaces entre parches de habitat en y alrededor del predio"
+        scoring:
+          low: "Fragmentos de habitat aislados sin corredores de conexion"
+          medium: "Algunos setos o franjas conectando areas de habitat"
+          high: "Red de habitat bien conectada con corredores diversos uniendo predio y paisaje"
+      pollinator_presence:
+        name: "Presencia de Polinizadores"
+        description: "Abundancia y diversidad de insectos polinizadores"
+        scoring:
+          low: "Pocos polinizadores observados; recursos florales limitados"
+          medium: "Actividad moderada de polinizadores; algunas plantas con flores presentes"
+          high: "Polinizadores abundantes y diversos; recursos florales durante todo el ano"
+      beneficial_insect_habitat:
+        name: "Habitat para Insectos Beneficos"
+        description: "Provision de habitat para insectos controladores de plagas"
+        scoring:
+          low: "Sin habitat dedicado para insectos beneficos"
+          medium: "Algunas franjas florales o refugios para insectos beneficos"
+          high: "Plantaciones insectarias diversas y elementos de habitat en todo el predio"
+      agroforestry_integration:
+        name: "Integracion Agroforestal"
+        description: "Integracion de arboles y arbustos en el sistema productivo"
+        scoring:
+          low: "Sin arboles en tierras cultivadas; paisaje despejado"
+          medium: "Algunos arboles dispersos o plantaciones en bordes"
+          high: "Sistema agroforestal disenado con integracion productiva y ecologica de arboles"
+      wildlife_corridors:
+        name: "Corredores de Fauna"
+        description: "Presencia de vias para el movimiento de fauna a traves del predio"
+        scoring:
+          low: "Sin corredores de fauna; cercas o cultivo bloquean el movimiento animal"
+          medium: "Algunas areas sin manejo permiten paso limitado de fauna"
+          high: "Corredores planificados conectando habitats con vegetacion apropiada"
+
+      # ── Manejo > Planificacion del Predio ───────────────
+      production_planning:
+        name: "Planificacion de Produccion"
+        description: "Planificacion sistematica de ciclos de cultivos y metas de produccion"
+        scoring:
+          low: "Sin plan escrito; decisiones tomadas de forma reactiva"
+          medium: "Plan estacional basico con algunas metas documentadas"
+          high: "Plan anual integral con calendarios de cultivos, metas y revision regular"
+      record_keeping:
+        name: "Registro de Actividades"
+        description: "Documentacion de actividades del predio, insumos y productos"
+        scoring:
+          low: "No se mantienen registros de actividades del predio"
+          medium: "Algunos registros de actividades principales y gastos"
+          high: "Registros detallados de todas las actividades, insumos, productos y observaciones"
+      financial_management:
+        name: "Gestion Financiera"
+        description: "Seguimiento y gestion de las finanzas del predio"
+        scoring:
+          low: "Sin seguimiento financiero; incapaz de evaluar rentabilidad"
+          medium: "Seguimiento basico de ingresos y gastos"
+          high: "Registros financieros completos con analisis de costos por cultivo y empresa"
+      risk_assessment:
+        name: "Evaluacion de Riesgos"
+        description: "Identificacion y gestion de riesgos del predio"
+        scoring:
+          low: "Sin evaluacion de riesgos; desconocimiento de vulnerabilidades principales"
+          medium: "Algunos riesgos identificados pero sin plan formal de mitigacion"
+          high: "Evaluacion sistematica de riesgos con estrategias de mitigacion documentadas"
+      technology_adoption:
+        name: "Adopcion de Tecnologia"
+        description: "Uso apropiado de tecnologia para mejorar las operaciones del predio"
+        scoring:
+          low: "Sin uso de tecnologia; dependencia exclusiva de metodos tradicionales"
+          medium: "Algo de tecnologia apropiada adoptada para operaciones clave"
+          high: "Uso estrategico de tecnologia mejorando eficiencia manteniendo practicas ecologicas"
+
+      # ── Manejo > Gestion de Insumos ─────────────────────
+      synthetic_fertilizer_dependency:
+        name: "Dependencia de Fertilizantes Sinteticos"
+        description: "Dependencia de fertilizantes sinteticos versus alternativas organicas"
+        scoring:
+          low: "Alta dependencia de fertilizantes sinteticos para todos los cultivos"
+          medium: "Uso mixto de fertilizantes sinteticos y organicos"
+          high: "Sin fertilizantes sinteticos; fertilidad manejada por medios organicos y biologicos"
+      pesticide_use:
+        name: "Uso de Pesticidas"
+        description: "Tipo y extension de aplicacion de pesticidas"
+        scoring:
+          low: "Aplicacion rutinaria de pesticidas sinteticos basada en calendario"
+          medium: "Uso reducido de pesticidas con algo de manejo integrado de plagas"
+          high: "Sin pesticidas sinteticos; enfoque totalmente integrado de manejo de plagas"
+      biological_pest_control:
+        name: "Control Biologico de Plagas"
+        description: "Uso de organismos biologicos para el manejo de plagas"
+        scoring:
+          low: "No se usan metodos de control biologico"
+          medium: "Algunos agentes o practicas de control biologico utilizados"
+          high: "Programa integral de control biologico con manejo de habitat para beneficos"
+      local_input_sourcing:
+        name: "Abastecimiento Local de Insumos"
+        description: "Proporcion de insumos del predio obtenidos localmente"
+        scoring:
+          low: "La mayoria de los insumos comprados a proveedores distantes"
+          medium: "Algunos insumos obtenidos localmente o producidos en el predio"
+          high: "Mayoria de insumos locales o producidos en el predio; minima dependencia externa"
+      energy_efficiency:
+        name: "Eficiencia Energetica"
+        description: "Eficiencia del uso de energia en el predio"
+        scoring:
+          low: "Alto consumo energetico sin medidas de eficiencia"
+          medium: "Algunas practicas de ahorro energetico; uso moderado de combustibles fosiles"
+          high: "Uso energetico optimizado con fuentes renovables y equipos eficientes"
+
+      # ── Manejo > Manejo Animal ──────────────────────────
+      livestock_integration:
+        name: "Integracion Ganadera"
+        description: "Integracion de animales en el sistema de cultivos"
+        scoring:
+          low: "Sin ganado o ganado completamente separado de los cultivos"
+          medium: "Algo de integracion del ganado con la produccion agricola"
+          high: "Integracion cultivo-ganado bien disenada con ciclo de nutrientes y beneficios mutuos"
+      animal_welfare:
+        name: "Bienestar Animal"
+        description: "Estandar de cuidado y condiciones de vida de los animales del predio"
+        scoring:
+          low: "Condiciones de confinamiento; acceso limitado al exterior o comportamiento natural"
+          medium: "Espacio adecuado y algo de acceso a areas exteriores"
+          high: "Altos estandares de bienestar; libre pastoreo, comportamiento natural y manejo sin estres"
+      grazing_management:
+        name: "Manejo de Pastoreo"
+        description: "Gestion de patrones de pastoreo y salud de pasturas"
+        scoring:
+          low: "Pastoreo continuo llevando a sobrepastoreo y degradacion"
+          medium: "Algo de pastoreo rotacional con manejo basico de pasturas"
+          high: "Pastoreo rotacional planificado con periodos de descanso optimizando salud de pasturas"
+      animal_health_practices:
+        name: "Practicas de Salud Animal"
+        description: "Enfoque para mantener la salud animal"
+        scoring:
+          low: "Solo tratamiento reactivo; uso rutinario de antibioticos; sin cuidado preventivo"
+          medium: "Cuidado preventivo basico; uso reducido de antibioticos"
+          high: "Manejo holistico de salud enfatizando prevencion, nutricion y remedios naturales"
+      manure_management:
+        name: "Manejo de Estiercol"
+        description: "Manejo y utilizacion del estiercol animal"
+        scoring:
+          low: "El estiercol causa contaminacion; sin compostaje ni sistema de manejo"
+          medium: "Recoleccion basica de estiercol con algo de compostaje"
+          high: "Compostaje y aplicacion sistematica de estiercol optimizando el ciclo de nutrientes"
+
+      # ── Socioeconomico > Viabilidad Economica ───────────
+      income_diversification:
+        name: "Diversificacion de Ingresos"
+        description: "Variedad de fuentes de ingreso del predio"
+        scoring:
+          low: "Un solo cultivo o producto como unica fuente de ingreso"
+          medium: "2-3 fuentes de ingreso de diferentes productos del predio"
+          high: "Multiples flujos de ingreso diversificados incluyendo productos, servicios y valor agregado"
+      market_access:
+        name: "Acceso a Mercados"
+        description: "Capacidad de alcanzar y vender en diferentes mercados"
+        scoring:
+          low: "Limitado a un solo comprador o intermediario"
+          medium: "Acceso a 2-3 canales de mercado"
+          high: "Multiples canales de mercado incluyendo directo, mayorista y mercados de especialidad"
+      value_added_products:
+        name: "Productos con Valor Agregado"
+        description: "Procesamiento o transformacion de productos crudos para mayor valor"
+        scoring:
+          low: "Todos los productos vendidos como materias primas"
+          medium: "Algo de procesamiento basico o empaquetado de productos"
+          high: "Diversos productos con valor agregado, marca y relaciones directas de mercado"
+      fair_pricing:
+        name: "Precios Justos"
+        description: "Capacidad de recibir precios justos que cubran costos de produccion"
+        scoring:
+          low: "Precios dictados por compradores; frecuentemente bajo costo de produccion"
+          medium: "Precios generalmente cubren costos con margenes pequenos"
+          high: "Precios consistentemente justos mediante venta directa, contratos o primas de certificacion"
+      direct_sales_channels:
+        name: "Canales de Venta Directa"
+        description: "Capacidad de vender directamente a consumidores"
+        scoring:
+          low: "Sin ventas directas; totalmente dependiente de intermediarios"
+          medium: "Algunas ventas directas en ferias o puerta de predio"
+          high: "Canales de venta directa establecidos incluyendo tienda del predio, canastas o venta en linea"
+      production_cost_management:
+        name: "Gestion de Costos de Produccion"
+        description: "Seguimiento y optimizacion de costos de produccion"
+        scoring:
+          low: "Sin seguimiento de costos; desconocimiento de costos por unidad"
+          medium: "Conocimiento basico de costos; algunas medidas para reducir gastos"
+          high: "Seguimiento detallado de costos por empresa con optimizacion continua"
+
+      # ── Socioeconomico > Bienestar Social ───────────────
+      labor_conditions:
+        name: "Condiciones Laborales"
+        description: "Condiciones de trabajo para los trabajadores del predio"
+        scoring:
+          low: "Malas condiciones de trabajo; sin acuerdos formales ni medidas de seguridad"
+          medium: "Estandares laborales basicos cumplidos; algunos acuerdos formales"
+          high: "Excelentes condiciones con salarios justos, medidas de seguridad y desarrollo laboral"
+      gender_equity:
+        name: "Equidad de Genero"
+        description: "Participacion igualitaria y toma de decisiones entre generos"
+        scoring:
+          low: "Toma de decisiones concentrada en un genero; acceso desigual a recursos"
+          medium: "Algo de equilibrio de genero en participacion pero brechas en decision"
+          high: "Participacion, decision y acceso a recursos igualitario entre generos"
+      community_engagement:
+        name: "Participacion Comunitaria"
+        description: "Participacion y contribucion a la comunidad local"
+        scoring:
+          low: "Predio aislado sin involucramiento comunitario"
+          medium: "Algo de participacion en actividades u organizaciones comunitarias"
+          high: "Liderazgo comunitario activo; predio alberga eventos, educacion o recursos compartidos"
+      knowledge_sharing:
+        name: "Intercambio de Conocimientos"
+        description: "Intercambio de saberes con otros agricultores e instituciones"
+        scoring:
+          low: "Sin intercambio de conocimientos con otros agricultores o instituciones"
+          medium: "Participacion ocasional en talleres o grupos de agricultores"
+          high: "Activo en redes de agricultores; ensena y aprende regularmente; recibe visitas al predio"
+      food_sovereignty:
+        name: "Soberania Alimentaria"
+        description: "Contribucion a la seguridad alimentaria local y autosuficiencia"
+        scoring:
+          low: "El predio produce solo cultivos de exportacion; el hogar compra toda la comida"
+          medium: "Algo de produccion de alimentos para consumo del hogar"
+          high: "Produccion significativa de alimentos para el hogar y la comunidad; cultivos alimentarios diversos"
+      youth_involvement:
+        name: "Involucramiento Juvenil"
+        description: "Participacion de jovenes en actividades y decisiones del predio"
+        scoring:
+          low: "Sin interes ni participacion juvenil; sin plan de sucesion"
+          medium: "Algo de participacion juvenil en actividades del predio"
+          high: "Participacion juvenil activa con capacitacion, responsabilidad e interes en continuidad"
+
+      # ── Resiliencia > Adaptacion Climatica ──────────────
+      drought_preparedness:
+        name: "Preparacion para Sequia"
+        description: "Capacidad de enfrentar y recuperarse de condiciones de sequia"
+        scoring:
+          low: "Sin preparacion para sequia; impactos severos durante periodos secos"
+          medium: "Algunas reservas de agua y cultivos tolerantes a la sequia"
+          high: "Estrategia integral de sequia con almacenamiento de agua, variedades tolerantes y manejo de suelo"
+      flood_management:
+        name: "Gestion de Inundaciones"
+        description: "Preparacion y manejo de eventos de exceso de agua"
+        scoring:
+          low: "Sin preparacion para inundaciones; perdida significativa de cultivos durante lluvias fuertes"
+          medium: "Drenaje basico y algunas medidas de mitigacion de inundaciones"
+          high: "Paisaje e infraestructura disenados para manejar exceso de agua efectivamente"
+      microclimate_management:
+        name: "Manejo de Microclima"
+        description: "Uso de elementos del paisaje para moderar extremos climaticos"
+        scoring:
+          low: "Sin manejo de microclima; campos expuestos y desprotegidos"
+          medium: "Algunos cortavientos o estructuras de sombra instalados"
+          high: "Manejo de microclima disenado con cortavientos, sombra y amortiguadores termicos"
+      climate_observation:
+        name: "Observacion Climatica"
+        description: "Monitoreo y registro de patrones climaticos"
+        scoring:
+          low: "Sin monitoreo climatico ni conciencia meteorologica"
+          medium: "Conciencia meteorologica basica; algo de planificacion estacional"
+          high: "Monitoreo climatico sistematico con gestion adaptativa basada en datos"
+      adaptive_capacity:
+        name: "Capacidad Adaptativa"
+        description: "Capacidad de ajustar practicas agricolas en respuesta al cambio"
+        scoring:
+          low: "Practicas rigidas; incapaz o reticente a cambiar enfoque"
+          medium: "Algo de disposicion a adaptarse; respuesta lenta a los cambios"
+          high: "Adaptacion proactiva; experimentacion continua y ajuste a condiciones"
+      heat_stress_management:
+        name: "Manejo de Estres Termico"
+        description: "Proteccion de cultivos y animales del calor extremo"
+        scoring:
+          low: "Sin medidas para mitigar el estres termico en cultivos o ganado"
+          medium: "Algo de sombra o medidas de enfriamiento; variedades tolerantes al calor"
+          high: "Manejo integral del calor con sombra, mulching, programacion y variedades adaptadas"
+
+      # ── Resiliencia > Resiliencia del Sistema ───────────
+      supply_chain_independence:
+        name: "Independencia de Cadena de Suministro"
+        description: "Grado de autosuficiencia en insumos del predio"
+        scoring:
+          low: "Totalmente dependiente de cadenas externas para insumos criticos"
+          medium: "Algo de produccion propia de insumos; dependencia externa moderada"
+          high: "Alta autosuficiencia en semillas, fertilidad, manejo de plagas y energia"
+      resource_recycling:
+        name: "Reciclaje de Recursos"
+        description: "Ciclaje en el predio de nutrientes, agua y materia organica"
+        scoring:
+          low: "Uso lineal de recursos; residuos exportados o descartados"
+          medium: "Algo de reciclaje y reutilizacion de recursos en el predio"
+          high: "Sistemas de ciclo cerrado maximizando ciclaje de nutrientes y reduccion de residuos"
+      ecosystem_services:
+        name: "Servicios Ecosistemicos"
+        description: "Contribucion del predio a funciones ecosistemicas mas amplias"
+        scoring:
+          low: "El predio degrada servicios ecosistemicos; impacto ambiental negativo neto"
+          medium: "Algunas contribuciones positivas junto con impactos negativos"
+          high: "El predio mejora almacenamiento de carbono, regulacion hidrica, polinizacion y biodiversidad"
+      disaster_recovery_plan:
+        name: "Plan de Recuperacion ante Desastres"
+        description: "Preparacion para recuperarse de desastres naturales"
+        scoring:
+          low: "Sin plan de desastre; recuperacion lenta y financieramente devastadora"
+          medium: "Seguro basico o ahorros; algo de planificacion de recuperacion"
+          high: "Plan integral con seguro, ingresos diversificados y red de apoyo comunitario"
+      infrastructure_resilience:
+        name: "Resiliencia de Infraestructura"
+        description: "Durabilidad de la infraestructura del predio ante eventos extremos"
+        scoring:
+          low: "Infraestructura fragil frecuentemente danada por eventos climaticos"
+          medium: "Calidad moderada de infraestructura; algo de vulnerabilidad a extremos"
+          high: "Infraestructura robusta disenada para resistir extremos climaticos locales"
+      succession_planning:
+        name: "Planificacion de Sucesion"
+        description: "Planes para la continuidad del predio entre generaciones"
+        scoring:
+          low: "Sin plan de sucesion; futuro del predio incierto"
+          medium: "Conversaciones informales sobre la sucesion del predio"
+          high: "Plan de sucesion claro con proxima generacion preparada y comprometida"
+
+      # ── Indicadores Extension Chile ─────────────────────
+      water_rights_status:
+        name: "Estado de Derechos de Agua"
+        description: "Estado legal y seguridad de los derechos de acceso al agua"
+        scoring:
+          low: "Sin derechos de agua formales; acceso informal o en disputa"
+          medium: "Algunos derechos de agua asegurados pero incompletos o disputados"
+          high: "Todos los derechos de agua necesarios legalmente asegurados e inscritos"
+      indigenous_land_recognition:
+        name: "Reconocimiento de Tierras Indigenas"
+        description: "Reconocimiento y respeto por los derechos territoriales indigenas"
+        scoring:
+          low: "Sin conciencia de reclamos de tierras indigenas o significado cultural"
+          medium: "Conciencia del contexto indigena; algo de dialogo con comunidades"
+          high: "Respeto activo por derechos indigenas; relaciones colaborativas con comunidades indigenas"
+      native_forest_protection:
+        name: "Proteccion de Bosque Nativo"
+        description: "Conservacion de areas de bosque nativo en o cerca del predio"
+        scoring:
+          low: "Bosque nativo talado o degradado; sin medidas de proteccion"
+          medium: "Algo de bosque nativo retenido con proteccion basica"
+          high: "Bosque nativo activamente conservado y expandido en cumplimiento de regulaciones"
+      sag_compliance:
+        name: "Cumplimiento SAG"
+        description: "Cumplimiento con las regulaciones del Servicio Agricola y Ganadero"
+        scoring:
+          low: "Incumplimiento de regulaciones SAG; sin registros"
+          medium: "Cumplimiento basico con principales requerimientos del SAG"
+          high: "Cumplimiento total del SAG incluyendo registros, inspecciones y documentacion"
+      indap_program_participation:
+        name: "Participacion en Programas INDAP"
+        description: "Involucramiento con el Instituto de Desarrollo Agropecuario"
+        scoring:
+          low: "Sin relacion con programas o apoyo de INDAP"
+          medium: "Ha recibido algo de apoyo de INDAP o participado en programas"
+          high: "Participante activo en programas INDAP con asistencia tecnica continua"
+      desertification_mitigation:
+        name: "Mitigacion de Desertificacion"
+        description: "Acciones para prevenir y revertir la degradacion de tierras en zonas secas"
+        scoring:
+          low: "Sin medidas contra desertificacion; degradacion de tierras avanzando"
+          medium: "Algunas medidas de conservacion de suelo y vegetacion implementadas"
+          high: "Prevencion integral de desertificacion con revegetacion y restauracion de suelos"
+      campesino_seed_networks:
+        name: "Redes Campesinas de Semillas"
+        description: "Participacion en redes tradicionales de intercambio de semillas campesinas"
+        scoring:
+          low: "Sin participacion en redes de semillas; todas las semillas compradas comercialmente"
+          medium: "Intercambio ocasional de semillas con agricultores vecinos"
+          high: "Miembro activo de redes campesinas de semillas; contribuye a ferias e intercambios"
+      earthquake_preparedness:
+        name: "Preparacion para Terremotos"
+        description: "Preparacion de la infraestructura del predio para eventos sismicos"
+        scoring:
+          low: "Sin preparacion sismica; infraestructura altamente vulnerable"
+          medium: "Algunos refuerzos estructurales; suministros basicos de emergencia"
+          high: "Infraestructura construida a estandares sismicos; plan y suministros de emergencia listos"
+
+    # ── Extensiones ───────────────────────────────────────
+    extensions:
+      chile: "Chile"

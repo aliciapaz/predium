@@ -1,0 +1,56 @@
+<div class="max-w-md mx-auto py-8">
+  <h2 class="text-xl font-bold text-earth-800 mb-6"><%= t("devise_views.edit_account") %></h2>
+
+  <div class="bg-white rounded-lg shadow-sm border border-earth-200 p-6">
+    <%= form_for(resource, as: resource_name, url: user_registration_path, html: { method: :put }) do |f| %>
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <div class="space-y-4">
+        <div>
+          <%= f.label :email, class: "block text-sm font-medium text-earth-700 mb-1" %>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email",
+              class: "w-full rounded-md border border-earth-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-forest-500" %>
+        </div>
+
+        <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+          <p class="text-sm text-mustard-600"><%= t("devise_views.pending_reconfirmation", email: resource.unconfirmed_email) %></p>
+        <% end %>
+
+        <div>
+          <%= f.label :password, class: "block text-sm font-medium text-earth-700 mb-1" %>
+          <p class="text-xs text-earth-400 mb-1"><%= t("devise_views.leave_blank") %></p>
+          <%= f.password_field :password, autocomplete: "new-password",
+              class: "w-full rounded-md border border-earth-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-forest-500" %>
+          <% if @minimum_password_length %>
+            <p class="text-xs text-earth-400 mt-1"><%= t("devise_views.characters_minimum", count: @minimum_password_length) %></p>
+          <% end %>
+        </div>
+
+        <div>
+          <%= f.label :password_confirmation, class: "block text-sm font-medium text-earth-700 mb-1" %>
+          <%= f.password_field :password_confirmation, autocomplete: "new-password",
+              class: "w-full rounded-md border border-earth-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-forest-500" %>
+        </div>
+
+        <div>
+          <%= f.label :current_password, class: "block text-sm font-medium text-earth-700 mb-1" %>
+          <p class="text-xs text-earth-400 mb-1"><%= t("devise_views.current_password_hint") %></p>
+          <%= f.password_field :current_password, autocomplete: "current-password",
+              class: "w-full rounded-md border border-earth-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-forest-500" %>
+        </div>
+
+        <%= f.submit t("devise_views.update_button"),
+            class: "w-full bg-forest-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-forest-700 transition-colors cursor-pointer" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mt-8 p-4 bg-rose-50 border border-rose-200 rounded-lg">
+    <h3 class="text-sm font-medium text-rose-800 mb-2"><%= t("devise_views.cancel_account") %></h3>
+    <p class="text-sm text-rose-600 mb-3"><%= t("devise_views.cancel_account_warning") %></p>
+    <%= button_to t("devise_views.cancel_account_button"), user_registration_path,
+        method: :delete,
+        data: { turbo_confirm: t("devise_views.cancel_account_confirm") },
+        class: "bg-rose-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-rose-700 transition-colors cursor-pointer" %>
+  </div>
+</div>

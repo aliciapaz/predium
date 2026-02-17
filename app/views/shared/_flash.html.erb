@@ -1,0 +1,14 @@
+<% flash.each do |type, message| %>
+  <% next if message.blank? %>
+  <% bg_class = type.to_s == "notice" ? "bg-forest-50 text-forest-800 border-forest-200" : "bg-rose-50 text-rose-800 border-rose-200" %>
+  <div class="border-b <%= bg_class %>" data-controller="dismissible">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <p class="text-sm"><%= message %></p>
+      <button data-action="dismissible#dismiss" class="text-current opacity-50 hover:opacity-100 ml-4" aria-label="Dismiss">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+<% end %>

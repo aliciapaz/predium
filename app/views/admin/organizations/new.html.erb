@@ -1,0 +1,6 @@
+<% content_for(:page_title, t("admin.new_organization")) %>
+
+<div class="space-y-6">
+  <h1 class="text-2xl font-bold text-earth-900"><%= t("admin.new_organization") %></h1>
+  <%= render "form", organization: @organization %>
+</div>

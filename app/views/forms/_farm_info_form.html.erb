@@ -1,0 +1,159 @@
+<%= form_with(model: form, class: "space-y-8") do |f| %>
+  <% if form.errors.any? %>
+    <div class="bg-rose-50 border border-rose-200 rounded-lg p-4">
+      <p class="text-sm font-medium text-rose-800 mb-2"><%= pluralize(form.errors.count, "error") %> prevented this form from being saved:</p>
+      <ul class="list-disc list-inside text-sm text-rose-700 space-y-1">
+        <% form.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%# Farmer Information %>
+  <fieldset class="space-y-4">
+    <legend class="text-lg font-semibold text-earth-800 border-b border-earth-200 pb-2 w-full"><%= t("farm_info.farmer_information") %></legend>
+
+    <div>
+      <%= f.label :name, t("farm_info.farm_farmer_name"), class: "block text-sm font-medium text-earth-700 mb-1" %>
+      <%= f.text_field :name,
+          required: true,
+          class: "w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm",
+          placeholder: t("farm_info.placeholder_farm_name") %>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <%= f.label :national_id, t("farm_info.national_id"), class: "block text-sm font-medium text-earth-700 mb-1" %>
+        <%= f.text_field :national_id,
+            class: "w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm" %>
+      </div>
+      <div>
+        <%= f.label :date_of_birth, t("farm_info.date_of_birth"), class: "block text-sm font-medium text-earth-700 mb-1" %>
+        <%= f.date_field :date_of_birth,
+            class: "w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm" %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <%= f.label :phone, t("farm_info.phone"), class: "block text-sm font-medium text-earth-700 mb-1" %>
+        <%= f.telephone_field :phone,
+            class: "w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm" %>
+      </div>
+      <div>
+        <%= f.label :gender, t("farm_info.gender"), class: "block text-sm font-medium text-earth-700 mb-1" %>
+        <%= f.select :gender,
+            Form.genders.keys.map { |g| [g.humanize, g] },
+            { include_blank: t("farm_info.select_placeholder") },
+            class: "w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm" %>
+      </div>
+    </div>
+  </fieldset>
+
+  <%# Property Information %>
+  <fieldset class="space-y-4">
+    <legend class="text-lg font-semibold text-earth-800 border-b border-earth-200 pb-2 w-full"><%= t("farm_info.property") %></legend>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <%= f.label :work_force, t("farm_info.workforce_people"), class: "block text-sm font-medium text-earth-700 mb-1" %>
+        <%= f.number_field :work_force,
+            min: 0,
+            class: "w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm" %>
+      </div>
+      <div>
+        <%= f.label :land_area, t("farm_info.land_area_ha"), class: "block text-sm font-medium text-earth-700 mb-1" %>
+        <%= f.number_field :land_area,
+            min: 0, step: 0.01,
+            class: "w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm" %>
+      </div>
+    </div>
+
+    <div>
+      <span class="block text-sm font-medium text-earth-700 mb-2"><%= t("farm_info.system_types") %></span>
+      <div class="flex flex-wrap gap-3">
+        <% %w[agriculture livestock forestry agroforestry mixed].each do |sys| %>
+          <label class="inline-flex items-center gap-2 text-sm text-earth-700">
+            <%= f.check_box :system_types, { multiple: true, class: "rounded border-earth-300 text-forest-600 focus:ring-forest-500" }, sys, nil %>
+            <%= t("farm_info.system_#{sys}") %>
+          </label>
+        <% end %>
+      </div>
+    </div>
+
+    <div>
+      <%= f.label :observations, t("farm_info.observations"), class: "block text-sm font-medium text-earth-700 mb-1" %>
+      <%= f.text_area :observations,
+          rows: 3,
+          class: "w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm",
+          placeholder: t("farm_info.placeholder_observations") %>
+    </div>
+  </fieldset>
+
+  <%# Location %>
+  <fieldset class="space-y-4">
+    <legend class="text-lg font-semibold text-earth-800 border-b border-earth-200 pb-2 w-full"><%= t("farm_info.location") %></legend>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div>
+        <%= f.label :country, t("farm_info.country"), class: "block text-sm font-medium text-earth-700 mb-1" %>
+        <%= f.text_field :country,
+            class: "w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm" %>
+      </div>
+      <div>
+        <%= f.label :region, t("farm_info.region"), class: "block text-sm font-medium text-earth-700 mb-1" %>
+        <%= f.text_field :region,
+            class: "w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm" %>
+      </div>
+      <div>
+        <%= f.label :locality, t("farm_info.locality"), class: "block text-sm font-medium text-earth-700 mb-1" %>
+        <%= f.text_field :locality,
+            class: "w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm" %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-controller="geolocation">
+      <div>
+        <%= f.label :latitude, t("farm_info.latitude"), class: "block text-sm font-medium text-earth-700 mb-1" %>
+        <%= f.number_field :latitude,
+            step: 0.000001,
+            data: { geolocation_target: "latitude" },
+            class: "w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm" %>
+      </div>
+      <div>
+        <%= f.label :longitude, t("farm_info.longitude"), class: "block text-sm font-medium text-earth-700 mb-1" %>
+        <%= f.number_field :longitude,
+            step: 0.000001,
+            data: { geolocation_target: "longitude" },
+            class: "w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm" %>
+      </div>
+      <div class="sm:col-span-2">
+        <button type="button"
+                data-action="geolocation#locate"
+                data-geolocation-target="button"
+                class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-forest-700 bg-forest-50 border border-forest-200 rounded-md hover:bg-forest-100 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          <%= t("farm_info.use_gps") %>
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <%= f.label :territory_key, t("farm_info.territory_extension"), class: "block text-sm font-medium text-earth-700 mb-1" %>
+      <%= f.select :territory_key,
+          [["None", ""], ["Chile", "chile"]],
+          {},
+          class: "w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm" %>
+    </div>
+  </fieldset>
+
+  <div class="flex items-center justify-end gap-4 pt-4 border-t border-earth-200">
+    <%= link_to t("buttons.cancel"), forms_path, class: "text-sm text-earth-500 hover:text-earth-700" %>
+    <%= f.submit submit_label,
+        class: "px-6 py-2.5 bg-forest-600 text-white font-medium rounded-lg hover:bg-forest-700 transition-colors shadow-sm cursor-pointer" %>
+  </div>
+<% end %>
