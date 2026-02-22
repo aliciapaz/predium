@@ -1,0 +1,141 @@
+digraph Predium {
+    graph [goal="An agroecological diagnostic platform that enables field technicians to assess farm sustainability through a structured questionnaire covering soil, water, biodiversity, management, socioeconomic, and resilience dimensions. The app is offline-first, territory-agnostic with extension support, multi-language (English and Spanish), and generates PDF reports with radar chart visualizations.", rankdir="LR"]
+    node [shape="box"]
+
+    start [label="Start", shape="Mdiamond"]
+    scaffold [label="Scaffold App", shape="box", prompt="Generate a new Rails application named Predium.\\n\\nSet up the project with these dependencies: rails, action_policy, turbo-rails, stimulus-rails, rspec-rails, factory_bot_rails.\\n\\nAuthentication: Devise with confirmable and invitable modules, Authorization: ActionPolicy for role-based access control, Frontend: Hotwire (Turbo + Stimulus) with Tailwind CSS, Testing: RSpec with FactoryBot and shoulda-matchers, Database: PostgreSQL, Rails: 8.1.2 with Propshaft asset pipeline and Importmap for JavaScript, State Machine: AASM gem for form state transitions (draft to completed), Soft Delete: Discard gem for form soft deletion via discarded_at column, PDF Generation: Ferrum gem for headless Chrome HTML-to-PDF rendering, Charts: Chart.js self-hosted at vendor/javascript/chart.umd.js via importmap, Offline: Service Worker with IndexedDB via Dexie.js for offline-first support, I18n: English (en) and Spanish (es) with per-user locale preference, Background Jobs: Solid Queue for async PDF generation, Caching: Solid Cache for application caching, WebSocket: Solid Cable for Action Cable\\n\\nFollow Telos code quality thresholds:
+- Target 5-7 lines per method (hard limit: 10)
+- Cyclomatic complexity max 7, perceived complexity max 8
+- ABC size max 17
+- Max 100 lines per class
+- Favor many small methods over few large ones
+- Method names should describe what they return or do
+- One level of abstraction per method"]
+    model_organization [label="Model: Organization", shape="box", prompt="Generate the model Organization with migration.\\n\\nFields: name:string.\\n\\nAssociations: has_many :memberships.\\n\\nValidations: validates :name, presence: true, uniqueness: true.\\n\\nFollow Telos model conventions:
+- Focus on persistence, associations, and data integrity only
+- Validations for database constraints
+- Callbacks only for persistence concerns (e.g., before_validation :set_defaults)
+- Use store_accessor for JSONB column accessors
+- Query scopes for common filters
+- NO business logic — move to services
+- Max 100 lines per class", goal_gate=true, retry_target="scaffold"]
+    model_user [label="Model: User", shape="box", prompt="Generate the model User with migration.\\n\\nFields: email:string, encrypted_password:string, first_name:string, last_name:string, locale:string, platform_role:integer.\\n\\nAssociations: has_one :profile, has_many :forms, has_many :memberships.\\n\\nValidations: validates :first_name, presence: true; validates :last_name, presence: true.\\n\\nFollow Telos model conventions:
+- Focus on persistence, associations, and data integrity only
+- Validations for database constraints
+- Callbacks only for persistence concerns (e.g., before_validation :set_defaults)
+- Use store_accessor for JSONB column accessors
+- Query scopes for common filters
+- NO business logic — move to services
+- Max 100 lines per class", goal_gate=true, retry_target="model_organization"]
+    model_profile [label="Model: Profile", shape="box", prompt="Generate the model Profile with migration.\\n\\nFields: phone:string, role_name:string, country:string, region:string, locality:string.\\n\\nAssociations: belongs_to :user.\\n\\nValidations: validates :user_id, uniqueness: true.\\n\\nFollow Telos model conventions:
+- Focus on persistence, associations, and data integrity only
+- Validations for database constraints
+- Callbacks only for persistence concerns (e.g., before_validation :set_defaults)
+- Use store_accessor for JSONB column accessors
+- Query scopes for common filters
+- NO business logic — move to services
+- Max 100 lines per class", goal_gate=true, retry_target="model_user"]
+    model_membership [label="Model: Membership", shape="box", prompt="Generate the model Membership with migration.\\n\\nFields: role:integer.\\n\\nAssociations: belongs_to :user, belongs_to :organization.\\n\\nValidations: validates :user_id, uniqueness: { scope: :organization_id }.\\n\\nFollow Telos model conventions:
+- Focus on persistence, associations, and data integrity only
+- Validations for database constraints
+- Callbacks only for persistence concerns (e.g., before_validation :set_defaults)
+- Use store_accessor for JSONB column accessors
+- Query scopes for common filters
+- NO business logic — move to services
+- Max 100 lines per class", goal_gate=true, retry_target="model_profile"]
+    model_form [label="Model: Form", shape="box", prompt="Generate the model Form with migration.\\n\\nFields: name:string, national_id:string, gender:integer, territory_key:string, state:string, latitude:float, longitude:float, system_types:text, land_area:float, country:string, region:string, locality:string, observations:text, work_force:integer, date_of_birth:date, phone:string, completed_at:datetime, synchronized_at:datetime, discarded_at:datetime.\\n\\nAssociations: belongs_to :user, has_many :formresponses.\\n\\nValidations: validates :name, presence: true.\\n\\nFollow Telos model conventions:
+- Focus on persistence, associations, and data integrity only
+- Validations for database constraints
+- Callbacks only for persistence concerns (e.g., before_validation :set_defaults)
+- Use store_accessor for JSONB column accessors
+- Query scopes for common filters
+- NO business logic — move to services
+- Max 100 lines per class", goal_gate=true, retry_target="model_membership"]
+    model_formresponse [label="Model: FormResponse", shape="box", prompt="Generate the model FormResponse with migration.\\n\\nFields: indicator_key:string, value:integer, is_extension:boolean.\\n\\nAssociations: belongs_to :form.\\n\\nValidations: validates :indicator_key, presence: true, uniqueness: { scope: :form_id }; validates :value, presence: true, numericality: { in: 1..10, only_integer: true }.\\n\\nFollow Telos model conventions:
+- Focus on persistence, associations, and data integrity only
+- Validations for database constraints
+- Callbacks only for persistence concerns (e.g., before_validation :set_defaults)
+- Use store_accessor for JSONB column accessors
+- Query scopes for common filters
+- NO business logic — move to services
+- Max 100 lines per class", goal_gate=true, retry_target="model_form"]
+    routes [label="Routes", shape="box", prompt="Generate config/routes.rb with RESTful resources for: Organization, User, Profile, Membership, Form, FormResponse.\\n\\nUse standard Rails resource routing conventions.\\n\\nFollow Telos code quality thresholds:
+- Target 5-7 lines per method (hard limit: 10)
+- Cyclomatic complexity max 7, perceived complexity max 8
+- ABC size max 17
+- Max 100 lines per class
+- Favor many small methods over few large ones
+- Method names should describe what they return or do
+- One level of abstraction per method"]
+    controllers [label="Controllers & Policies", shape="box", prompt="Generate controllers for: Organization, User, Profile, Membership, Form, FormResponse.\\n\\nInclude ActionPolicy authorization and strong parameters.\\n\\nGenerate corresponding policy classes.\\n\\nFollow Telos controller conventions:
+- Maximum 30-50 lines — if longer, extract to service objects
+- Instantiate services, never put business logic directly in controllers
+- Use strong parameters with params.expect() pattern
+- Include concerns for cross-cutting behavior (authentication, tracking)
+- Handle service errors and provide user feedback
+- Delegate authorization to policies (ActionPolicy): authorize! @resource\\n\\nFollow Telos authorization conventions:
+- Use ActionPolicy (not Pundit or CanCanCan)
+- Policy naming: ResourcePolicy (e.g., ListingPolicy, UserPolicy)
+- Define methods matching controller actions: create?, update?, destroy?
+- Controller usage: authorize! @resource
+- Rescue unauthorized: rescue_from ActionPolicy::Unauthorized
+- Check ownership and feature flags in policies"]
+    services [label="Service Objects", shape="box", prompt="Generate service objects for the following features:\\nYAML-Driven Questionnaire Configuration: QuestionnaireConfig is a singleton service object that loads and caches the questionnaire structure from config/questionnaire/core.yml. It uses a class-level Mutex for thread-safe lazy loading. The YAML file defines a hierarchical structure with 6 L1 categories (Soil, Water, Biodiversity, Management, Socioeconomic, Resilience), each containing L2 dimensions, each containing L2 indicator definitions with key, i18n_key, level, and position fields. The service provides class methods: core_indicators (returns all 74 core indicators), dimensions (returns all 15 dimensions), l1_categories (returns the 6 top-level categories), indicator(key) for single-indicator lookup, extension(territory_key) to load territory-specific extension indicators from config/questionnaire/extensions/{territory_key}.yml, and reload! to clear the thread-safe cache. The config is accessed throughout the app to drive the questionnaire flow, scoring calculations, and chart rendering.\\nQuestionnaire Step-by-Step Flow: The questionnaire presents indicators dimension by dimension. Each dimension is a step in the flow. Within each step, indicators are displayed with a 1-10 scoring grid using styled buttons. Selecting a score highlights the button with color coding (1-3 rose/red for low, 4-7 amber/mustard for medium, 8-10 green/forest for high) and shows a tier-appropriate description (low, medium, or high). After selecting a score, the UI auto-scrolls to the next question. A progress bar at the top shows completion percentage based on answered indicators vs total. Forms use AASM state machine with draft and completed states. The save-and-continue pattern persists form_responses as the user progresses through dimensions. Navigation allows moving between dimensions freely. When all dimensions are complete, the user can mark the form as completed which transitions its AASM state from draft to completed and sets completed_at.\\nScoring Calculation: Scoring::Calculator is a service object that takes a form and computes nested scores at three levels. It reads the form's form_responses and the QuestionnaireConfig structure. For each L2 indicator, it looks up the form_response value (1-10). For each dimension (L2 level), it computes the average of its indicator scores. For each L1 category, it computes the average of its dimension scores. The service filters out extension indicators (is_extension: true) from core scoring unless explicitly included. It returns a hash with indicator_scores (individual values keyed by indicator_key), l2_scores (dimension averages keyed by dimension key), and l1_scores (category averages keyed by category key). This data feeds into both the radar chart and the PDF report.\\nRadar Chart Visualization: A radar chart displays the L1 category scores using Chart.js loaded from vendor/javascript/chart.umd.js (self-hosted, no CDN). A Stimulus controller (radar_chart_controller) initializes a Chart.js radar chart on connect. It reads score data from data attributes on the canvas element. The radar chart uses a 0-10 scale with category names as labels around the perimeter. The chart is styled with a semi-transparent fill area and colored border. The chart is rendered on the form show page when the form has responses. The Chart.js library must be self-hosted at vendor/javascript/chart.umd.js and imported via importmap, not loaded from a CDN, to support offline usage.\\nFerrum PDF Generation: PDF reports are generated using the Ferrum gem for headless Chrome HTML-to-PDF rendering. A dedicated HTML template renders the form data, scores, and radar chart into a print-friendly layout. A background job (GeneratePdfJob) processes PDF generation asynchronously. The generated PDF is attached to the form via Active Storage (has_one_attached :pdf). The PDF includes form metadata (name, location, date, territory), a radar chart image, dimension scores table, and individual indicator scores. The HTML template uses inline CSS for print styling. Ferrum is configured to wait for Chart.js to render before capturing the PDF.\\nTerritory Extensions: Territory-specific indicator extensions are loaded from YAML files at config/questionnaire/extensions/{territory_key}.yml. When a form has a territory_key set (e.g., \"chile\"), the QuestionnaireConfig.extension(territory_key) method loads additional indicators specific to that territory. Extension indicators are stored as FormResponse records with is_extension: true. The questionnaire flow appends extension dimensions after the core dimensions when a territory_key is present. Extension scores are calculated separately and can be included in or excluded from the main radar chart. The chile.yml extension file serves as the reference implementation for territory extensions.\\nOffline-First Architecture: The app works offline using a Service Worker for asset caching and IndexedDB (via Dexie.js) for data storage. The Service Worker intercepts fetch requests and serves cached assets when offline. A TranslationsController serves locale JSON at /translations/{locale}.json for offline i18n. IndexedDB stores form data and form_responses locally. When connectivity is restored, a background sync mechanism pushes local changes to the server. A Stimulus controller monitors online/offline status and shows sync indicators. The app shell (navigation, layouts, static assets) is cached on first visit for instant offline loading.\\nUser Authentication: User authentication uses Devise with confirmable (email verification) and invitable (admin can invite users via email). Users register with email, password, first_name, and last_name. Email confirmation is required before sign-in. Admins can invite new users who receive an email with a link to set their password. The User model has platform_role as an integer enum with regular (0) and super_admin (1) values. Devise views are customized to match the app design with Tailwind CSS styling.\\nOrganization Management: Organizations are managed through a membership-based multi-tenancy model. Users belong to organizations through Membership records. Membership has a role integer enum with member (0) and admin (1) values. Organization admins can manage members (invite, remove, change roles). Users can belong to multiple organizations. The organizations index shows all organizations the current user belongs to. Organization show page lists members and their roles.\\nAdmin Dashboard: Super admin users (platform_role: super_admin) access an admin dashboard showing platform-wide statistics: total users, total forms, completed forms, forms by territory, and forms by state. The dashboard provides user management (list, view, invite) and organization management (list, view, create). Admin routes are namespaced under /admin. Access is restricted via ActionPolicy authorization checking platform_role == super_admin.\\nI18n and Locale Management: The app supports English (en) and Spanish (es) locales. Locale files are organized at config/locales/en.yml, config/locales/es.yml, config/locales/en/questionnaire.yml, and config/locales/es/questionnaire.yml. Users can set their preferred locale in their profile. The app detects the preferred locale from the user's profile setting, falling back to the Accept-Language header, falling back to the default locale (en). Locale is set via an around_action in ApplicationController using I18n.with_locale. Questionnaire translations include names, descriptions, and scoring tier descriptions (low, medium, high) for all 74 indicators across both languages. A locale switcher in the navigation allows changing language on the fly.\\nGeolocation: A Stimulus controller (geolocation_controller) uses the browser Geolocation API to capture GPS coordinates. When the user clicks a locate button, the controller calls navigator.geolocation.getCurrentPosition and populates hidden latitude and longitude form fields. Error handling covers permission denied, position unavailable, and timeout scenarios with user-friendly messages. The geolocation feature is used on the form edit page to capture the farm location.\\n\\nFollow Telos service object conventions:
+- Name with action + \"Service\" or \"Creator\"
+- Pattern A: call method for operations that return data
+- Pattern B: save method for operations that persist data (returns true/false)
+- Include ActiveModel::Model for validations when needed
+- Define custom error classes: class Error < StandardError; end
+- Use attr_accessor for dependencies passed in initialize
+- Wrap database changes in ActiveRecord::Base.transaction blocks
+- Let exceptions bubble up with meaningful error messages"]
+    views [label="Views & Frontend", shape="box", prompt="Generate views for: Organization, User, Profile, Membership, Form, FormResponse.\\n\\nInclude index, show, new, edit, and form partials.\\n\\nUse Turbo Frames and Stimulus controllers where appropriate.\\n\\nFollow Telos frontend conventions (Hotwire):
+- Default to server-side rendering — let Rails handle the HTML
+- Use Turbo Frames for isolated page sections (modals, inline editing, lazy-loaded content)
+- Use Turbo Streams for real-time updates (append, prepend, replace, update, remove)
+- Stimulus controllers: small, focused, single responsibility
+- Use data attributes for configuration, not hardcoded values
+- No jQuery, React, Vue — stick to Stimulus for interactions
+- Progressive enhancement: site works without JS, better with it"]
+    yaml_config [label="YAML Questionnaire Config", shape="box", prompt="Generate the QuestionnaireConfig singleton service object at app/services/questionnaire_config.rb. This service loads and caches the questionnaire structure from config/questionnaire/core.yml using a class-level Mutex for thread-safe lazy loading. The YAML structure has 6 L1 categories (soil, water, biodiversity, management, socioeconomic, resilience), each with L2 dimensions, each with L2 indicators having key, i18n_key, level, and position fields. Provide these class methods: core_indicators (returns all 74 core indicators as a flat array), dimensions (returns all 15 dimensions), l1_categories (returns the 6 top-level category hashes), indicator(key) for single-indicator lookup by key string, extension(territory_key) to load territory-specific indicators from config/questionnaire/extensions/{territory_key}.yml, and reload! to clear the cache. Also generate the config/questionnaire/core.yml file with the full hierarchical structure containing 6 categories, 15 dimensions, and 74 indicators. Reference the existing file at the develop branch for the exact structure and indicator keys. Each indicator needs: key (snake_case), i18n_key (dot-notation for I18n.t), level: 2, and position (integer within its dimension).", goal_gate=true, retry_target="views"]
+    copy_reference_assets [label="Copy Reference Assets", shape="parallelogram", tool_command="mkdir -p config/questionnaire/extensions config/locales/en config/locales/es vendor/javascript && git -C ~/OS/predium show develop:config/questionnaire/core.yml > config/questionnaire/core.yml && git -C ~/OS/predium show develop:config/questionnaire/extensions/chile.yml > config/questionnaire/extensions/chile.yml && git -C ~/OS/predium show develop:vendor/javascript/chart.umd.js > vendor/javascript/chart.umd.js && git -C ~/OS/predium show develop:config/locales/en.yml > config/locales/en.yml && git -C ~/OS/predium show develop:config/locales/es.yml > config/locales/es.yml && git -C ~/OS/predium show develop:config/locales/en/questionnaire.yml > config/locales/en/questionnaire.yml && git -C ~/OS/predium show develop:config/locales/es/questionnaire.yml > config/locales/es/questionnaire.yml", timeout="30s"]
+    scoring_service [label="Scoring Calculator Service", shape="box", prompt="Generate the Scoring::Calculator service object at app/services/scoring/calculator.rb. It takes a form in initialize and has a call method that returns a hash with three keys: indicator_scores (hash of indicator_key => integer value from form_responses), l2_scores (hash of dimension_key => average of its indicator scores), and l1_scores (hash of category_key => average of its dimension l2_scores). Use QuestionnaireConfig.l1_categories and QuestionnaireConfig.dimensions to traverse the hierarchy. Filter out extension indicators (is_extension: true on FormResponse) from core scoring. Handle missing responses gracefully by skipping them in averages. Follow Telos service conventions: call method pattern, max 100 lines, 5-7 lines per method.", goal_gate=true, retry_target="copy_reference_assets"]
+    ferrum_pdf [label="Ferrum PDF Generation", shape="box", prompt="Generate the Ferrum-based PDF generation system: 1) app/services/pdf_generator.rb — a service that takes a form, computes scores via Scoring::Calculator, renders an HTML template with form metadata (name, location, date, territory), radar chart data, dimension scores table, and indicator scores, then uses Ferrum::Browser to convert the HTML to PDF bytes. Configure Ferrum to wait for page load. 2) app/jobs/generate_pdf_job.rb — a background job that calls PdfGenerator and attaches the result to the form via Active Storage (form.pdf.attach). 3) app/views/pdfs/report.html.erb — the HTML template with inline CSS for print-friendly layout including a canvas for the radar chart rendered by inline Chart.js script. The Form model already has has_one_attached :pdf. Use Solid Queue for the background job.", timeout="10m"]
+    stimulus_controllers [label="Stimulus Controllers", shape="box", prompt="Generate all Stimulus controllers in app/javascript/controllers/: 1) radar_chart_controller.js — imports Chart from chart.umd.js, reads category labels and scores from data attributes (data-radar-chart-labels-value and data-radar-chart-scores-value as JSON arrays), creates a radar chart on a canvas target with 0-10 scale, semi-transparent fill, colored border. 2) question_controller.js — handles 1-10 scoring grid with targets for optionBtn, hiddenInput, descLow, descMedium, descHigh. select(event) sets value, highlightSelected() color-codes buttons (1-3 rose, 4-7 amber, 8-10 forest green), showDescription() reveals the matching tier, scrollToNext() auto-scrolls to next question. 3) progress_controller.js — targets bar and text, values total and completed, calculates percentage and updates bar width and text. 4) geolocation_controller.js — targets latitudeInput and longitudeInput, locate() calls navigator.geolocation.getCurrentPosition, fills hidden fields, handles errors. 5) navbar_controller.js — toggle() for mobile menu. 6) collapsible_controller.js — toggle() for expandable sections. 7) dismissible_controller.js — dismiss() removes element. Also update app/javascript/controllers/index.js to register all controllers. Pin chart.umd.js in config/importmap.rb from vendor/javascript/chart.umd.js.", timeout="10m"]
+    offline_setup [label="Offline Infrastructure", shape="box", prompt="Generate the offline-first infrastructure: 1) app/views/service_worker/service_worker.js.erb — Service Worker that caches the app shell (HTML, CSS, JS, fonts) on install, intercepts fetch requests with a cache-first strategy for assets and network-first for API calls, falls back to cached versions when offline. 2) public/dexie.min.js — note this will be a placeholder; the actual Dexie.js library should be vendored. 3) app/javascript/controllers/offline_controller.js — Stimulus controller that monitors navigator.onLine, shows online/offline status indicator, triggers sync when coming back online. 4) app/controllers/translations_controller.rb — serves locale JSON at /translations/:locale.json by reading and merging the YAML locale files into a flat JSON structure for offline i18n. 5) Add the service worker route and translations route to config/routes.rb. The service worker should be served from the root path /service_worker.js for maximum scope.", timeout="10m"]
+    tests [label="Write Tests", shape="box", prompt="Generate RSpec tests for models: Organization, User, Profile, Membership, Form, FormResponse.\\n\\nGenerate request specs for controllers.\\n\\nGenerate FactoryBot factories.\\n\\nCover features: YAML-Driven Questionnaire Configuration, Questionnaire Step-by-Step Flow, Scoring Calculation, Radar Chart Visualization, Ferrum PDF Generation, Territory Extensions, Offline-First Architecture, User Authentication, Organization Management, Admin Dashboard, I18n and Locale Management, Geolocation.\\n\\nFollow Telos testing conventions:
+- RSpec with FactoryBot
+- Prefer request specs over system specs (faster, more reliable)
+- Only use system specs when testing complex JS interactions
+- Use let and before blocks, avoid fixtures
+- Test critical paths and edge cases"]
+    run_tests [label="Run Tests", shape="parallelogram", tool_command="bundle exec rspec", timeout="5m"]
+    test_gate [label="Tests Passing?", shape="diamond"]
+    human_review [label="Human Review", shape="hexagon"]
+    exit [label="Exit", shape="Msquare"]
+
+    start -> scaffold
+    scaffold -> model_organization
+    model_organization -> model_user
+    model_user -> model_profile
+    model_profile -> model_membership
+    model_membership -> model_form
+    model_form -> model_formresponse
+    model_formresponse -> routes
+    routes -> controllers
+    controllers -> services
+    services -> views
+    views -> yaml_config
+    yaml_config -> copy_reference_assets
+    copy_reference_assets -> scoring_service
+    scoring_service -> ferrum_pdf
+    ferrum_pdf -> stimulus_controllers
+    stimulus_controllers -> offline_setup
+    offline_setup -> tests
+    tests -> run_tests
+    run_tests -> test_gate
+    test_gate -> tests [label="Retry", condition="outcome!=success"]
+    test_gate -> human_review [label="Pass", condition="outcome=success"]
+    human_review -> exit [label="[A] Approve"]
+    human_review -> tests [label="[F] Request Fixes"]
+}

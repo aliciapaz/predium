@@ -1,0 +1,8 @@
+Generate a new Rails application named Predium.\n\nSet up the project with these dependencies: rails, action_policy, turbo-rails, stimulus-rails, rspec-rails, factory_bot_rails.\n\nAuthentication: Devise with confirmable and invitable modules, Authorization: ActionPolicy for role-based access control, Frontend: Hotwire (Turbo + Stimulus) with Tailwind CSS, Testing: RSpec with FactoryBot and shoulda-matchers, Database: PostgreSQL, Rails: 8.1.2 with Propshaft asset pipeline and Importmap for JavaScript, State Machine: AASM gem for form state transitions (draft to completed), Soft Delete: Discard gem for form soft deletion via discarded_at column, PDF Generation: Ferrum gem for headless Chrome HTML-to-PDF rendering, Charts: Chart.js self-hosted at vendor/javascript/chart.umd.js via importmap, Offline: Service Worker with IndexedDB via Dexie.js for offline-first support, I18n: English (en) and Spanish (es) with per-user locale preference, Background Jobs: Solid Queue for async PDF generation, Caching: Solid Cache for application caching, WebSocket: Solid Cable for Action Cable\n\nFollow Telos code quality thresholds:
+- Target 5-7 lines per method (hard limit: 10)
+- Cyclomatic complexity max 7, perceived complexity max 8
+- ABC size max 17
+- Max 100 lines per class
+- Favor many small methods over few large ones
+- Method names should describe what they return or do
+- One level of abstraction per method

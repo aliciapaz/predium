@@ -1,0 +1,10 @@
+{
+  "outcome": "success",
+  "preferred_next_label": "",
+  "suggested_next_ids": [],
+  "context_updates": {
+    "last_stage": "model_formresponse",
+    "last_response": "The model and migration already exist with exactly the fields, associations, validations, and scopes you described:\n\n**Migration** (`db/migrate/20260214000006_create_form_responses.rb`):\n- `form_id` r"
+  },
+  "notes": "Stage completed: model_formresponse"
+}

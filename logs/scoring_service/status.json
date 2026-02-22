@@ -1,0 +1,10 @@
+{
+  "outcome": "success",
+  "preferred_next_label": "",
+  "suggested_next_ids": [],
+  "context_updates": {
+    "last_stage": "scoring_service",
+    "last_response": "The `Scoring::Calculator` already exists and matches the requirements exactly. It:\n\n- Takes a `form` in `initialize` (line 7-9)\n- Has a `call` method returning `{ indicator_scores:, l2_scores:, l1_sco"
+  },
+  "notes": "Stage completed: scoring_service"
+}

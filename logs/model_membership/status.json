@@ -1,0 +1,10 @@
+{
+  "outcome": "success",
+  "preferred_next_label": "",
+  "suggested_next_ids": [],
+  "context_updates": {
+    "last_stage": "model_membership",
+    "last_response": "The Membership model, migration, and associations already exist in the codebase. Here's what's already in place:\n\n**Model** (`app/models/membership.rb`):\n- `belongs_to :user` and `belongs_to :organiza"
+  },
+  "notes": "Stage completed: model_membership"
+}

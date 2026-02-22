@@ -1,0 +1,10 @@
+{
+  "outcome": "success",
+  "preferred_next_label": "",
+  "suggested_next_ids": [],
+  "context_updates": {
+    "last_stage": "model_organization",
+    "last_response": "The Organization model and migration already exist and match your requirements exactly:\n\n**Model** (`app/models/organization.rb`):\n- `has_many :memberships, dependent: :destroy` (plus `has_many :users"
+  },
+  "notes": "Stage completed: model_organization"
+}

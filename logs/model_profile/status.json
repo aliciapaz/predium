@@ -1,0 +1,10 @@
+{
+  "outcome": "success",
+  "preferred_next_label": "",
+  "suggested_next_ids": [],
+  "context_updates": {
+    "last_stage": "model_profile",
+    "last_response": "I need permission to edit the file. The migration and model already exist in this project. Here's what's already in place and what needs to change:\n\n**Migration** (`db/migrate/20260214000004_create_pr"
+  },
+  "notes": "Stage completed: model_profile"
+}

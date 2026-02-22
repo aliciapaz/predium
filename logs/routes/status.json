@@ -1,0 +1,10 @@
+{
+  "outcome": "success",
+  "preferred_next_label": "",
+  "suggested_next_ids": [],
+  "context_updates": {
+    "last_stage": "routes",
+    "last_response": "The routes file already has RESTful resources for all six models you mentioned:\n\n| Resource | Routes | Notes |\n|---|---|---|\n| **Organization** | `resources :organizations, only: [:show]` + full CRUD "
+  },
+  "notes": "Stage completed: routes"
+}

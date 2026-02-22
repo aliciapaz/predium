@@ -1,0 +1,12 @@
+{
+  "outcome": "success",
+  "preferred_next_label": "",
+  "suggested_next_ids": [
+    "exit"
+  ],
+  "context_updates": {
+    "human.gate.selected": "A",
+    "human.gate.label": "[A] Approve"
+  },
+  "notes": ""
+}

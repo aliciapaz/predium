@@ -1,0 +1,10 @@
+{
+  "outcome": "success",
+  "preferred_next_label": "",
+  "suggested_next_ids": [],
+  "context_updates": {
+    "last_stage": "model_form",
+    "last_response": "The Form model and migration already exist with all the fields, associations, and validations you specified. Here's what's already in place:\n\n**Model** (`app/models/form.rb`):\n- `belongs_to :user` and"
+  },
+  "notes": "Stage completed: model_form"
+}

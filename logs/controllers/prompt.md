@@ -1,0 +1,13 @@
+Generate controllers for: Organization, User, Profile, Membership, Form, FormResponse.\n\nInclude ActionPolicy authorization and strong parameters.\n\nGenerate corresponding policy classes.\n\nFollow Telos controller conventions:
+- Maximum 30-50 lines — if longer, extract to service objects
+- Instantiate services, never put business logic directly in controllers
+- Use strong parameters with params.expect() pattern
+- Include concerns for cross-cutting behavior (authentication, tracking)
+- Handle service errors and provide user feedback
+- Delegate authorization to policies (ActionPolicy): authorize! @resource\n\nFollow Telos authorization conventions:
+- Use ActionPolicy (not Pundit or CanCanCan)
+- Policy naming: ResourcePolicy (e.g., ListingPolicy, UserPolicy)
+- Define methods matching controller actions: create?, update?, destroy?
+- Controller usage: authorize! @resource
+- Rescue unauthorized: rescue_from ActionPolicy::Unauthorized
+- Check ownership and feature flags in policies

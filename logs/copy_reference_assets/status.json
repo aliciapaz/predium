@@ -1,0 +1,9 @@
+{
+  "outcome": "success",
+  "preferred_next_label": "",
+  "suggested_next_ids": [],
+  "context_updates": {
+    "tool.output": ""
+  },
+  "notes": "Tool completed: mkdir -p config/questionnaire/extensions config/locales/en config/locales/es vendor/javascript && git -C ~/OS/predium show develop:config/questionnaire/core.yml > config/questionnaire/core.yml && git -C ~/OS/predium show develop:config/questionnaire/extensions/chile.yml > config/questionnaire/extensions/chile.yml && git -C ~/OS/predium show develop:vendor/javascript/chart.umd.js > vendor/javascript/chart.umd.js && git -C ~/OS/predium show develop:config/locales/en.yml > config/locales/en.yml && git -C ~/OS/predium show develop:config/locales/es.yml > config/locales/es.yml && git -C ~/OS/predium show develop:config/locales/en/questionnaire.yml > config/locales/en/questionnaire.yml && git -C ~/OS/predium show develop:config/locales/es/questionnaire.yml > config/locales/es/questionnaire.yml"
+}
