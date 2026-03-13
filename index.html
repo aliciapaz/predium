@@ -1,50 +1,879 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Predium</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #2d5016 0%, #4a7c23 100%);
-            color: white;
-            text-align: center;
-            padding: 20px;
-        }
-        h1 {
-            font-size: 3.5rem;
-            margin-bottom: 0.5rem;
-            letter-spacing: 2px;
-        }
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            margin-bottom: 3rem;
-            max-width: 500px;
-        }
-        .construction {
-            font-size: 1.5rem;
-            padding: 1rem 2rem;
-            border: 2px solid rgba(255,255,255,0.5);
-            border-radius: 8px;
-            background: rgba(255,255,255,0.1);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Predium — Diagnóstico y Transición Agroecológica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&amp;family=Outfit:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --green-deep: #0f2a1b;
+    --green-dark: #163d25;
+    --green-mid: #22623a;
+    --green-leaf: #3a9957;
+    --green-bright: #5cc97a;
+    --green-pale: #d4edda;
+    --earth: #a68b5b;
+    --earth-light: #d4c4a0;
+    --cream: #f4f1eb;
+    --cream-dark: #e8e2d6;
+    --gold: #c9a84c;
+    --white: #ffffff;
+    --text-dark: #1a1a18;
+    --text-mid: #4a4a42;
+    --text-light: #7a7a6e;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-dark);
+    background: var(--cream);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    background-size: 256px 256px;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ===== NAV ===== */
+  nav {
+    position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+    padding: 1.25rem 2.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: background 0.4s, backdrop-filter 0.4s, box-shadow 0.4s;
+  }
+  nav.scrolled {
+    background: rgba(15, 42, 27, 0.92);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 2px 24px rgba(0,0,0,0.15);
+  }
+  .nav-logo {
+    font-family: 'Fraunces', serif; font-weight: 700; font-size: 1.6rem;
+    color: var(--white); text-decoration: none; letter-spacing: -0.02em;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .nav-logo .dot {
+    width: 10px; height: 10px; background: var(--green-bright);
+    border-radius: 50%; display: inline-block;
+    animation: pulse-dot 2.5s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.6; }
+  }
+  .nav-links { display: flex; gap: 2rem; align-items: center; list-style: none; }
+  .nav-links a {
+    color: rgba(255,255,255,0.8); text-decoration: none;
+    font-size: 0.9rem; font-weight: 400; letter-spacing: 0.02em; transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--green-bright); }
+  .nav-cta {
+    background: var(--green-bright) !important; color: var(--green-deep) !important;
+    padding: 0.6rem 1.5rem; border-radius: 100px; font-weight: 600 !important;
+    transition: transform 0.3s, box-shadow 0.3s !important;
+  }
+  .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(92,201,122,0.4); }
+
+  /* ===== HERO ===== */
+  .hero {
+    position: relative; min-height: 100vh;
+    background: linear-gradient(165deg, var(--green-deep) 0%, #0d3520 40%, #184a2d 70%, var(--green-mid) 100%);
+    display: flex; align-items: center; overflow: hidden;
+  }
+  .hero-bg-pattern {
+    position: absolute; inset: 0; opacity: 0.06;
+    background-image:
+      radial-gradient(circle at 20% 80%, var(--green-bright) 1px, transparent 1px),
+      radial-gradient(circle at 80% 20%, var(--green-bright) 1px, transparent 1px),
+      radial-gradient(circle at 50% 50%, var(--green-bright) 0.5px, transparent 0.5px);
+    background-size: 60px 60px, 80px 80px, 40px 40px;
+  }
+  .hero-topo {
+    position: absolute; right: -5%; top: 10%; width: 55%; height: 80%; opacity: 0.07;
+  }
+  .hero-topo svg { width: 100%; height: 100%; }
+  .hero-content {
+    position: relative; z-index: 2; max-width: 1280px; margin: 0 auto;
+    padding: 8rem 2.5rem 5rem;
+    display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 4rem; align-items: center;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: rgba(92,201,122,0.12); border: 1px solid rgba(92,201,122,0.25);
+    color: var(--green-bright); padding: 0.45rem 1rem; border-radius: 100px;
+    font-size: 0.8rem; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;
+    margin-bottom: 1.5rem; animation: fadeSlideUp 0.8s ease-out both;
+  }
+  .hero-tag::before { content: ''; width: 6px; height: 6px; background: var(--green-bright); border-radius: 50%; }
+  .hero h1 {
+    font-family: 'Fraunces', serif; font-size: clamp(2.8rem, 5.5vw, 4.5rem);
+    font-weight: 700; color: var(--white); line-height: 1.08; letter-spacing: -0.03em;
+    margin-bottom: 1.5rem; animation: fadeSlideUp 0.8s 0.15s ease-out both;
+  }
+  .hero h1 em { font-style: italic; color: var(--green-bright); font-weight: 500; }
+  .hero-desc {
+    font-size: 1.15rem; color: rgba(255,255,255,0.7); line-height: 1.65;
+    max-width: 540px; margin-bottom: 2.5rem; font-weight: 300;
+    animation: fadeSlideUp 0.8s 0.3s ease-out both;
+  }
+  .hero-actions {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+    animation: fadeSlideUp 0.8s 0.45s ease-out both;
+  }
+
+  /* ===== BUTTONS ===== */
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--green-bright); color: var(--green-deep);
+    padding: 1rem 2rem; border-radius: 100px;
+    font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 600;
+    text-decoration: none; border: none; cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(92,201,122,0.35); }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: transparent; color: var(--white);
+    padding: 1rem 2rem; border-radius: 100px;
+    font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 400;
+    text-decoration: none; border: 1px solid rgba(255,255,255,0.25); cursor: pointer;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.05); }
+
+  /* ===== HERO VISUAL: APP MOCKUP ===== */
+  .hero-visual { position: relative; animation: fadeSlideUp 1s 0.5s ease-out both; }
+  .app-mockup {
+    position: relative; background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+    padding: 1.5rem; backdrop-filter: blur(10px);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+  }
+  .mockup-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.25rem; padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .mockup-title { color: var(--white); font-size: 0.85rem; font-weight: 500; }
+  .mockup-badge {
+    background: rgba(92,201,122,0.15); color: var(--green-bright);
+    font-size: 0.7rem; padding: 0.3rem 0.7rem; border-radius: 100px;
+    font-weight: 500; display: flex; align-items: center; gap: 0.35rem;
+  }
+  .mockup-badge::before { content: ''; width: 6px; height: 6px; background: var(--green-bright); border-radius: 50%; }
+  .radar-container { display: flex; justify-content: center; margin-bottom: 1.25rem; }
+  .radar-container svg { width: 240px; height: 240px; }
+  .mockup-scores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+  .score-item { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 0.7rem; text-align: center; }
+  .score-label { font-size: 0.6rem; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.3rem; }
+  .score-value { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; color: var(--green-bright); }
+  .mockup-floating {
+    position: absolute; bottom: -20px; left: -30px;
+    background: var(--white); border-radius: 14px;
+    padding: 0.9rem 1.2rem; box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+    display: flex; align-items: center; gap: 0.7rem;
+    animation: float 4s ease-in-out infinite;
+  }
+  .mockup-floating .icon-circle {
+    width: 36px; height: 36px; background: var(--green-pale);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  }
+  .mockup-floating .fl-label { font-size: 0.7rem; color: var(--text-light); }
+  .mockup-floating .fl-value { font-size: 0.9rem; font-weight: 600; color: var(--green-mid); }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+  /* ===== STATS STRIP ===== */
+  .stats-strip { background: var(--green-deep); border-top: 1px solid rgba(255,255,255,0.06); padding: 3rem 2.5rem; }
+  .stats-inner { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+  .stat { text-align: center; }
+  .stat-number { font-family: 'Fraunces', serif; font-size: 2.4rem; font-weight: 700; color: var(--green-bright); line-height: 1; margin-bottom: 0.4rem; }
+  .stat-label { font-size: 0.8rem; color: rgba(255,255,255,0.5); font-weight: 300; letter-spacing: 0.02em; }
+
+  /* ===== SECTION SHARED ===== */
+  .section-tag {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: 0.75rem; font-weight: 500; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--green-mid); margin-bottom: 1.25rem;
+  }
+  .section-tag::before { content: ''; width: 24px; height: 2px; background: var(--green-mid); }
+
+  /* ===== PROBLEM ===== */
+  .problem-section { padding: 7rem 2.5rem; background: var(--cream); position: relative; }
+  .problem-section::before {
+    content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 1px; height: 60px; background: linear-gradient(to bottom, var(--green-deep), transparent);
+  }
+  .problem-inner { max-width: 1080px; margin: 0 auto; }
+  .problem-headline {
+    font-family: 'Fraunces', serif; font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700; color: var(--green-deep); line-height: 1.15;
+    letter-spacing: -0.02em; max-width: 750px; margin-bottom: 3.5rem;
+  }
+  .problem-headline em { font-style: italic; color: var(--green-mid); }
+  .pain-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+  .pain-card {
+    background: var(--white); border-radius: 16px; padding: 2rem;
+    border: 1px solid var(--cream-dark); transition: transform 0.3s, box-shadow 0.3s;
+    position: relative; overflow: hidden;
+  }
+  .pain-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.06); }
+  .pain-card::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--earth), var(--earth-light));
+  }
+  .pain-icon {
+    width: 48px; height: 48px; background: var(--cream); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; margin-bottom: 1.25rem;
+  }
+  .pain-card h3 {
+    font-family: 'Fraunces', serif; font-size: 1.15rem; font-weight: 600;
+    color: var(--green-deep); margin-bottom: 0.75rem; line-height: 1.3;
+  }
+  .pain-card p { font-size: 0.9rem; color: var(--text-mid); line-height: 1.6; font-weight: 300; }
+
+  /* ===== METHODOLOGY (NEW SECTION) ===== */
+  .method-section { padding: 7rem 2.5rem; background: var(--white); }
+  .method-inner { max-width: 1080px; margin: 0 auto; }
+  .method-header { text-align: center; margin-bottom: 4rem; }
+  .method-headline {
+    font-family: 'Fraunces', serif; font-size: clamp(2rem, 4vw, 2.8rem);
+    font-weight: 700; color: var(--green-deep); line-height: 1.15;
+    letter-spacing: -0.02em; margin-bottom: 1rem;
+  }
+  .method-sub {
+    font-size: 1.05rem; color: var(--text-mid); font-weight: 300;
+    max-width: 640px; margin: 0 auto; line-height: 1.6;
+  }
+  .method-levels {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;
+    margin-bottom: 3rem;
+  }
+  .method-level {
+    background: var(--cream); border-radius: 20px; padding: 2.5rem 2rem;
+    position: relative; text-align: center;
+    border: 1px solid var(--cream-dark); transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .method-level:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.06); }
+  .method-level-tag {
+    display: inline-block; font-size: 0.65rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--white); background: var(--green-mid);
+    padding: 0.3rem 0.8rem; border-radius: 100px; margin-bottom: 1.25rem;
+  }
+  .method-level h3 {
+    font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700;
+    color: var(--green-deep); margin-bottom: 0.75rem; line-height: 1.3;
+  }
+  .method-level p { font-size: 0.88rem; color: var(--text-mid); line-height: 1.6; font-weight: 300; }
+  .method-level-icon {
+    font-size: 2.2rem; margin-bottom: 1rem;
+  }
+  .method-arrow {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; color: var(--text-light); gap: 0.5rem;
+    margin-top: 2rem; font-weight: 300;
+  }
+  .method-arrow svg { opacity: 0.4; }
+
+  /* ===== DIMENSIONS SHOWCASE ===== */
+  .dimensions-section { padding: 5rem 2.5rem 7rem; background: var(--white); }
+  .dimensions-inner { max-width: 1080px; margin: 0 auto; }
+  .dimensions-header { text-align: center; margin-bottom: 3rem; }
+  .dimensions-headline {
+    font-family: 'Fraunces', serif; font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 700; color: var(--green-deep); line-height: 1.2;
+    margin-bottom: 0.75rem;
+  }
+  .dimensions-sub { font-size: 0.95rem; color: var(--text-mid); font-weight: 300; }
+  .dim-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem;
+  }
+  .dim-chip {
+    background: var(--cream); border: 1px solid var(--cream-dark);
+    border-radius: 12px; padding: 1.2rem 1rem; text-align: center;
+    transition: transform 0.2s, border-color 0.3s;
+  }
+  .dim-chip:hover { transform: translateY(-2px); border-color: var(--green-leaf); }
+  .dim-chip-icon { font-size: 1.4rem; margin-bottom: 0.5rem; }
+  .dim-chip-name {
+    font-size: 0.75rem; font-weight: 500; color: var(--green-deep);
+    line-height: 1.3;
+  }
+
+  /* ===== FEATURES ===== */
+  .features-section { padding: 7rem 2.5rem; background: var(--cream); position: relative; }
+  .features-inner { max-width: 1080px; margin: 0 auto; }
+  .features-header { text-align: center; margin-bottom: 4.5rem; }
+  .features-headline {
+    font-family: 'Fraunces', serif; font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700; color: var(--green-deep); line-height: 1.15;
+    letter-spacing: -0.02em; margin-bottom: 1rem;
+  }
+  .features-sub {
+    font-size: 1.05rem; color: var(--text-mid); font-weight: 300;
+    max-width: 600px; margin: 0 auto; line-height: 1.6;
+  }
+  .feature-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
+    align-items: center; margin-bottom: 5rem;
+  }
+  .feature-row:nth-child(even) { direction: rtl; }
+  .feature-row:nth-child(even) > * { direction: ltr; }
+  .feature-text .feature-number {
+    font-family: 'Fraunces', serif; font-size: 0.8rem; color: var(--green-leaf);
+    font-weight: 500; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;
+  }
+  .feature-number::after { content: ''; flex: 1; height: 1px; background: var(--green-pale); max-width: 60px; }
+  .feature-text h3 {
+    font-family: 'Fraunces', serif; font-size: 1.7rem; font-weight: 700;
+    color: var(--green-deep); line-height: 1.2; letter-spacing: -0.01em; margin-bottom: 1rem;
+  }
+  .feature-text p {
+    font-size: 0.95rem; color: var(--text-mid); line-height: 1.7;
+    font-weight: 300; margin-bottom: 1.5rem;
+  }
+  .feature-benefit {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.85rem; font-weight: 500; color: var(--green-mid);
+  }
+  .feature-benefit svg { flex-shrink: 0; }
+  .feature-visual {
+    background: linear-gradient(135deg, var(--green-deep), var(--green-dark));
+    border-radius: 20px; padding: 2rem; min-height: 320px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .feature-visual::after {
+    content: ''; position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 30% 70%, rgba(92,201,122,0.1) 0%, transparent 50%),
+      radial-gradient(circle at 70% 30%, rgba(201,168,76,0.08) 0%, transparent 50%);
+  }
+  .fv-content { position: relative; z-index: 1; text-align: center; color: var(--white); }
+  .fv-icon {
+    width: 64px; height: 64px; border: 2px solid rgba(255,255,255,0.15);
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1rem; font-size: 1.8rem; background: rgba(255,255,255,0.05);
+  }
+  .fv-label { font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.35rem; }
+  .fv-big { font-family: 'Fraunces', serif; font-size: 2.5rem; font-weight: 700; color: var(--green-bright); }
+  .fv-detail { font-size: 0.85rem; color: rgba(255,255,255,0.55); margin-top: 0.5rem; }
+
+  /* ===== HOW IT WORKS ===== */
+  .how-section { padding: 7rem 2.5rem; background: var(--white); }
+  .how-inner { max-width: 1080px; margin: 0 auto; }
+  .how-header { text-align: center; margin-bottom: 4rem; }
+  .how-headline {
+    font-family: 'Fraunces', serif; font-size: clamp(2rem, 4vw, 2.8rem);
+    font-weight: 700; color: var(--green-deep); line-height: 1.15;
+    letter-spacing: -0.02em; margin-bottom: 1rem;
+  }
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; position: relative; }
+  .steps::before {
+    content: ''; position: absolute; top: 38px; left: 12.5%; width: 75%; height: 2px;
+    background: linear-gradient(90deg, var(--green-bright), var(--green-leaf), var(--green-mid), var(--earth));
+    opacity: 0.25;
+  }
+  .step { text-align: center; position: relative; }
+  .step-num {
+    width: 48px; height: 48px; background: var(--green-deep); color: var(--green-bright);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700;
+    margin: 0 auto 1.25rem; position: relative; z-index: 1;
+    box-shadow: 0 4px 15px rgba(15,42,27,0.2);
+  }
+  .step h4 { font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 600; color: var(--green-deep); margin-bottom: 0.6rem; }
+  .step p { font-size: 0.85rem; color: var(--text-mid); line-height: 1.55; font-weight: 300; }
+
+  /* ===== TESTIMONIAL ===== */
+  .social-section {
+    padding: 6rem 2.5rem;
+    background: linear-gradient(165deg, var(--green-deep) 0%, #184a2d 100%);
+    position: relative; overflow: hidden;
+  }
+  .social-section::before {
+    content: ''; position: absolute; inset: 0; opacity: 0.04;
+    background-image:
+      radial-gradient(circle at 25% 75%, var(--green-bright) 1px, transparent 1px),
+      radial-gradient(circle at 75% 25%, var(--green-bright) 1px, transparent 1px);
+    background-size: 50px 50px, 70px 70px;
+  }
+  .social-inner { max-width: 800px; margin: 0 auto; text-align: center; position: relative; z-index: 1; }
+  .quote-mark { font-family: 'Fraunces', serif; font-size: 5rem; color: var(--green-bright); opacity: 0.3; line-height: 1; margin-bottom: -1rem; }
+  .testimonial-text {
+    font-family: 'Fraunces', serif; font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+    font-weight: 300; font-style: italic; color: var(--white);
+    line-height: 1.55; margin-bottom: 2rem; opacity: 0.9;
+  }
+  .testimonial-author { display: flex; align-items: center; justify-content: center; gap: 1rem; }
+  .author-avatar {
+    width: 48px; height: 48px; background: linear-gradient(135deg, var(--green-mid), var(--green-bright));
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; font-weight: 600; color: var(--white);
+  }
+  .author-info { text-align: left; }
+  .author-name { font-weight: 600; color: var(--white); font-size: 0.95rem; }
+  .author-role { font-size: 0.8rem; color: rgba(255,255,255,0.5); font-weight: 300; }
+
+  /* ===== CTA ===== */
+  .cta-section { padding: 7rem 2.5rem; background: var(--cream); text-align: center; }
+  .cta-inner { max-width: 680px; margin: 0 auto; }
+  .cta-headline {
+    font-family: 'Fraunces', serif; font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700; color: var(--green-deep); line-height: 1.15;
+    letter-spacing: -0.02em; margin-bottom: 1rem;
+  }
+  .cta-desc { font-size: 1.05rem; color: var(--text-mid); font-weight: 300; line-height: 1.6; margin-bottom: 2.5rem; }
+  .cta-form { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+  .cta-input {
+    flex: 1; min-width: 260px; max-width: 360px; padding: 1rem 1.5rem;
+    border: 2px solid var(--cream-dark); border-radius: 100px;
+    font-family: 'Outfit', sans-serif; font-size: 0.95rem;
+    background: var(--white); color: var(--text-dark); outline: none;
+    transition: border-color 0.3s;
+  }
+  .cta-input:focus { border-color: var(--green-leaf); }
+  .cta-note { font-size: 0.78rem; color: var(--text-light); font-weight: 300; }
+
+  /* ===== FOOTER ===== */
+  footer { background: var(--green-deep); padding: 3.5rem 2.5rem 2rem; color: rgba(255,255,255,0.4); }
+  .footer-inner {
+    max-width: 1080px; margin: 0 auto; display: flex;
+    justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+  }
+  .footer-logo { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 700; color: var(--white); }
+  .footer-links { display: flex; gap: 2rem; list-style: none; }
+  .footer-links a { color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.85rem; transition: color 0.3s; }
+  .footer-links a:hover { color: var(--green-bright); }
+  .footer-copy {
+    width: 100%; text-align: center; font-size: 0.75rem; margin-top: 2rem;
+    padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease-out, transform 0.7s ease-out; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    .hero-content { grid-template-columns: 1fr; padding-top: 7rem; }
+    .hero-visual { order: -1; max-width: 420px; margin: 0 auto; }
+    .stats-inner { grid-template-columns: repeat(2, 1fr); }
+    .pain-cards { grid-template-columns: 1fr; }
+    .method-levels { grid-template-columns: 1fr; }
+    .dim-grid { grid-template-columns: repeat(3, 1fr); }
+    .feature-row, .feature-row:nth-child(even) { grid-template-columns: 1fr; direction: ltr; gap: 2rem; }
+    .steps { grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+    .steps::before { display: none; }
+    .nav-links { display: none; }
+  }
+  @media (max-width: 600px) {
+    .stats-inner { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .dim-grid { grid-template-columns: repeat(2, 1fr); }
+    .steps { grid-template-columns: 1fr; }
+  }
+</style>
 </head>
 <body>
-    <h1>Predium</h1>
-    <p class="subtitle">Herramienta de diagnóstico predial para la transición agroecológica</p>
-    <p class="construction">En construcción...</p>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo"><span class="dot"></span>Predium</a>
+  <ul class="nav-links">
+    <li><a href="#problema">El Problema</a></li>
+    <li><a href="#metodologia">Metodología</a></li>
+    <li><a href="#funciones">Funciones</a></li>
+    <li><a href="#cta" class="nav-cta">Solicitar Acceso</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-pattern"></div>
+  <div class="hero-topo">
+    <svg viewBox="0 0 600 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M50 400 Q150 350 250 380 Q350 410 450 350 Q550 290 600 310" stroke="rgba(92,201,122,0.5)" stroke-width="1.5" fill="none"/>
+      <path d="M0 350 Q100 300 200 330 Q300 360 400 300 Q500 240 600 260" stroke="rgba(92,201,122,0.4)" stroke-width="1.5" fill="none"/>
+      <path d="M30 300 Q130 250 230 280 Q330 310 430 250 Q530 190 600 210" stroke="rgba(92,201,122,0.3)" stroke-width="1.5" fill="none"/>
+      <path d="M0 250 Q100 200 200 230 Q300 260 400 200 Q500 140 600 160" stroke="rgba(92,201,122,0.25)" stroke-width="1.5" fill="none"/>
+      <path d="M50 200 Q150 150 250 180 Q350 210 450 150 Q550 90 600 110" stroke="rgba(92,201,122,0.2)" stroke-width="1.5" fill="none"/>
+      <path d="M0 150 Q100 100 200 130 Q300 160 400 100 Q500 40 600 60" stroke="rgba(92,201,122,0.15)" stroke-width="1.5" fill="none"/>
+    </svg>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-text">
+      <div class="hero-tag">Transición Agroecológica Digital</div>
+      <h1>Diagnostica. Transforma.<br><em>Regenera.</em></h1>
+      <p class="hero-desc">La herramienta digital para el diagnóstico agroecológico de predios campesinos. Evalúa principios, dimensiones e indicadores en terreno — sin internet — y acompaña el proceso de transición con datos confiables y reportes profesionales.</p>
+      <div class="hero-actions">
+        <a href="#cta" class="btn-primary">
+          Solicitar Acceso Anticipado
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#metodologia" class="btn-secondary">Ver la Metodología</a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="app-mockup">
+        <div class="mockup-header">
+          <span class="mockup-title">Diagnóstico — Finca La Esperanza</span>
+          <span class="mockup-badge">Modo Sin Conexión</span>
+        </div>
+        <div class="radar-container">
+          <svg viewBox="0 0 240 240">
+            <!-- Radar grid -->
+            <polygon points="120,25 185,55 205,120 185,185 120,215 55,185 35,120 55,55" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+            <polygon points="120,48 170,70 185,120 170,170 120,192 70,170 55,120 70,70" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+            <polygon points="120,72 155,85 165,120 155,155 120,168 85,155 75,120 85,85" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <!-- Data: agroecological principles -->
+            <polygon points="120,32 178,60 198,125 170,180 85,190 40,140 50,58" fill="rgba(92,201,122,0.15)" stroke="rgba(92,201,122,0.8)" stroke-width="2"/>
+            <circle cx="120" cy="32" r="4" fill="#5cc97a"/>
+            <circle cx="178" cy="60" r="4" fill="#5cc97a"/>
+            <circle cx="198" cy="125" r="4" fill="#5cc97a"/>
+            <circle cx="170" cy="180" r="4" fill="#5cc97a"/>
+            <circle cx="85" cy="190" r="4" fill="#5cc97a"/>
+            <circle cx="40" cy="140" r="4" fill="#5cc97a"/>
+            <circle cx="50" cy="58" r="4" fill="#5cc97a"/>
+            <!-- Labels: agroecological principles -->
+            <text x="120" y="17" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-size="7" font-family="Outfit">Biodiversidad</text>
+            <text x="210" y="55" text-anchor="start" fill="rgba(255,255,255,0.55)" font-size="7" font-family="Outfit">Reciclaje</text>
+            <text x="215" y="128" text-anchor="start" fill="rgba(255,255,255,0.55)" font-size="7" font-family="Outfit">Manejo suelo</text>
+            <text x="178" y="197" text-anchor="start" fill="rgba(255,255,255,0.55)" font-size="7" font-family="Outfit">Control plagas</text>
+            <text x="75" y="207" text-anchor="end" fill="rgba(255,255,255,0.55)" font-size="7" font-family="Outfit">Interacciones</text>
+            <text x="25" y="148" text-anchor="end" fill="rgba(255,255,255,0.55)" font-size="7" font-family="Outfit">Saber trad.</text>
+            <text x="35" y="52" text-anchor="end" fill="rgba(255,255,255,0.55)" font-size="7" font-family="Outfit">Agua</text>
+          </svg>
+        </div>
+        <div class="mockup-scores">
+          <div class="score-item">
+            <div class="score-label">Global</div>
+            <div class="score-value">6.8</div>
+          </div>
+          <div class="score-item">
+            <div class="score-label">Suelo</div>
+            <div class="score-value">7.5</div>
+          </div>
+          <div class="score-item">
+            <div class="score-label">Biodiv.</div>
+            <div class="score-value">8.2</div>
+          </div>
+          <div class="score-item">
+            <div class="score-label">Reciclaje</div>
+            <div class="score-value">5.9</div>
+          </div>
+          <div class="score-item">
+            <div class="score-label">Diseño</div>
+            <div class="score-value">6.1</div>
+          </div>
+          <div class="score-item">
+            <div class="score-label">Saberes</div>
+            <div class="score-value">7.8</div>
+          </div>
+        </div>
+      </div>
+      <div class="mockup-floating">
+        <div class="icon-circle">
+          <svg width="18" height="18" fill="none" stroke="#22623a" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+        </div>
+        <div>
+          <div class="fl-label">Línea base</div>
+          <div class="fl-value">Lista para el plan de trabajo</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="stats-inner">
+    <div class="stat">
+      <div class="stat-number">15</div>
+      <div class="stat-label">Dimensiones Agroecológicas</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">3</div>
+      <div class="stat-label">Niveles de Diagnóstico</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">100%</div>
+      <div class="stat-label">Funciona Sin Internet</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">1–10</div>
+      <div class="stat-label">Escala Estandarizada</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROBLEMA -->
+<section class="problem-section" id="problema">
+  <div class="problem-inner">
+    <div class="section-tag">La realidad de hoy</div>
+    <h2 class="problem-headline reveal">La transición agroecológica no puede depender de <em>formularios de papel.</em></h2>
+    <div class="pain-cards">
+      <div class="pain-card reveal">
+        <div class="pain-icon">📋</div>
+        <h3>Diagnósticos que se pierden en hojas sueltas</h3>
+        <p>Los extensionistas recorren el predio con formularios impresos, después transcriben a mano los datos a hojas de cálculo. Cada paso introduce errores y retrasa semanas la línea base que debería iniciar el proceso de transición.</p>
+      </div>
+      <div class="pain-card reveal">
+        <div class="pain-icon">🔀</div>
+        <h3>Criterios dispares entre evaluadores</h3>
+        <p>Sin descriptores estandarizados para cada indicador, cada profesional interpreta la escala 1 a 10 de manera diferente. El resultado: datos incomparables entre predios que debilitan cualquier análisis territorial o propuesta de política pública.</p>
+      </div>
+      <div class="pain-card reveal">
+        <div class="pain-icon">📄</div>
+        <h3>Sin seguimiento del proceso de transición</h3>
+        <p>Completar el diagnóstico inicial es solo el comienzo. Pero monitorear la evolución del agroecosistema a lo largo del tiempo — comparar líneas base, medir avances, ajustar el rediseño predial — es casi imposible con datos dispersos en distintos formatos.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METODOLOGÍA -->
+<section class="method-section" id="metodologia">
+  <div class="method-inner">
+    <div class="method-header">
+      <div class="section-tag" style="justify-content:center;">Metodología de diagnóstico</div>
+      <h2 class="method-headline reveal">Tres niveles de diagnóstico,<br>una sola herramienta</h2>
+      <p class="method-sub reveal">Predium digitaliza la metodología de diagnóstico agroecológico en tres etapas progresivas — desde los principios globales hasta los indicadores específicos de cada dimensión.</p>
+    </div>
+
+    <div class="method-levels">
+      <div class="method-level reveal">
+        <div class="method-level-tag">Etapa I</div>
+        <div class="method-level-icon">🌿</div>
+        <h3>Principios Agroecológicos</h3>
+        <p>Evaluación global del agroecosistema en función de seis principios: biodiversidad, reciclaje, manejo ecológico de suelo, control natural de plagas, interrelación entre subsistemas y aplicación de saberes tradicionales.</p>
+      </div>
+      <div class="method-level reveal">
+        <div class="method-level-tag">Etapa II</div>
+        <div class="method-level-icon">📐</div>
+        <h3>Dimensiones del Agroecosistema</h3>
+        <p>Análisis del estado general a través de 15 dimensiones ecológico-productivas, socioculturales y económicas — desde calidad de suelo y manejo de agua hasta diseño predial e ingresos familiares.</p>
+      </div>
+      <div class="method-level reveal">
+        <div class="method-level-tag">Etapa III</div>
+        <div class="method-level-icon">🔬</div>
+        <h3>Indicadores Específicos</h3>
+        <p>Evaluación detallada de cada dimensión mediante indicadores con descriptores claros en tres estados (1, 5 y 10). Cobertura de suelo, actividad biológica, rotaciones, policultivos, erosión y muchos más.</p>
+      </div>
+    </div>
+
+    <div class="method-arrow reveal">
+      <span>Cada etapa genera un gráfico radial que permite visualizar el estado del predio e identificar las áreas prioritarias para el plan de transición</span>
+    </div>
+  </div>
+</section>
+
+<!-- DIMENSIONES -->
+<section class="dimensions-section">
+  <div class="dimensions-inner">
+    <div class="dimensions-header reveal">
+      <h3 class="dimensions-headline">Las 15 dimensiones que Predium evalúa</h3>
+      <p class="dimensions-sub">Basadas en la metodología de diagnóstico agroecológico para agricultura familiar campesina</p>
+    </div>
+    <div class="dim-grid reveal">
+      <div class="dim-chip"><div class="dim-chip-icon">🌱</div><div class="dim-chip-name">Calidad de Suelo</div></div>
+      <div class="dim-chip"><div class="dim-chip-icon">🔄</div><div class="dim-chip-name">Manejo Ecológico de Suelo</div></div>
+      <div class="dim-chip"><div class="dim-chip-icon">💧</div><div class="dim-chip-name">Disponibilidad y Conservación de Agua</div></div>
+      <div class="dim-chip"><div class="dim-chip-icon">🐛</div><div class="dim-chip-name">Control Natural de Plagas</div></div>
+      <div class="dim-chip"><div class="dim-chip-icon">🌾</div><div class="dim-chip-name">Diversidad Productiva</div></div>
+      <div class="dim-chip"><div class="dim-chip-icon">🌳</div><div class="dim-chip-name">Vegetación y Biodiversidad</div></div>
+      <div class="dim-chip"><div class="dim-chip-icon">♻️</div><div class="dim-chip-name">Reciclaje y Residuos</div></div>
+      <div class="dim-chip"><div class="dim-chip-icon">🗺️</div><div class="dim-chip-name">Diseño General del Predio</div></div>
+      <div class="dim-chip"><div class="dim-chip-icon">🐄</div><div class="dim-chip-name">Sanidad de los Sistemas</div></div>
+      <div class="dim-chip"><div class="dim-chip-icon">🌿</div><div class="dim-chip-name">Vida del Suelo y Espacios Naturales</div></div>
+      <div class="dim-chip"><div class="dim-chip-icon">🧬</div><div class="dim-chip-name">Semillas y Material Genético</div></div>
+      <div class="dim-chip"><div class="dim-chip-icon">🏡</div><div class="dim-chip-name">Autosuficiencia Alimentaria</div></div>
+      <div class="dim-chip"><div class="dim-chip-icon">📦</div><div class="dim-chip-name">Orientación Productiva y Comercial</div></div>
+      <div class="dim-chip"><div class="dim-chip-icon">👥</div><div class="dim-chip-name">Organización y Redes</div></div>
+      <div class="dim-chip"><div class="dim-chip-icon">💡</div><div class="dim-chip-name">Saberes Tradicionales</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FUNCIONES -->
+<section class="features-section" id="funciones">
+  <div class="features-inner">
+    <div class="features-header">
+      <div class="section-tag" style="justify-content:center;">Capacidades</div>
+      <h2 class="features-headline reveal">Diseñado para el terreno.<br>Confiable para las instituciones.</h2>
+      <p class="features-sub reveal">Tres capacidades que transforman el diagnóstico agroecológico desde una tarea dispersa en papel hacia un proceso estandarizado con datos accionables.</p>
+    </div>
+
+    <div class="feature-row reveal">
+      <div class="feature-text">
+        <div class="feature-number">01 — Sin Conexión</div>
+        <h3>Diagnóstico completo sin señal de internet</h3>
+        <p>Realiza la evaluación de las tres etapas del diagnóstico agroecológico en cualquier dispositivo, incluso en predios sin cobertura de celular. Los datos se sincronizan automáticamente cuando vuelve la conectividad — sin formularios de papel, sin transcripción, sin demoras.</p>
+        <div class="feature-benefit">
+          <svg width="16" height="16" fill="none" stroke="#3a9957" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          La línea base se genera en la misma visita de campo
+        </div>
+      </div>
+      <div class="feature-visual">
+        <div class="fv-content">
+          <div class="fv-icon">📡</div>
+          <div class="fv-label">Conectividad requerida</div>
+          <div class="fv-big">0%</div>
+          <div class="fv-detail">Funcional en zonas rurales sin cobertura</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-row reveal">
+      <div class="feature-text">
+        <div class="feature-number">02 — Escala Estandarizada</div>
+        <h3>Descriptores claros para cada indicador</h3>
+        <p>Cada indicador tiene criterios descriptivos en tres estados (1, 5 y 10) que guían la puntuación del evaluador. Cobertura de suelo, erosión, actividad biológica, rotaciones — todos con la misma escala. Cualquier extensionista produce resultados replicables y comparables.</p>
+        <div class="feature-benefit">
+          <svg width="16" height="16" fill="none" stroke="#3a9957" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          Datos comparables entre predios, territorios y temporadas
+        </div>
+      </div>
+      <div class="feature-visual">
+        <div class="fv-content">
+          <div class="fv-icon">📊</div>
+          <div class="fv-label">Escala de evaluación</div>
+          <div class="fv-big">1–10</div>
+          <div class="fv-detail">Con descriptores en niveles 1 · 5 · 10</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-row reveal">
+      <div class="feature-text">
+        <div class="feature-number">03 — Gráficos Radiales Instantáneos</div>
+        <h3>La fotografía del agroecosistema, lista al momento</h3>
+        <p>Genera reportes PDF con gráficos radiales que representan el estado de los principios, dimensiones e indicadores — la misma representación recomendada por la metodología de diagnóstico. Entrega una línea base visual al agricultor antes de salir del predio.</p>
+        <div class="feature-benefit">
+          <svg width="16" height="16" fill="none" stroke="#3a9957" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          Del diagnóstico al plan de transición en segundos
+        </div>
+      </div>
+      <div class="feature-visual">
+        <div class="fv-content">
+          <div class="fv-icon">📑</div>
+          <div class="fv-label">Generación de reportes</div>
+          <div class="fv-big">Instantáneo</div>
+          <div class="fv-detail">PDF con gráficos radiales y análisis por dimensión</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CÓMO FUNCIONA -->
+<section class="how-section" id="como">
+  <div class="how-inner">
+    <div class="how-header">
+      <div class="section-tag" style="justify-content:center;">Flujo de trabajo</div>
+      <h2 class="how-headline reveal">De la llegada al predio<br>al plan de transición</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">1</div>
+        <h4>Abrir Diagnóstico</h4>
+        <p>Selecciona el predio y comienza la evaluación guiada por las tres etapas del diagnóstico — sin necesidad de internet.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">2</div>
+        <h4>Evaluar en Terreno</h4>
+        <p>Recorre los principios, dimensiones e indicadores junto al agricultor. Los descriptores en pantalla guían la asignación de valores en la escala 1-10.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">3</div>
+        <h4>Generar Línea Base</h4>
+        <p>Con un toque genera el reporte PDF con gráficos radiales — la fotografía del agroecosistema que identifica las áreas prioritarias del rediseño predial.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">4</div>
+        <h4>Monitorear la Transición</h4>
+        <p>Con conexión, los datos se sincronizan. Compara evaluaciones en el tiempo para medir avances, ajustar el plan y demostrar resultados a financiadores.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIO -->
+<section class="social-section">
+  <div class="social-inner reveal">
+    <div class="quote-mark">"</div>
+    <p class="testimonial-text">La transición agroecológica necesita datos claros para avanzar. Con Predium podemos generar la línea base de un predio campesino en una sola visita y entregarle al agricultor un gráfico radial que entiende de inmediato — incluso a tres horas de la antena más cercana.</p>
+    <div class="testimonial-author">
+      <div class="author-avatar">MC</div>
+      <div class="author-info">
+        <div class="author-name">María Cifuentes</div>
+        <div class="author-role">Extensionista, Programa Piloto de Transición Agroecológica</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+  <div class="cta-inner">
+    <div class="section-tag" style="justify-content:center;">Comienza ahora</div>
+    <h2 class="cta-headline reveal">¿Listo para digitalizar el diagnóstico agroecológico?</h2>
+    <p class="cta-desc reveal">Únete a organizaciones de extensión, ONG y universidades de América Latina en el programa piloto. Lleva la metodología de transición agroecológica a cada predio campesino que visites — con datos estandarizados y reportes profesionales.</p>
+    <form class="cta-form reveal" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+      <input type="email" name="email" class="cta-input" placeholder="Tu correo electrónico institucional" required>
+      <button type="submit" class="btn-primary">
+        Solicitar Acceso
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </form>
+    <p class="cta-note reveal">Gratuito para participantes del piloto. No requiere tarjeta de crédito.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Predium</div>
+    <ul class="footer-links">
+      <li><a href="#">Nosotros</a></li>
+      <li><a href="#">Documentación</a></li>
+      <li><a href="#">Contacto</a></li>
+      <li><a href="#">Privacidad</a></li>
+    </ul>
+    <div class="footer-copy">© 2026 Predium. Diagnóstico y transición agroecológica para la agricultura familiar campesina.</div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 60); });
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => { entry.target.classList.add('visible'); }, i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(el => observer.observe(el));
+</script>
+
 </body>
 </html>
