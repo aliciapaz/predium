@@ -36,3 +36,6 @@
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
+/tmp
+development.log
+/app/assets/builds/
