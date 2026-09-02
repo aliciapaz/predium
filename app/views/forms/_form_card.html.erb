@@ -39,15 +39,10 @@
 
     <div class="flex items-center gap-4 mt-4 pt-3 border-t border-earth-100">
       <% if form.draft? %>
-        <% first_dim = QuestionnaireConfig.dimensions.first %>
         <%= link_to t("questionnaire.continue"),
-            form_questionnaire_step_path(form, first_dim[:key]),
-            data: { turbo_frame: "_top" },
-            class: "text-sm font-medium text-forest-600 hover:text-forest-700" %>
-        <%= link_to t("forms.edit_farm_info"),
             edit_form_path(form),
             data: { turbo_frame: "_top" },
-            class: "text-sm text-earth-500 hover:text-earth-700" %>
+            class: "text-sm font-medium text-forest-600 hover:text-forest-700" %>
       <% else %>
         <%= link_to t("forms.view_results"),
             form_path(form),

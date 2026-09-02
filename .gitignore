@@ -39,3 +39,6 @@
 /tmp
 development.log
 /app/assets/builds/
+
+# Ignore test coverage reports
+/coverage

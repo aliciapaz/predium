@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Admin
   class UsersController < Admin::BaseController
     before_action :set_user, only: [:show, :edit, :update]
@@ -9,7 +11,7 @@ module Admin
         query = "%#{params[:q]}%"
         @users = @users.where(
           "first_name ILIKE :q OR last_name ILIKE :q OR email ILIKE :q",
-          q: query
+          q: query,
         )
       end
 
@@ -26,9 +28,9 @@ module Admin
 
     def update
       if @user.update(user_params)
-        redirect_to admin_user_path(@user), notice: "User role updated."
+        redirect_to(admin_user_path(@user), notice: t("flash.user_role_updated"))
       else
-        render :edit, status: :unprocessable_entity
+        render(:edit, status: :unprocessable_entity)
       end
     end
 

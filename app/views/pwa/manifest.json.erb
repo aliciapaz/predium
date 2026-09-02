@@ -1,13 +1,20 @@
 {
   "name": "Predium",
+  "short_name": "Predium",
+  "lang": "<%= I18n.locale %>",
   "icons": [
     {
-      "src": "/icon.png",
+      "src": "/favicon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/favicon-512.png",
       "type": "image/png",
       "sizes": "512x512"
     },
     {
-      "src": "/icon.png",
+      "src": "/favicon-512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
@@ -16,7 +23,7 @@
   "start_url": "/",
   "display": "standalone",
   "scope": "/",
-  "description": "Predium.",
-  "theme_color": "red",
-  "background_color": "red"
+  "description": "<%= t("pwa.description") %>",
+  "theme_color": "#347844",
+  "background_color": "#faf9f7"
 }

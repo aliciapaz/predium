@@ -33,11 +33,25 @@ class QuestionnaireConfig
       @indicators_by_key[key.to_s] || raise(Error, "Unknown indicator: #{key}")
     end
 
+    def core_indicator?(key)
+      load_core!
+      @indicators_by_key.key?(key.to_s)
+    end
+
     def extension(territory_key)
       MUTEX.synchronize do
         @extensions ||= {}
         @extensions[territory_key.to_s] ||= load_extension!(territory_key)
       end
+    end
+
+    def extension_keys
+      EXTENSIONS_DIR.glob("*.yml").map { |path| path.basename(".yml").to_s }.sort
+    end
+
+    def fingerprint
+      files = [CORE_PATH] + EXTENSIONS_DIR.glob("*.yml").sort + questionnaire_locale_files
+      Digest::SHA256.hexdigest(files.map(&:read).join("\x1e"))
     end
 
     def reload!
@@ -52,6 +66,10 @@ class QuestionnaireConfig
     end
 
     private
+
+    def questionnaire_locale_files
+      Rails.root.glob("config/locales/*/questionnaire.yml").sort
+    end
 
     def load_core!
       return if @loaded
@@ -99,14 +117,14 @@ class QuestionnaireConfig
           i18n_key: ind.fetch("i18n_key"),
           level: ind.fetch("level"),
           position: ind.fetch("position"),
-          extension: territory_key.to_s
+          extension: territory_key.to_s,
         }
       end
 
       {
         territory: raw.fetch("territory"),
         i18n_key: raw.fetch("i18n_key"),
-        indicators: indicators
+        indicators: indicators,
       }
     end
 
@@ -115,7 +133,7 @@ class QuestionnaireConfig
         key: cat.fetch("key"),
         i18n_key: cat.fetch("i18n_key"),
         level: cat.fetch("level"),
-        position: cat.fetch("position")
+        position: cat.fetch("position"),
       }
     end
 
@@ -123,7 +141,7 @@ class QuestionnaireConfig
       {
         key: dim.fetch("key"),
         i18n_key: dim.fetch("i18n_key"),
-        category: category_key
+        category: category_key,
       }
     end
 
@@ -134,7 +152,7 @@ class QuestionnaireConfig
         level: ind.fetch("level"),
         position: ind.fetch("position"),
         dimension: dimension_key,
-        category: category_key
+        category: category_key,
       }
     end
   end

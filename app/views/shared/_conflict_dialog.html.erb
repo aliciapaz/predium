@@ -1,0 +1,30 @@
+<dialog data-controller="conflict-dialog"
+        data-action="predium:conflict@document->conflict-dialog#open"
+        class="rounded-xl border border-earth-200 shadow-xl p-0 w-full max-w-md backdrop:bg-earth-900/40">
+  <div class="p-6">
+    <h2 class="text-lg font-semibold text-earth-900 mb-2"><%= t("offline.conflict_title") %></h2>
+    <p class="text-sm text-earth-600 mb-4"><%= t("offline.conflict_body") %></p>
+
+    <dl class="text-sm space-y-2 mb-6">
+      <div class="flex justify-between gap-4">
+        <dt class="text-earth-500"><%= t("offline.conflict_yours") %></dt>
+        <dd class="font-medium text-earth-800" data-conflict-dialog-target="localTime"></dd>
+      </div>
+      <div class="flex justify-between gap-4">
+        <dt class="text-earth-500"><%= t("offline.conflict_server") %></dt>
+        <dd class="font-medium text-earth-800" data-conflict-dialog-target="serverTime"></dd>
+      </div>
+    </dl>
+
+    <div class="flex items-center justify-end gap-3">
+      <button type="button" data-action="conflict-dialog#takeServer"
+              class="px-4 py-2 text-sm font-medium text-earth-600 hover:text-earth-800 cursor-pointer">
+        <%= t("offline.conflict_take_server") %>
+      </button>
+      <button type="button" data-action="conflict-dialog#keepMine"
+              class="px-4 py-2 text-sm font-medium bg-forest-600 text-white rounded-lg hover:bg-forest-700 cursor-pointer">
+        <%= t("offline.conflict_keep_mine") %>
+      </button>
+    </div>
+  </div>
+</dialog>

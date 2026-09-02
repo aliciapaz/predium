@@ -44,6 +44,35 @@ es:
     member_invited: "Miembro invitado exitosamente."
     member_removed: "Miembro removido."
     profile_updated: "Perfil actualizado exitosamente."
+    form_locked: "Los formularios completados no se pueden editar."
+    missing_indicators: "Por favor complete todos los indicadores. Faltan: %{dimensions}"
+    user_role_updated: "Rol de usuario actualizado."
+
+  # ── PWA / Sin conexion ──────────────────────────────────
+  pwa:
+    description: "Diagnostico agroecologico de fincas, con o sin conexion."
+  offline:
+    online: "En linea"
+    offline: "Sin conexion"
+    pending_count: "%{count} pendientes"
+    pending_sync: "Sincronizacion pendiente"
+    sync_now: "Sincronizar ahora"
+    last_sync: "Ultima sincronizacion"
+    session_expired: "Sesion expirada, inicie sesion para sincronizar"
+    saved_locally: "Guardado en este dispositivo"
+    loading: "Cargando..."
+    loading_questionnaire: "Cargando cuestionario..."
+    config_unavailable: "El cuestionario aun no esta disponible sin conexion. Conectese una vez para descargarlo."
+    results_unavailable: "Este formulario no esta guardado en este dispositivo. Conectese una vez para descargar sus formularios."
+    complete_requires_sync: "Completar un formulario requiere conexion para respaldar los resultados primero."
+    complete_missing_indicators: "Califique todos los indicadores para completar el cuestionario."
+    extension_badge: "Extension territorial"
+    conflict_title: "Conflicto de sincronizacion"
+    conflict_body: "Este borrador cambio en el servidor mientras lo editaba sin conexion. Que version desea conservar?"
+    conflict_yours: "Su version"
+    conflict_server: "Version del servidor"
+    conflict_keep_mine: "Conservar la mia"
+    conflict_take_server: "Usar la del servidor"
 
   # ── Titulos de Pagina ───────────────────────────────────
   titles:
@@ -171,6 +200,11 @@ es:
     longitude: "Longitud"
     use_gps: "Usar GPS"
     territory_extension: "Territorio (extension opcional)"
+    genders:
+      not_specified: "No especificado"
+      male: "Masculino"
+      female: "Femenino"
+      other: "Otro"
     update_farm_info: "Actualizar Info del Predio"
     create_farm_info: "Crear Info del Predio"
     select_placeholder: "Seleccionar..."
@@ -299,6 +333,7 @@ es:
       blank: "no puede estar en blanco"
       invalid: "no es valido"
       taken: "ya esta en uso"
+      not_in_questionnaire: "no es un indicador valido del cuestionario"
 
   # ── ActiveRecord ────────────────────────────────────────
   activerecord:

@@ -99,8 +99,8 @@ QuestionnaireConfig.indicator("soil_coverage") # single indicator metadata
 **Context:**
 PrediApp already uses Workbox + Dexie.js for offline support, but the approach is brittle — questionnaire config is not cached, sync has no conflict detection, and there's no queue for failed syncs.
 
-**Decision:**
-Keep the Workbox + Dexie.js foundation but improve the architecture:
+**Decision (amended 2026-08-31):**
+Hand-rolled service worker plus Dexie.js. Workbox made sense in the v1 build; without a JS build step (importmap + Propshaft) it would mean vendoring several Workbox modules to replace ~150 lines of dependency-free service worker code, so v2 owns the worker directly:
 
 **IndexedDB stores (Dexie.js):**
 - `forms` — full form data including draft state
@@ -111,9 +111,9 @@ Keep the Workbox + Dexie.js foundation but improve the architecture:
 
 **Sync strategy:**
 1. All writes go to IndexedDB first, then queue for server sync
-2. Background Sync API dispatches queued changes when connectivity returns
-3. Manual "Sync Now" button as fallback for browsers without Background Sync
-4. Each queued item tracks: `form_id`, `operation` (create/update), `timestamp`, `payload`
+2. Sync runs from page context (Stimulus), triggered by the `online` event, app load, visibility change, and a manual "Sync Now" button; the Background Sync API is progressive enhancement only, since iOS Safari does not implement it and field devices are often iPhones
+3. Each queued item tracks: `form_client_id`, `operation`, `timestamp`, attempt count, and last error; the upsert payload is built from the current IndexedDB state at send time, so repeated edits collapse into one request
+4. Forms carry a client-generated UUID (`client_id`) as the sync idempotency key and URL identifier
 
 **Conflict resolution:**
 - **Completed forms:** server wins (authoritative after completion)
@@ -121,11 +121,11 @@ Keep the Workbox + Dexie.js foundation but improve the architecture:
 - **Deleted forms:** server-side soft delete is authoritative
 - Conflicts surface a notification so the user is always aware
 
-**Cache strategy (Workbox):**
-- App shell (HTML, CSS, JS): cache-first with network update
-- Questionnaire YAML and locale files: stale-while-revalidate
-- API responses: network-first with cache fallback
-- Images/assets: cache-first
+**Cache strategy (hand-rolled worker, versioned caches):**
+- HTML documents: network-first with cache fallback, plus a cached shell fallback for form URLs (the editor and results pages carry no server-rendered data, so one cached shell serves any form offline)
+- Digested assets (Propshaft) and images: cache-first
+- Questionnaire config JSON and locale files: stale-while-revalidate, invalidated by a server-computed content fingerprint
+- Other API responses: network-first with cache fallback
 
 **Consequences:**
 - Forms can be created, edited, and viewed entirely offline
