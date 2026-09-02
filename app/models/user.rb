@@ -1,6 +1,13 @@
+# frozen_string_literal: true
+
 class User < ApplicationRecord
-  devise :database_authenticatable, :registerable, :recoverable,
-         :rememberable, :validatable, :confirmable, :invitable
+  devise :database_authenticatable,
+    :registerable,
+    :recoverable,
+    :rememberable,
+    :validatable,
+    :confirmable,
+    :invitable
 
   enum :platform_role, { regular: 0, super_admin: 1 }
 

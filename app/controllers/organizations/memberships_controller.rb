@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Organizations
   class MembershipsController < ApplicationController
     before_action :authenticate_user!
@@ -12,7 +14,7 @@ module Organizations
     def destroy
       membership = @organization.memberships.find(params[:id])
       membership.destroy
-      redirect_to organization_memberships_path(@organization), notice: t("flash.member_removed")
+      redirect_to(organization_memberships_path(@organization), notice: t("flash.member_removed"))
     end
 
     private
@@ -23,13 +25,13 @@ module Organizations
 
     def authorize_org_access
       unless current_user.memberships.exists?(organization: @organization)
-        redirect_to root_path, alert: t("flash.unauthorized")
+        redirect_to(root_path, alert: t("flash.unauthorized"))
       end
     end
 
     def authorize_org_admin
       unless current_user.memberships.exists?(organization: @organization, role: :admin)
-        redirect_to organization_memberships_path(@organization), alert: t("flash.unauthorized")
+        redirect_to(organization_memberships_path(@organization), alert: t("flash.unauthorized"))
       end
     end
   end

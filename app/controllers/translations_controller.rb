@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 class TranslationsController < ApplicationController
   def show
     locale = params[:locale]
 
     unless I18n.available_locales.map(&:to_s).include?(locale)
-      head :not_found
+      head(:not_found)
       return
     end
 
     translations = flatten_translations(I18n.t(".", locale: locale))
 
-    expires_in 1.hour, public: true
-    render json: translations
+    expires_in(1.hour, public: true)
+    render(json: translations)
   end
 
   private

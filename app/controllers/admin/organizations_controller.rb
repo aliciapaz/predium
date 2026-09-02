@@ -1,22 +1,24 @@
+# frozen_string_literal: true
+
 module Admin
   class OrganizationsController < Admin::BaseController
     before_action :set_organization, only: [:show, :edit, :update, :destroy]
 
     def index
       @organizations = Organization.all
-                                   .left_joins(:memberships)
-                                   .select("organizations.*, COUNT(memberships.id) AS members_count")
-                                   .group("organizations.id")
-                                   .order(:name)
+        .left_joins(:memberships)
+        .select("organizations.*, COUNT(memberships.id) AS members_count")
+        .group("organizations.id")
+        .order(:name)
     end
 
     def show
       @members = @organization.memberships.includes(:user).order("users.last_name")
       @recent_forms = Form.where(user_id: @organization.user_ids)
-                          .completed
-                          .includes(:user)
-                          .order(completed_at: :desc)
-                          .limit(5)
+        .completed
+        .includes(:user)
+        .order(completed_at: :desc)
+        .limit(5)
       @forms_count = Form.where(user_id: @organization.user_ids).count
     end
 
@@ -28,9 +30,9 @@ module Admin
       @organization = Organization.new(organization_params)
 
       if @organization.save
-        redirect_to admin_organization_path(@organization), notice: "Organization created."
+        redirect_to(admin_organization_path(@organization), notice: "Organization created.")
       else
-        render :new, status: :unprocessable_entity
+        render(:new, status: :unprocessable_entity)
       end
     end
 
@@ -39,18 +41,18 @@ module Admin
 
     def update
       if @organization.update(organization_params)
-        redirect_to admin_organization_path(@organization), notice: "Organization updated."
+        redirect_to(admin_organization_path(@organization), notice: "Organization updated.")
       else
-        render :edit, status: :unprocessable_entity
+        render(:edit, status: :unprocessable_entity)
       end
     end
 
     def destroy
       if @organization.memberships.exists?
-        redirect_to admin_organizations_path, alert: "Cannot delete organization with active members."
+        redirect_to(admin_organizations_path, alert: "Cannot delete organization with active members.")
       else
         @organization.destroy
-        redirect_to admin_organizations_path, notice: "Organization deleted."
+        redirect_to(admin_organizations_path, notice: "Organization deleted.")
       end
     end
 

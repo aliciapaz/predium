@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Admin
   module DashboardHelper
     def format_admin_date(date)
@@ -16,7 +18,7 @@ module Admin
         "bg-earth-200 text-earth-700"
       end
 
-      tag.span role.to_s.titleize, class: "inline-block rounded-full px-2 py-1 text-xs font-medium #{classes}"
+      tag.span(role.to_s.titleize, class: "inline-block rounded-full px-2 py-1 text-xs font-medium #{classes}")
     end
   end
 end

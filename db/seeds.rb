@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Seed data for development and QA testing.
 # Run with: bin/rails db:seed
 # Idempotent — safe to run multiple times.
@@ -12,7 +14,7 @@ admin.assign_attributes(
   password: "password",
   platform_role: :super_admin,
   locale: "en",
-  confirmed_at: Time.current
+  confirmed_at: Time.current,
 )
 admin.save!
 puts "  Super admin: admin@predium.cl / password"
@@ -30,7 +32,7 @@ org_admin.assign_attributes(
   password: "password",
   platform_role: :regular,
   locale: "es",
-  confirmed_at: Time.current
+  confirmed_at: Time.current,
 )
 org_admin.save!
 Membership.find_or_create_by!(user: org_admin, organization: org_tierra) do |m|
@@ -46,7 +48,7 @@ member.assign_attributes(
   password: "password",
   platform_role: :regular,
   locale: "es",
-  confirmed_at: Time.current
+  confirmed_at: Time.current,
 )
 member.save!
 Membership.find_or_create_by!(user: member, organization: org_tierra) do |m|
@@ -62,7 +64,7 @@ indie.assign_attributes(
   password: "password",
   platform_role: :regular,
   locale: "en",
-  confirmed_at: Time.current
+  confirmed_at: Time.current,
 )
 indie.save!
 puts "  Independent user: user@predium.cl / password"
@@ -75,7 +77,7 @@ member2.assign_attributes(
   password: "password",
   platform_role: :regular,
   locale: "es",
-  confirmed_at: Time.current
+  confirmed_at: Time.current,
 )
 member2.save!
 Membership.find_or_create_by!(user: member2, organization: org_semilla) do |m|
@@ -87,10 +89,10 @@ puts "  Org admin (Red Semilla): member2@predium.cl / password"
 [admin, org_admin, member, indie, member2].each do |user|
   Profile.find_or_create_by!(user: user) do |p|
     p.phone = "+56 9 #{rand(1000_0000..9999_9999)}"
-    p.role_name = %w[Farmer Researcher Extension\ Agent Agronomist].sample
+    p.role_name = ["Farmer", "Researcher", "Extension Agent", "Agronomist"].sample
     p.country = "CL"
-    p.region = %w[Valparaíso Biobío Araucanía Maule].sample
-    p.locality = %w[Limache Chillán Temuco Talca].sample
+    p.region = ["Valparaíso", "Biobío", "Araucanía", "Maule"].sample
+    p.locality = ["Limache", "Chillán", "Temuco", "Talca"].sample
   end
 end
 puts "  Profiles created for all users"
@@ -101,9 +103,15 @@ indicators = QuestionnaireConfig.core_indicators
 # Completed form for org_admin
 completed_form = org_admin.forms.find_or_initialize_by(name: "Fundo El Roble")
 completed_form.assign_attributes(
-  country: "CL", region: "Biobío", locality: "Chillán",
-  land_area: 12.5, latitude: -36.6066, longitude: -72.1034,
-  work_force: 3, state: "completed", completed_at: 2.days.ago
+  country: "CL",
+  region: "Biobío",
+  locality: "Chillán",
+  land_area: 12.5,
+  latitude: -36.6066,
+  longitude: -72.1034,
+  work_force: 3,
+  state: "completed",
+  completed_at: 2.days.ago,
 )
 completed_form.save!
 indicators.each do |ind|
@@ -117,9 +125,15 @@ puts "  Completed form: Fundo El Roble (org_admin)"
 # Another completed form for member
 completed_form2 = member.forms.find_or_initialize_by(name: "Huerta La Esperanza")
 completed_form2.assign_attributes(
-  country: "CL", region: "Araucanía", locality: "Temuco",
-  land_area: 5.0, latitude: -38.7359, longitude: -72.5904,
-  work_force: 2, state: "completed", completed_at: 1.week.ago
+  country: "CL",
+  region: "Araucanía",
+  locality: "Temuco",
+  land_area: 5.0,
+  latitude: -38.7359,
+  longitude: -72.5904,
+  work_force: 2,
+  state: "completed",
+  completed_at: 1.week.ago,
 )
 completed_form2.save!
 indicators.each do |ind|
@@ -133,8 +147,11 @@ puts "  Completed form: Huerta La Esperanza (member)"
 # Draft form for member
 draft_form = member.forms.find_or_initialize_by(name: "Campo Nuevo")
 draft_form.assign_attributes(
-  country: "CL", region: "Maule", locality: "Talca",
-  land_area: 8.0, state: "draft"
+  country: "CL",
+  region: "Maule",
+  locality: "Talca",
+  land_area: 8.0,
+  state: "draft",
 )
 draft_form.save!
 # Partially filled — only first 20 indicators
@@ -149,8 +166,10 @@ puts "  Draft form (partial): Campo Nuevo (member)"
 # Draft form for indie user
 draft_indie = indie.forms.find_or_initialize_by(name: "Parcela Sol")
 draft_indie.assign_attributes(
-  country: "CL", region: "Valparaíso", locality: "Limache",
-  state: "draft"
+  country: "CL",
+  region: "Valparaíso",
+  locality: "Limache",
+  state: "draft",
 )
 draft_indie.save!
 puts "  Draft form (empty): Parcela Sol (indie user)"
@@ -158,9 +177,15 @@ puts "  Draft form (empty): Parcela Sol (indie user)"
 # Completed form for indie user
 completed_indie = indie.forms.find_or_initialize_by(name: "Quinta Verde")
 completed_indie.assign_attributes(
-  country: "CL", region: "Valparaíso", locality: "Quillota",
-  land_area: 3.2, latitude: -32.8801, longitude: -71.2514,
-  work_force: 1, state: "completed", completed_at: 3.days.ago
+  country: "CL",
+  region: "Valparaíso",
+  locality: "Quillota",
+  land_area: 3.2,
+  latitude: -32.8801,
+  longitude: -71.2514,
+  work_force: 1,
+  state: "completed",
+  completed_at: 3.days.ago,
 )
 completed_indie.save!
 indicators.each do |ind|

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Organizations
   class InvitationsController < ApplicationController
     before_action :authenticate_user!
@@ -14,7 +16,7 @@ module Organizations
 
       if user&.confirmed?
         if @organization.memberships.exists?(user: user)
-          redirect_to organization_memberships_path(@organization), alert: t("flash.member_already_exists", default: "User is already a member of this organization.")
+          redirect_to(organization_memberships_path(@organization), alert: t("flash.member_already_exists", default: "User is already a member of this organization."))
           return
         end
 
@@ -24,7 +26,7 @@ module Organizations
         @organization.memberships.create!(user: user, role: role) unless @organization.memberships.exists?(user: user)
       end
 
-      redirect_to organization_memberships_path(@organization), notice: t("flash.member_invited")
+      redirect_to(organization_memberships_path(@organization), notice: t("flash.member_invited"))
     end
 
     private
@@ -35,7 +37,7 @@ module Organizations
 
     def authorize_org_admin
       unless current_user.memberships.exists?(organization: @organization, role: :admin)
-        redirect_to organization_memberships_path(@organization), alert: t("flash.unauthorized")
+        redirect_to(organization_memberships_path(@organization), alert: t("flash.unauthorized"))
       end
     end
 

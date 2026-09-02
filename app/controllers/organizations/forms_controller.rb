@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Organizations
   class FormsController < ApplicationController
     before_action :authenticate_user!
@@ -6,10 +8,10 @@ module Organizations
 
     def index
       @forms = Form.joins(user: :memberships)
-                   .where(memberships: { organization_id: @organization.id })
-                   .kept
-                   .includes(:user)
-                   .order(updated_at: :desc)
+        .where(memberships: { organization_id: @organization.id })
+        .kept
+        .includes(:user)
+        .order(updated_at: :desc)
 
       @forms = @forms.where(state: params[:state]) if params[:state].present?
       @forms = @forms.where("forms.name ILIKE ?", "%#{Form.sanitize_sql_like(params[:search])}%") if params[:search].present?
@@ -23,7 +25,7 @@ module Organizations
 
     def authorize_org_access
       unless current_user.memberships.exists?(organization: @organization)
-        redirect_to root_path, alert: t("flash.unauthorized")
+        redirect_to(root_path, alert: t("flash.unauthorized"))
       end
     end
   end

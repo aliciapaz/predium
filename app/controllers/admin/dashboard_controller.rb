@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Admin
   class DashboardController < Admin::BaseController
     def show
@@ -14,9 +16,9 @@ module Admin
       @draft_forms = forms.draft.count
       @countries = Form.distinct.where.not(country: [nil, ""]).pluck(:country).sort
       @recent_forms = forms.completed
-                           .includes(:user)
-                           .order(completed_at: :desc)
-                           .limit(10)
+        .includes(:user)
+        .order(completed_at: :desc)
+        .limit(10)
     end
   end
 end
