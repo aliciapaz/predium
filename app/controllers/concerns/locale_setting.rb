@@ -10,7 +10,7 @@ module LocaleSetting
   private
 
   def set_locale
-    I18n.locale = locale_from_user || locale_from_params || locale_from_header || I18n.default_locale
+    I18n.locale = locale_from_params || locale_from_user || locale_from_header || I18n.default_locale
   end
 
   def locale_from_user
