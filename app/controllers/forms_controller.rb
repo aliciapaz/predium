@@ -6,7 +6,7 @@ class FormsController < ApplicationController
   before_action :ensure_draft, only: [:edit]
 
   def index
-    forms = current_user.forms.order(updated_at: :desc)
+    forms = current_user.forms.recently_updated
     @drafts = forms.draft
     @completed = forms.completed
   end

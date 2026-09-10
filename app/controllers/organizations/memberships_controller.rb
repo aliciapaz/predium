@@ -8,7 +8,7 @@ module Organizations
     before_action :authorize_org_admin, only: [:destroy]
 
     def index
-      @memberships = @organization.memberships.includes(:user).order(created_at: :asc)
+      @memberships = @organization.memberships.with_user.ordered_by_join_date
     end
 
     def destroy
