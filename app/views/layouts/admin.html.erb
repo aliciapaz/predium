@@ -6,6 +6,10 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <% if user_signed_in? %>
+      <meta name="predium-signed-in" content="true">
+    <% end %>
+
     <%= yield :head %>
 
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>

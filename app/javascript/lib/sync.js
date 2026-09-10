@@ -1,5 +1,5 @@
 import {
-  getForm, getResponses, saveForm, queueEntries, dequeue, markAttempt,
+  getForm, listForms, getResponses, saveForm, queueEntries, dequeue, markAttempt,
   applyServerForm, markSynced, deleteLocalForm, pendingCount, queueChanged
 } from "lib/db"
 
@@ -36,8 +36,20 @@ export async function seedFromServer() {
     const payload = await response.json()
     const pending = new Set((await queueEntries()).map((entry) => entry.form_client_id))
     for (const serverForm of payload.forms) {
-      // Never clobber a form with local changes waiting to sync.
-      if (!pending.has(serverForm.client_id)) await applyServerForm(serverForm)
+      if (pending.has(serverForm.client_id)) continue
+      // A dirty form with no queue entry means a save crashed between writing
+      // the value and enqueuing it; keep the local edit rather than clobber it.
+      const local = await getForm(serverForm.client_id)
+      if (local && local.dirty) continue
+      await applyServerForm(serverForm)
+    }
+    // The index returns this user's complete kept set, so a clean local form
+    // missing from it was discarded elsewhere: drop it unless it holds
+    // unsynced work.
+    const serverIds = new Set(payload.forms.map((serverForm) => serverForm.client_id))
+    for (const local of await listForms()) {
+      if (serverIds.has(local.client_id) || pending.has(local.client_id) || local.dirty) continue
+      await deleteLocalForm(local.client_id)
     }
     queueChanged()
   } catch {
@@ -155,6 +167,9 @@ async function handleConflict(entry, form, conflict) {
     await applyServerForm(conflict.form)
     await dequeue(entry.id)
     notify("conflict_resolved", { name: form.name })
+    // The open editor still holds the discarded local values in memory; reload
+    // so it re-reads the server version the user just chose.
+    window.Turbo?.visit(window.location.href, { action: "replace" })
     return true
   }
   // dialog unavailable (page without the partial): leave the entry queued
