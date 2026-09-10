@@ -1,6 +1,10 @@
 # Shopify Ruby styling (Telos standard); the gem bundled in the Gemfile
 inherit_gem: { rubocop-shopify: rubocop.yml }
 
+# Telos AI Harness: cops enforcing layered architecture with agent-parseable messages
+plugins:
+  - rubocop-harness
+
 # Overwrite or add rules to create your own house style
 #
 # # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
