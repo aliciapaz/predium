@@ -5,11 +5,11 @@
 
   <!-- Stats cards -->
   <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
-    <%= render "admin/shared/stat_card", title: t("admin.total_users"), value: @total_users %>
-    <%= render "admin/shared/stat_card", title: t("admin.total_organizations"), value: @total_organizations %>
-    <%= render "admin/shared/stat_card", title: t("admin.completed_forms"), value: @completed_forms %>
-    <%= render "admin/shared/stat_card", title: t("admin.draft_forms"), value: @draft_forms %>
-    <%= render "admin/shared/stat_card", title: t("admin.countries_active"), value: @countries.size %>
+    <%= render "admin/shared/stat_card", title: t("admin.total_users"), value: @report.total_users %>
+    <%= render "admin/shared/stat_card", title: t("admin.total_organizations"), value: @report.total_organizations %>
+    <%= render "admin/shared/stat_card", title: t("admin.completed_forms"), value: @report.completed_forms %>
+    <%= render "admin/shared/stat_card", title: t("admin.draft_forms"), value: @report.draft_forms %>
+    <%= render "admin/shared/stat_card", title: t("admin.countries_active"), value: @report.countries.size %>
   </div>
 
   <!-- Filter bar -->
@@ -19,7 +19,7 @@
         <label class="block text-sm font-medium text-earth-700 mb-1"><%= t("admin.filter_country") %></label>
         <select name="country" class="rounded-lg border-earth-300 text-sm focus:ring-forest-500 focus:border-forest-500">
           <option value=""><%= t("admin.filter_all_countries") %></option>
-          <% @countries.each do |country| %>
+          <% @report.countries.each do |country| %>
             <option value="<%= country %>" <%= "selected" if params[:country] == country %>><%= country %></option>
           <% end %>
         </select>
@@ -62,7 +62,7 @@
           </tr>
         </thead>
         <tbody>
-          <% @recent_forms.each do |form| %>
+          <% @report.recent_forms.each do |form| %>
             <tr class="hover:bg-earth-50 transition-colors">
               <td class="px-6 py-3 border-b border-earth-100">
                 <%= link_to form.name, form_path(form), class: "text-forest-600 hover:text-forest-800 font-medium" %>
@@ -75,7 +75,7 @@
               <td class="px-6 py-3 border-b border-earth-100 text-sm text-earth-700"><%= format_admin_date(form.completed_at) %></td>
             </tr>
           <% end %>
-          <% if @recent_forms.empty? %>
+          <% if @report.recent_forms.empty? %>
             <tr>
               <td colspan="5" class="px-6 py-8 text-center text-sm text-earth-500"><%= t("admin.no_completed_forms") %></td>
             </tr>

@@ -10,6 +10,12 @@ class FormResponse < ApplicationRecord
   scope :core, -> { where(is_extension: false) }
   scope :territory_extensions, -> { where(is_extension: true) }
 
+  class << self
+    def core_indicator_keys
+      core.pluck(:indicator_key)
+    end
+  end
+
   private
 
   def indicator_key_in_questionnaire

@@ -26,7 +26,7 @@ module Forms
     end
 
     def missing_dimensions
-      responded_keys = @form.form_responses.core.pluck(:indicator_key)
+      responded_keys = @form.form_responses.core_indicator_keys
       QuestionnaireConfig.dimensions.select do |dim|
         dim_indicators = QuestionnaireConfig.core_indicators.select { |i| i[:dimension] == dim[:key] }
         dim_indicators.any? { |i| !responded_keys.include?(i[:key]) }

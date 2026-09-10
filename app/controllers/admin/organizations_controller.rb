@@ -5,21 +5,13 @@ module Admin
     before_action :set_organization, only: [:show, :edit, :update, :destroy]
 
     def index
-      @organizations = Organization.all
-        .left_joins(:memberships)
-        .select("organizations.*, COUNT(memberships.id) AS members_count")
-        .group("organizations.id")
-        .order(:name)
+      @organizations = Organization.with_member_counts
     end
 
     def show
-      @members = @organization.memberships.includes(:user).order("users.last_name")
-      @recent_forms = Form.where(user_id: @organization.user_ids)
-        .completed
-        .includes(:user)
-        .order(completed_at: :desc)
-        .limit(5)
-      @forms_count = Form.where(user_id: @organization.user_ids).count
+      @members = @organization.memberships.with_user.ordered_by_user_name
+      @recent_forms = Form.for_user_ids(@organization.user_ids).recent_completed(5)
+      @forms_count = Form.for_user_ids(@organization.user_ids).count
     end
 
     def new

@@ -3,18 +3,28 @@
 module Api
   class FormsController < Api::BaseController
     def index
-      forms = current_user.forms.includes(:form_responses).order(updated_at: :desc)
+      forms = current_user.forms.with_responses.recently_updated
       render(json: { forms: forms.map { |form| serialize_form(form) } })
     end
 
     def update
-      unknown = params.fetch(:responses, {}).keys - known_indicator_keys
-      if unknown.any?
-        errors = unknown.index_with { [I18n.t("errors.messages.not_in_questionnaire")] }
-        return render(json: { errors: errors }, status: :unprocessable_entity)
-      end
+      invalid = unknown_indicator_errors
+      return render(json: { errors: invalid }, status: :unprocessable_entity) if invalid
 
-      result = Forms::SyncUpsert.new(
+      render_result(sync_upsert)
+    end
+
+    private
+
+    def unknown_indicator_errors
+      unknown = params.fetch(:responses, {}).keys - known_indicator_keys
+      return if unknown.empty?
+
+      unknown.index_with { [I18n.t("errors.messages.not_in_questionnaire")] }
+    end
+
+    def sync_upsert
+      Forms::SyncUpsert.new(
         user: current_user,
         client_id: params[:client_id],
         attributes: form_params,
@@ -22,11 +32,7 @@ module Api
         base_updated_at: params[:base_updated_at],
         force: ActiveModel::Type::Boolean.new.cast(params[:force]),
       ).call
-
-      render_result(result)
     end
-
-    private
 
     def render_result(result)
       case result.status
@@ -85,10 +91,14 @@ module Api
         completed_at: form.completed_at&.iso8601(3),
         synchronized_at: form.synchronized_at&.iso8601(3),
         updated_at: form.updated_at.iso8601(3),
-        responses: form.form_responses.map do |response|
-          { indicator_key: response.indicator_key, value: response.value, is_extension: response.is_extension }
-        end,
+        responses: serialize_responses(form),
       )
+    end
+
+    def serialize_responses(form)
+      form.form_responses.map do |response|
+        { indicator_key: response.indicator_key, value: response.value, is_extension: response.is_extension }
+      end
     end
   end
 end
