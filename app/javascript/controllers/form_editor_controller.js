@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { newClientId, getForm, saveForm, getResponses, saveResponse, enqueue } from "lib/db"
+import { newClientId, getForm, saveForm, getResponses, saveResponse, enqueue, pruneStaleExtensions } from "lib/db"
 import { cachedConfig, dimensionIndicators, extensionIndicators } from "lib/config_cache"
 import { load as loadTranslations, t } from "lib/i18n"
 import { syncNow, csrfToken } from "lib/sync"
@@ -126,12 +126,25 @@ export default class extends Controller {
     ).map((box) => box.value)
 
     await saveForm(this.form)
+    if (this.form.territory_key !== territoryBefore) await this.dropStaleExtensions()
     await enqueue(this.clientId)
     this.markSaved()
     if (this.form.name) this.titleTarget.textContent = this.form.name
     if (this.form.territory_key !== territoryBefore) this.render()
     this.refreshCompleteState()
     syncNow()
+  }
+
+  // A territory change hides the old extension questions; their saved answers
+  // must also go, or every sync ships keys the new territory disallows.
+  async dropStaleExtensions() {
+    const allowed = extensionIndicators(this.config, this.form.territory_key).map((indicator) => indicator.key)
+    await pruneStaleExtensions(this.clientId, allowed)
+    const allowedSet = new Set(allowed)
+    Object.keys(this.responses).forEach((key) => {
+      const isExtension = !this.config.indicators.some((indicator) => indicator.key === key)
+      if (isExtension && !allowedSet.has(key)) delete this.responses[key]
+    })
   }
 
   async persistResponse(key, value) {

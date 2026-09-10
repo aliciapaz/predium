@@ -60,6 +60,17 @@ export async function saveResponse(formClientId, indicatorKey, value, isExtensio
   await db.forms.update(formClientId, { updated_at: new Date().toISOString(), dirty: 1 })
 }
 
+// Drops extension responses no longer allowed by the form's territory so a
+// territory change cannot leave keys the server will reject with 422 forever.
+export async function pruneStaleExtensions(formClientId, allowedKeys) {
+  const allowed = new Set(allowedKeys)
+  await db.form_responses
+    .where({ form_client_id: formClientId })
+    .and((row) => row.is_extension && !allowed.has(row.indicator_key))
+    .delete()
+  await db.forms.update(formClientId, { updated_at: new Date().toISOString(), dirty: 1 })
+}
+
 export async function getConfig() {
   return db.questionnaire_config.get("core")
 }

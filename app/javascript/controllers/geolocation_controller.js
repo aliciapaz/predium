@@ -16,8 +16,8 @@ export default class extends Controller {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        this.latitudeTarget.value = position.coords.latitude.toFixed(6)
-        this.longitudeTarget.value = position.coords.longitude.toFixed(6)
+        this.setCoordinate(this.latitudeTarget, position.coords.latitude)
+        this.setCoordinate(this.longitudeTarget, position.coords.longitude)
         this.resetButton()
       },
       (error) => {
@@ -26,6 +26,13 @@ export default class extends Controller {
       },
       { enableHighAccuracy: true, timeout: 10000 }
     )
+  }
+
+  // Programmatic value changes do not fire input/change, so the form editor
+  // never persists them. Dispatch input so the coordinate is saved and queued.
+  setCoordinate(target, value) {
+    target.value = value.toFixed(6)
+    target.dispatchEvent(new Event("input", { bubbles: true }))
   }
 
   resetButton() {
