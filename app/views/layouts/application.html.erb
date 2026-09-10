@@ -9,6 +9,12 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <meta name="theme-color" content="#347844">
+    <% if user_signed_in? %>
+      <meta name="predium-signed-in" content="true">
+    <% end %>
+    <link rel="manifest" href="<%= pwa_manifest_path %>">
+
     <%= yield :head %>
 
     <link rel="icon" href="/icon.png" type="image/png">
@@ -23,6 +29,7 @@
   <body class="bg-earth-50 text-earth-900 min-h-screen flex flex-col">
     <% if user_signed_in? %>
       <%= render "shared/navbar" %>
+      <%= render "shared/conflict_dialog" %>
     <% end %>
 
     <%= render "shared/flash" %>

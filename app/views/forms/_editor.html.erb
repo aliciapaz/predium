@@ -1,0 +1,209 @@
+<%# Local-first editor shell (KTD-4): every input reads from and writes to
+    IndexedDB via the form-editor controller. The server never renders form
+    data here, so the same cached page works for any form, online or offline. %>
+<div data-controller="form-editor"
+     data-form-editor-client-id-value="<%= client_id %>"
+     data-form-editor-forms-url-value="<%= forms_path %>">
+
+  <div class="mb-6">
+    <%= link_to forms_path, class: "text-sm text-earth-500 hover:text-earth-700 inline-flex items-center gap-1" do %>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      <%= t("forms.back_to_forms") %>
+    <% end %>
+  </div>
+
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-earth-900" data-form-editor-target="title"><%= t("questionnaire.new_questionnaire") %></h1>
+    <span class="text-xs text-earth-400" data-form-editor-target="saveState"></span>
+  </div>
+
+  <%# Overall progress %>
+  <div class="mb-6">
+    <div class="flex items-center justify-between mb-1.5">
+      <span class="text-sm font-medium text-earth-700"><%= t("questionnaire.overall_progress") %></span>
+      <span class="text-sm text-earth-500" data-form-editor-target="progressText"></span>
+    </div>
+    <div class="w-full bg-earth-100 rounded-full h-2.5">
+      <div class="bg-forest-500 h-2.5 rounded-full transition-all" data-form-editor-target="progressBar" style="width: 0%"></div>
+    </div>
+  </div>
+
+  <%# Farm info: static inputs, hydrated and persisted by the controller %>
+  <details class="bg-white border border-earth-200 rounded-lg mb-6" data-form-editor-target="farmInfo" open>
+    <summary class="px-5 py-3 font-semibold text-earth-800 cursor-pointer select-none"><%= t("farm_info.farmer_information") %> &middot; <%= t("farm_info.property") %> &middot; <%= t("farm_info.location") %></summary>
+    <div class="px-5 pb-5 space-y-6">
+      <div class="space-y-4">
+        <div>
+          <label for="farm_name" class="block text-sm font-medium text-earth-700 mb-1"><%= t("farm_info.farm_farmer_name") %></label>
+          <input type="text" id="farm_name" data-farm-field="name" required
+                 class="w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm"
+                 placeholder="<%= t("farm_info.placeholder_farm_name") %>">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="farm_national_id" class="block text-sm font-medium text-earth-700 mb-1"><%= t("farm_info.national_id") %></label>
+            <input type="text" id="farm_national_id" data-farm-field="national_id"
+                   class="w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm">
+          </div>
+          <div>
+            <label for="farm_date_of_birth" class="block text-sm font-medium text-earth-700 mb-1"><%= t("farm_info.date_of_birth") %></label>
+            <input type="date" id="farm_date_of_birth" data-farm-field="date_of_birth"
+                   class="w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="farm_phone" class="block text-sm font-medium text-earth-700 mb-1"><%= t("farm_info.phone") %></label>
+            <input type="tel" id="farm_phone" data-farm-field="phone"
+                   class="w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm">
+          </div>
+          <div>
+            <label for="farm_gender" class="block text-sm font-medium text-earth-700 mb-1"><%= t("farm_info.gender") %></label>
+            <select id="farm_gender" data-farm-field="gender"
+                    class="w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm">
+              <option value=""><%= t("farm_info.select_placeholder") %></option>
+              <% Form.genders.keys.each do |gender| %>
+                <option value="<%= gender %>"><%= t("farm_info.genders.#{gender}") %></option>
+              <% end %>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="farm_work_force" class="block text-sm font-medium text-earth-700 mb-1"><%= t("farm_info.workforce_people") %></label>
+            <input type="number" id="farm_work_force" data-farm-field="work_force" min="0"
+                   class="w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm">
+          </div>
+          <div>
+            <label for="farm_land_area" class="block text-sm font-medium text-earth-700 mb-1"><%= t("farm_info.land_area_ha") %></label>
+            <input type="number" id="farm_land_area" data-farm-field="land_area" min="0" step="0.01"
+                   class="w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm">
+          </div>
+        </div>
+
+        <div>
+          <span class="block text-sm font-medium text-earth-700 mb-2"><%= t("farm_info.system_types") %></span>
+          <div class="flex flex-wrap gap-3">
+            <% %w[agriculture livestock forestry agroforestry mixed].each do |sys| %>
+              <label class="inline-flex items-center gap-2 text-sm text-earth-700">
+                <input type="checkbox" value="<%= sys %>" data-farm-field="system_types"
+                       class="rounded border-earth-300 text-forest-600 focus:ring-forest-500">
+                <%= t("farm_info.system_#{sys}") %>
+              </label>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <label for="farm_observations" class="block text-sm font-medium text-earth-700 mb-1"><%= t("farm_info.observations") %></label>
+          <textarea id="farm_observations" data-farm-field="observations" rows="3"
+                    class="w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm"
+                    placeholder="<%= t("farm_info.placeholder_observations") %>"></textarea>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label for="farm_country" class="block text-sm font-medium text-earth-700 mb-1"><%= t("farm_info.country") %></label>
+            <input type="text" id="farm_country" data-farm-field="country"
+                   class="w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm">
+          </div>
+          <div>
+            <label for="farm_region" class="block text-sm font-medium text-earth-700 mb-1"><%= t("farm_info.region") %></label>
+            <input type="text" id="farm_region" data-farm-field="region"
+                   class="w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm">
+          </div>
+          <div>
+            <label for="farm_locality" class="block text-sm font-medium text-earth-700 mb-1"><%= t("farm_info.locality") %></label>
+            <input type="text" id="farm_locality" data-farm-field="locality"
+                   class="w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-controller="geolocation">
+          <div>
+            <label for="farm_latitude" class="block text-sm font-medium text-earth-700 mb-1"><%= t("farm_info.latitude") %></label>
+            <input type="number" id="farm_latitude" data-farm-field="latitude" step="0.000001"
+                   data-geolocation-target="latitude"
+                   class="w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm">
+          </div>
+          <div>
+            <label for="farm_longitude" class="block text-sm font-medium text-earth-700 mb-1"><%= t("farm_info.longitude") %></label>
+            <input type="number" id="farm_longitude" data-farm-field="longitude" step="0.000001"
+                   data-geolocation-target="longitude"
+                   class="w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm">
+          </div>
+          <div class="sm:col-span-2">
+            <button type="button"
+                    data-action="geolocation#locate"
+                    data-geolocation-target="button"
+                    class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-forest-700 bg-forest-50 border border-forest-200 rounded-md hover:bg-forest-100 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <%= t("farm_info.use_gps") %>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label for="farm_territory_key" class="block text-sm font-medium text-earth-700 mb-1"><%= t("farm_info.territory_extension") %></label>
+          <select id="farm_territory_key" data-farm-field="territory_key"
+                  class="w-full rounded-md border-earth-300 shadow-sm focus:border-forest-500 focus:ring-forest-500 text-sm">
+            <option value=""><%= t("farm_info.select_placeholder") %></option>
+            <% QuestionnaireConfig.extension_keys.each do |key| %>
+              <option value="<%= key %>"><%= key.humanize %></option>
+            <% end %>
+          </select>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <%# Dimension navigation and indicator cards, rendered from cached config %>
+  <div class="mb-6 overflow-x-auto snap-x snap-mandatory">
+    <nav class="flex gap-1 min-w-max pb-2" data-form-editor-target="dimensionNav"></nav>
+  </div>
+
+  <div class="space-y-8" data-form-editor-target="indicators">
+    <p class="text-sm text-earth-500"><%= t("offline.loading_questionnaire") %></p>
+  </div>
+
+  <%# Bottom bar %>
+  <div class="sticky bottom-0 z-10 bg-earth-50 border-t border-earth-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] -mx-4 px-4 py-4 mt-8 flex items-center justify-between">
+    <button type="button" data-form-editor-target="prevButton" data-action="form-editor#previousDimension"
+            class="inline-flex items-center gap-1 text-sm text-earth-600 hover:text-earth-800 disabled:invisible cursor-pointer">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      <%= t("questionnaire.previous") %>
+    </button>
+
+    <div class="flex flex-col sm:flex-row items-center gap-3">
+      <button type="button" data-form-editor-target="nextButton" data-action="form-editor#nextDimension"
+              class="inline-flex items-center gap-1 px-5 py-2.5 bg-forest-600 text-white font-medium rounded-lg hover:bg-forest-700 transition-colors shadow-sm cursor-pointer">
+        <%= t("questionnaire.save_continue") %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+
+      <%= form_with url: "#", method: :post, data: { form_editor_target: "completeForm" }, class: "contents" do %>
+        <button type="submit" data-form-editor-target="completeButton" disabled
+                class="inline-flex items-center gap-1 px-5 py-2.5 bg-forest-600 text-white font-medium rounded-lg hover:bg-forest-700 transition-colors shadow-sm cursor-pointer disabled:bg-earth-300 disabled:cursor-not-allowed">
+          <%= t("questionnaire.complete") %>
+        </button>
+      <% end %>
+    </div>
+  </div>
+  <p class="text-xs text-earth-400 text-right mt-2 hidden" data-form-editor-target="completeHint"><%= t("offline.complete_requires_sync") %></p>
+</div>

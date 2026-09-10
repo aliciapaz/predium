@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ProfilesController < ApplicationController
   before_action :authenticate_user!
   before_action :set_profile
@@ -11,9 +13,9 @@ class ProfilesController < ApplicationController
   def update
     if @profile.update(profile_params)
       current_user.update(locale: locale_param) if locale_param.present?
-      redirect_to profile_path, notice: t("flash.profile_updated")
+      redirect_to(profile_path, notice: t("flash.profile_updated"))
     else
-      render :edit, status: :unprocessable_entity
+      render(:edit, status: :unprocessable_entity)
     end
   end
 

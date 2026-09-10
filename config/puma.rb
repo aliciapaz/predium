@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Puma configuration file.
 #
 # Workers and threads are configured via environment variables for flexibility

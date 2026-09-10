@@ -1,5 +1,7 @@
 <% content_for(:title, t("titles.forms_index")) %>
 
+<div data-controller="offline-forms">
+
 <div class="flex items-center justify-between mb-8">
   <h1 class="text-2xl font-bold text-earth-900"><%= t("titles.forms_index") %></h1>
   <%= link_to new_form_path,
@@ -11,6 +13,7 @@
   <% end %>
 </div>
 
+<div data-offline-forms-target="list">
 <%# Drafts Section %>
 <section class="mb-10">
   <div class="flex items-center gap-2 mb-4">
@@ -53,3 +56,6 @@
     <%= render "shared/empty_state", message: t("forms.no_completed") %>
   <% end %>
 </section>
+</div>
+
+</div>

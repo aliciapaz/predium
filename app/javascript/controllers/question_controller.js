@@ -17,6 +17,7 @@ export default class extends Controller {
     const value = parseInt(event.currentTarget.dataset.value, 10)
     this.selectedValue = value
     this.hiddenInputTarget.value = value
+    this.hiddenInputTarget.dispatchEvent(new Event("change", { bubbles: true }))
     this.highlightSelected()
     this.showDescription()
     this.scrollToNext()

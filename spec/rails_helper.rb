@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 require "simplecov"
-SimpleCov.start "rails" do
+SimpleCov.start("rails") do
   enable_coverage :branch
   add_filter "/spec/"
 end
@@ -15,7 +17,7 @@ Rails.root.glob("spec/support/**/*.rb").sort_by(&:to_s).each { |f| require f }
 begin
   ActiveRecord::Migration.maintain_test_schema!
 rescue ActiveRecord::PendingMigrationError => e
-  abort e.to_s.strip
+  abort(e.to_s.strip)
 end
 
 RSpec.configure do |config|

@@ -44,6 +44,35 @@ en:
     member_invited: "Member invited successfully."
     member_removed: "Member removed."
     profile_updated: "Profile updated successfully."
+    form_locked: "Completed forms cannot be edited."
+    missing_indicators: "Please complete all indicators. Missing: %{dimensions}"
+    user_role_updated: "User role updated."
+
+  # ── PWA / Offline ───────────────────────────────────────
+  pwa:
+    description: "Agroecological farm diagnosis, online or offline."
+  offline:
+    online: "Online"
+    offline: "Offline"
+    pending_count: "%{count} pending"
+    pending_sync: "Pending sync"
+    sync_now: "Sync now"
+    last_sync: "Last sync"
+    session_expired: "Session expired, log in to sync"
+    saved_locally: "Saved on this device"
+    loading: "Loading..."
+    loading_questionnaire: "Loading questionnaire..."
+    config_unavailable: "The questionnaire is not available offline yet. Connect once to download it."
+    results_unavailable: "This form is not stored on this device. Connect once to download your forms."
+    complete_requires_sync: "Completing a form needs a connection so results are backed up first."
+    complete_missing_indicators: "Score all indicators to complete the questionnaire."
+    extension_badge: "Territory extension"
+    conflict_title: "Sync conflict"
+    conflict_body: "This draft changed on the server while you edited it offline. Which version do you want to keep?"
+    conflict_yours: "Your version"
+    conflict_server: "Server version"
+    conflict_keep_mine: "Keep mine"
+    conflict_take_server: "Take server version"
 
   # ── Page Titles ─────────────────────────────────────────
   titles:
@@ -171,6 +200,11 @@ en:
     longitude: "Longitude"
     use_gps: "Use GPS"
     territory_extension: "Territory (optional extension)"
+    genders:
+      not_specified: "Not specified"
+      male: "Male"
+      female: "Female"
+      other: "Other"
     update_farm_info: "Update Farm Info"
     create_farm_info: "Create Farm Info"
     select_placeholder: "Select..."
@@ -299,6 +333,7 @@ en:
       blank: "can't be blank"
       invalid: "is invalid"
       taken: "has already been taken"
+      not_in_questionnaire: "is not a known questionnaire indicator"
 
   # ── ActiveRecord ────────────────────────────────────────
   activerecord:

@@ -1,24 +1,17 @@
+# frozen_string_literal: true
+
 module Admin
   class UsersController < Admin::BaseController
     before_action :set_user, only: [:show, :edit, :update]
 
     def index
-      @users = User.all.order(:last_name, :first_name)
-
-      if params[:q].present?
-        query = "%#{params[:q]}%"
-        @users = @users.where(
-          "first_name ILIKE :q OR last_name ILIKE :q OR email ILIKE :q",
-          q: query
-        )
-      end
-
-      @users = @users.includes(:organizations, :forms)
+      @users = User.ordered_by_name.with_organizations_and_forms
+      @users = @users.search(params[:q]) if params[:q].present?
     end
 
     def show
-      @memberships = @user.memberships.includes(:organization)
-      @recent_forms = @user.forms.order(created_at: :desc).limit(10)
+      @memberships = @user.memberships.with_organization
+      @recent_forms = @user.forms.recent(10)
     end
 
     def edit
@@ -26,9 +19,9 @@ module Admin
 
     def update
       if @user.update(user_params)
-        redirect_to admin_user_path(@user), notice: "User role updated."
+        redirect_to(admin_user_path(@user), notice: t("flash.user_role_updated"))
       else
-        render :edit, status: :unprocessable_entity
+        render(:edit, status: :unprocessable_entity)
       end
     end
 

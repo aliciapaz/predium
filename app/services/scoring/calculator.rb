@@ -18,7 +18,7 @@ module Scoring
       {
         indicator_scores: indicator_scores,
         l2_scores: l2_scores,
-        l1_scores: l1_scores
+        l1_scores: l1_scores,
       }
     end
 

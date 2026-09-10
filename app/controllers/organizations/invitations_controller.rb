@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Organizations
   class InvitationsController < ApplicationController
     before_action :authenticate_user!
@@ -8,26 +10,25 @@ module Organizations
     end
 
     def create
-      email = invitation_params[:email]&.downcase&.strip
-      role = invitation_params[:role] || "member"
-      user = User.find_by(email: email)
+      result = Organizations::MemberInviter.new(
+        organization: @organization,
+        email: invitation_params[:email],
+        role: invitation_params[:role],
+        invited_by: current_user,
+      ).call
 
-      if user&.confirmed?
-        if @organization.memberships.exists?(user: user)
-          redirect_to organization_memberships_path(@organization), alert: t("flash.member_already_exists", default: "User is already a member of this organization.")
-          return
-        end
-
-        @organization.memberships.create!(user: user, role: role)
-      else
-        user = User.invite!({ email: email, first_name: "Invited", last_name: "User" }, current_user)
-        @organization.memberships.create!(user: user, role: role) unless @organization.memberships.exists?(user: user)
-      end
-
-      redirect_to organization_memberships_path(@organization), notice: t("flash.member_invited")
+      redirect_to(organization_memberships_path(@organization), **flash_for(result))
     end
 
     private
+
+    def flash_for(result)
+      if result.status == :already_member
+        { alert: t("flash.member_already_exists", default: "User is already a member of this organization.") }
+      else
+        { notice: t("flash.member_invited") }
+      end
+    end
 
     def set_organization
       @organization = Organization.find(params[:organization_id])
@@ -35,7 +36,7 @@ module Organizations
 
     def authorize_org_admin
       unless current_user.memberships.exists?(organization: @organization, role: :admin)
-        redirect_to organization_memberships_path(@organization), alert: t("flash.unauthorized")
+        redirect_to(organization_memberships_path(@organization), alert: t("flash.unauthorized"))
       end
     end
 

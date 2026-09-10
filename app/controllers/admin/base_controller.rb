@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Admin
   class BaseController < ApplicationController
     before_action :authenticate_user!
@@ -8,7 +10,7 @@ module Admin
     private
 
     def require_super_admin!
-      redirect_to root_path, alert: "Not authorized" unless current_user.super_admin?
+      redirect_to(root_path, alert: t("flash.unauthorized")) unless current_user.super_admin?
     end
   end
 end
