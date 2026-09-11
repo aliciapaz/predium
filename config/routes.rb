@@ -27,7 +27,7 @@ Rails.application.routes.draw do
 
   namespace :api, defaults: { format: :json } do
     resource :questionnaire, only: [:show]
-    resources :forms, only: [:index, :update], param: :client_id
+    resources :forms, only: [:index, :show, :update], param: :client_id
   end
 
   get "translations/:locale", to: "translations#show", as: :translations
