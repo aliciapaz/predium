@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { newClientId, getForm, saveForm, getResponses, saveResponse, enqueue, pruneStaleExtensions } from "lib/db"
 import { cachedConfig, dimensionIndicators, extensionIndicators } from "lib/config_cache"
 import { load as loadTranslations, t } from "lib/i18n"
-import { syncNow, seedFromServer, csrfToken } from "lib/sync"
+import { syncNow, hydrateForm, csrfToken } from "lib/sync"
 
 const FARM_FIELDS = [
   "name", "national_id", "date_of_birth", "phone", "gender", "work_force",
@@ -184,7 +184,7 @@ export default class extends Controller {
       if (response.ok || response.redirected) {
         // /completion flips state to completed server-side only; refresh the
         // local copy so results render the completed form, not a stale draft.
-        await seedFromServer()
+        await hydrateForm(this.clientId)
         window.Turbo.visit(response.url, { action: "replace" })
         return
       }
