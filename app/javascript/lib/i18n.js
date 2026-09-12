@@ -33,3 +33,9 @@ export function t(key, interpolations = {}) {
   })
   return value
 }
+
+// Whether a translation actually exists for a key. t() returns the key itself
+// when missing, so callers cannot use it to detect absence (KTD-7).
+export function has(key) {
+  return Boolean(translations && Object.prototype.hasOwnProperty.call(translations, key))
+}

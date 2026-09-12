@@ -48,6 +48,7 @@ module Forms
         form.assign_attributes(attributes)
         form.synchronized_at = Time.current
         form.save!
+        prune_out_of_chain!(form)
         apply_responses!(form)
       end
       Result.new(status: :ok, form: form)
@@ -55,11 +56,18 @@ module Forms
       Result.new(status: :invalid, errors: e.record.errors.to_hash(true))
     end
 
+    # A territory change leaves indicator rows that the new chain no longer
+    # allows; drop them so the reload cannot resurrect them into the client.
+    # Principles (and the new chain's keys) are always allowed.
+    def prune_out_of_chain!(form)
+      allowed = QuestionnaireConfig.known_indicator_keys(form.territory_key)
+      form.form_responses.where.not(indicator_key: allowed).destroy_all
+    end
+
     def apply_responses!(form)
       responses.each do |key, value|
         form.form_responses.find_or_initialize_by(indicator_key: key).tap do |response|
           response.value = value
-          response.is_extension = !QuestionnaireConfig.core_indicator?(key)
           response.save!
         end
       end
@@ -74,6 +82,11 @@ module Forms
 
     def responses_match?(form)
       current = form.form_responses.each_with_object({}) { |r, map| map[r.indicator_key] = r.value }
+      # Require the same key SET, not just that sent keys match: a payload that
+      # drops a key (e.g. the client pruned a removed indicator) must count as a
+      # change so apply -> prune_out_of_chain! runs instead of short-circuiting.
+      return false unless current.keys.map(&:to_s).sort == responses.keys.map(&:to_s).sort
+
       responses.all? { |key, value| current[key] == value.to_i }
     end
 
@@ -92,11 +105,21 @@ module Forms
     end
 
     def unknown_indicator_keys(form)
-      allowed = QuestionnaireConfig.core_indicators.map { |i| i[:key] }
-      if form.territory_key.present?
-        allowed += QuestionnaireConfig.extension(form.territory_key)[:indicators].map { |i| i[:key] }
-      end
-      responses.keys - allowed
+      responses.keys - allowed_keys(form)
+    end
+
+    # Allow-list is built from the INCOMING territory (the payload's value when it
+    # carries one, else the stored value), so a push that switches territory and
+    # sends the new keys together is accepted rather than rejected on the stale one.
+    def allowed_keys(form)
+      QuestionnaireConfig.known_indicator_keys(target_territory(form))
+    end
+
+    # ActionController::Parameters has indifferent access, so the symbol form
+    # covers a string-keyed payload. Fall back to the stored territory only when
+    # the payload does not carry the key at all.
+    def target_territory(form)
+      attributes.key?(:territory_key) ? attributes[:territory_key] : form.territory_key
     end
 
     def invalid_keys(keys)

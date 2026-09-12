@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { getForm, getResponses } from "lib/db"
-import { cachedConfig, dimensionIndicators } from "lib/config_cache"
+import { cachedConfig, principles, dimensionIndicators, visibleDimensions } from "lib/config_cache"
 import { load as loadTranslations, t } from "lib/i18n"
 import { calculateScores } from "lib/scoring"
 
@@ -22,7 +22,7 @@ export default class extends Controller {
     }
 
     const responses = await getResponses(this.clientIdValue)
-    this.scores = calculateScores(this.config, responses)
+    this.scores = calculateScores(this.config, responses, this.form.territory_key)
 
     this.renderFarmInfo()
     this.renderRadar()
@@ -65,8 +65,9 @@ export default class extends Controller {
   }
 
   renderRadar() {
-    const labels = this.config.categories.map((category) => t(category.i18n_key))
-    const scores = this.config.categories.map((category) => this.scores.l1Scores[category.key] || 0)
+    const items = principles(this.config)
+    const labels = items.map((principle) => t(`${principle.i18n_key}.name`))
+    const scores = items.map((principle) => this.scores.l1Scores[principle.key] || 0)
 
     // Built via DOM APIs: the JSON attribute values contain double quotes,
     // which an innerHTML template would need attribute-escaping for.
@@ -82,7 +83,7 @@ export default class extends Controller {
   }
 
   renderDimensions() {
-    this.dimensionsTarget.innerHTML = this.config.dimensions.map((dimension) => {
+    this.dimensionsTarget.innerHTML = visibleDimensions(this.config, this.form.territory_key).map((dimension) => {
       const score = this.scores.l2Scores[dimension.key] || 0
       const color = score >= 7 ? "bg-forest-500" : score >= 4 ? "bg-mustard-500" : "bg-rose-500"
       return `<div class="flex items-center gap-4 px-5 py-3">
@@ -96,16 +97,19 @@ export default class extends Controller {
   }
 
   renderIndicators() {
-    this.indicatorsTarget.innerHTML = this.config.dimensions.map((dimension) => {
-      const rows = dimensionIndicators(this.config, dimension.key).map((indicator) => {
+    this.indicatorsTarget.innerHTML = visibleDimensions(this.config, this.form.territory_key).map((dimension) => {
+      const rows = dimensionIndicators(this.config, dimension.key, this.form.territory_key).map((indicator) => {
         const value = this.scores.indicatorScores[indicator.key]
         let badge = '<span class="text-earth-300">-</span>'
         if (value != null) {
           const cls = value >= 8 ? "bg-forest-100 text-forest-700" : value >= 4 ? "bg-mustard-100 text-mustard-700" : "bg-rose-100 text-rose-700"
           badge = `<span class="inline-flex items-center justify-center w-8 h-8 rounded-md text-sm font-semibold ${cls}">${value}</span>`
         }
+        const source = indicator.extension
+          ? `<span class="ml-2 inline-flex items-center px-1.5 py-0.5 text-xs font-medium rounded-full bg-earth-100 text-earth-500">${this.escape(t("offline.extension_badge"))}</span>`
+          : ""
         return `<div class="flex items-center gap-4 px-5 py-2.5 text-sm">
-                  <span class="text-earth-600 flex-1">${this.escape(t(`${indicator.i18n_key}.name`))}</span>
+                  <span class="text-earth-600 flex-1">${this.escape(t(`${indicator.i18n_key}.name`))}${source}</span>
                   ${badge}
                 </div>`
       }).join("")

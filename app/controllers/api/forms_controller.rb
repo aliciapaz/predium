@@ -77,10 +77,7 @@ module Api
     end
 
     def known_indicator_keys
-      @known_indicator_keys ||= QuestionnaireConfig.core_indicators.map { |i| i[:key] } +
-        QuestionnaireConfig.extension_keys.flat_map do |key|
-          QuestionnaireConfig.extension(key)[:indicators].map { |i| i[:key] }
-        end
+      @known_indicator_keys ||= QuestionnaireConfig.principle_keys + QuestionnaireConfig.all_indicator_keys
     end
 
     def serialize_form(form)

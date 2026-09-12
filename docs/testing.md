@@ -136,19 +136,18 @@ spec/services/
   pdf_generators/
     diagnosis_report_spec.rb       # PDF content and structure
   scoring/
-    calculator_spec.rb             # L1/L2 score aggregation from responses
-    extension_calculator_spec.rb   # Territory extension scoring, isolated from core
+    calculator_spec.rb             # L1 from principles, L2 per dimension over the territory chain
   sync/
     processor_spec.rb              # Server-side processing of offline sync payloads
 ```
 
 **QuestionnaireConfig spec:**
-- Loads core indicators from YAML
-- Returns correct count of L1 (6) and L2 (74) indicators
-- Loads territory extensions by key
-- Returns `nil` / raises for unknown territory keys
-- Caching: subsequent calls return same object
-- Each indicator has required keys: `key`, `dimension`, `level`, `position`, `i18n_key`
+- Loads the 6 principles and 14 dimensions from core.yml (core defines no indicators)
+- Resolves a territory extension chain (`extends`): parent indicators first, then the child's, each tagged with its source
+- Raises on a cycle, an unknown parent, an unknown dimension, or a key declared in two extension files
+- `known_key?` / `extension_indicator_keys` degrade to none for a blank or unknown territory without raising
+- Caching: subsequent calls return the same object; a fingerprint change is detected
+- Each extension indicator has required keys: `key`, `dimension`, `position`, `i18n_key`
 
 **PDF generator spec:**
 - Generates a valid PDF (non-zero byte string)
@@ -172,10 +171,10 @@ end
 ```
 
 **Scoring calculator spec:**
-- Calculates L2 dimension averages from individual responses
-- Calculates L1 category averages from L2 scores
-- Handles missing responses (incomplete drafts)
-- Excludes extension indicators from core calculations
+- Level 1 = the six principle answers (nil when unanswered); no category rollup
+- Level 2 = per-dimension mean over the form's resolved territory chain (0 when a dimension has no answered indicator)
+- Matches the shared parity fixture (`spec/fixtures/scoring_parity.json`) that pins the JS port
+- A form with no territory scores Level 1 only; every dimension is 0
 
 ---
 

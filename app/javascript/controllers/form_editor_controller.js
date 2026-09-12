@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 import { newClientId, getForm, saveForm, getResponses, saveResponse, enqueue, pruneStaleExtensions } from "lib/db"
-import { cachedConfig, dimensionIndicators, extensionIndicators } from "lib/config_cache"
-import { load as loadTranslations, t } from "lib/i18n"
+import { cachedConfig, principles, territoryIndicators, dimensionIndicators, visibleDimensions } from "lib/config_cache"
+import { load as loadTranslations, t, has } from "lib/i18n"
 import { syncNow, csrfToken } from "lib/sync"
 
 const FARM_FIELDS = [
@@ -60,23 +60,25 @@ export default class extends Controller {
 
   // ── Dimensions ─────────────────────────────────────────
 
+  // Principles first (the Level 1 entry door), then only the dimensions that
+  // have an indicator for this form's territory.
   dimensions() {
-    const core = this.config.dimensions.map((dimension) => ({ ...dimension, extension: false }))
-    const territory = this.form.territory_key
-    const extIndicators = extensionIndicators(this.config, territory)
-    if (extIndicators.length) {
-      core.push({
-        key: `extension:${territory}`,
-        i18n_key: this.config.extensions[territory].i18n_key,
-        extension: true
-      })
-    }
-    return core
+    const principlesSection = { key: "principles", i18n_key: "questionnaire.principles_title", principles: true }
+    return [principlesSection, ...visibleDimensions(this.config, this.form.territory_key)]
   }
 
   indicatorsFor(dimension) {
-    if (dimension.extension) return extensionIndicators(this.config, this.form.territory_key)
-    return dimensionIndicators(this.config, dimension.key)
+    if (dimension.principles) return principles(this.config)
+    return dimensionIndicators(this.config, dimension.key, this.form.territory_key)
+  }
+
+  // Everything that must be scored to complete: principles plus the chain.
+  requiredItems() {
+    return [...principles(this.config), ...territoryIndicators(this.config, this.form.territory_key)]
+  }
+
+  isPrinciple(key) {
+    return principles(this.config).some((principle) => principle.key === key)
   }
 
   previousDimension() {
@@ -138,18 +140,17 @@ export default class extends Controller {
   // A territory change hides the old extension questions; their saved answers
   // must also go, or every sync ships keys the new territory disallows.
   async dropStaleExtensions() {
-    const allowed = extensionIndicators(this.config, this.form.territory_key).map((indicator) => indicator.key)
+    const allowed = territoryIndicators(this.config, this.form.territory_key).map((indicator) => indicator.key)
     await pruneStaleExtensions(this.clientId, allowed)
     const allowedSet = new Set(allowed)
     Object.keys(this.responses).forEach((key) => {
-      const isExtension = !this.config.indicators.some((indicator) => indicator.key === key)
-      if (isExtension && !allowedSet.has(key)) delete this.responses[key]
+      if (!this.isPrinciple(key) && !allowedSet.has(key)) delete this.responses[key]
     })
   }
 
   async persistResponse(key, value) {
     if (!value) return
-    const isExtension = !this.config.indicators.some((indicator) => indicator.key === key)
+    const isExtension = !this.isPrinciple(key)
     this.responses[key] = Number(value)
     if (!(await getForm(this.clientId))) await saveForm(this.form)
     await saveResponse(this.clientId, key, value, isExtension)
@@ -191,7 +192,7 @@ export default class extends Controller {
   }
 
   refreshCompleteState() {
-    const allScored = this.config.indicators.every((indicator) => this.responses[indicator.key] !== undefined)
+    const allScored = this.requiredItems().every((item) => this.responses[item.key] !== undefined)
     const online = navigator.onLine
     this.completeButtonTarget.disabled = !(allScored && online)
 
@@ -208,6 +209,9 @@ export default class extends Controller {
   // ── Rendering ──────────────────────────────────────────
 
   render() {
+    // A territory change can shrink dimensions() (e.g. clearing the territory
+    // drops every dimension section); keep currentIndex in range before rendering.
+    this.currentIndex = Math.min(this.currentIndex, this.dimensions().length - 1)
     this.renderNav()
     this.renderIndicators()
     this.updateProgress()
@@ -230,7 +234,6 @@ export default class extends Controller {
       else if (done) cls += "bg-forest-50 text-forest-700 hover:bg-forest-100"
       else if (partial) cls += "bg-mustard-50 text-mustard-700 hover:bg-mustard-100"
       else cls += "bg-earth-100 text-earth-500 hover:bg-earth-200"
-      if (dimension.extension) cls += " border border-dashed border-earth-400"
 
       return `<button type="button" class="${cls}" data-action="form-editor#jump" data-index="${index}">
                 ${done ? this.checkIcon() : partial ? '<span class="w-2 h-2 rounded-full bg-current"></span>' : ""}
@@ -248,14 +251,17 @@ export default class extends Controller {
     const indicators = this.indicatorsFor(dimension)
     const answered = indicators.filter((indicator) => this.responses[indicator.key] !== undefined).length
 
+    const hint = dimension.principles && !this.form.territory_key
+      ? `<p class="text-sm text-earth-500 mt-1">${this.escape(t("questionnaire.no_territory_hint"))}</p>`
+      : ""
+
     const header = `
       <h2 class="text-xl font-bold text-earth-900">${this.escape(t(dimension.i18n_key))}</h2>
       <p class="text-sm text-earth-500">
         ${this.escape(t("questionnaire.dimension_of", { current: this.currentIndex + 1, total: this.dimensions().length }))}
         &middot;
         ${this.escape(t("questionnaire.answered_count", { answered, total: indicators.length }))}
-        ${dimension.extension ? `<span class="ml-2 inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-earth-100 text-earth-600">${this.escape(t("offline.extension_badge"))}</span>` : ""}
-      </p>`
+      </p>${hint}`
 
     this.indicatorsTarget.innerHTML = header + indicators.map((indicator) => this.indicatorCard(indicator)).join("")
   }
@@ -264,6 +270,8 @@ export default class extends Controller {
     const key = indicator.key
     const base = indicator.i18n_key
     const value = this.responses[key]
+    const hasDescription = has(`${base}.description`)
+    const hasScoring = has(`${base}.scoring.low`)
 
     const buttons = Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
       let cls = "bg-earth-50 border-earth-300 text-earth-600 hover:bg-earth-100"
@@ -281,11 +289,12 @@ export default class extends Controller {
       return matches ? "" : "bg-earth-50 border-earth-100 text-earth-400"
     }
 
-    return `
-      <div class="bg-white border border-earth-200 rounded-lg p-5" data-controller="question">
-        <div class="flex items-start justify-between mb-4">
-          <h3 class="text-base font-semibold text-earth-900">${this.escape(t(`${base}.name`))}</h3>
-          <div class="relative shrink-0 ml-2" data-controller="collapsible">
+    const badge = indicator.extension
+      ? `<span class="ml-2 inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-earth-100 text-earth-600 align-middle">${this.escape(t("offline.extension_badge"))}</span>`
+      : ""
+
+    const info = hasDescription
+      ? `<div class="relative shrink-0 ml-2" data-controller="collapsible">
             <button type="button" data-action="collapsible#toggle" class="text-earth-400 hover:text-earth-600 p-1">
               <svg data-collapsible-target="icon" class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -294,14 +303,11 @@ export default class extends Controller {
             <div data-collapsible-target="content" class="hidden absolute right-0 mt-2 w-80 bg-white border border-earth-200 rounded-lg shadow-lg p-4 z-10 text-left">
               <p class="text-sm text-earth-600 mb-3">${this.escape(t(`${base}.description`))}</p>
             </div>
-          </div>
-        </div>
+          </div>`
+      : ""
 
-        <input type="hidden" name="form_responses[${key}]" value="${value ?? ""}" data-question-target="hiddenInput">
-
-        <div class="grid grid-cols-5 sm:gap-2 gap-1.5">${buttons}</div>
-
-        <div class="mt-3 space-y-1.5 text-sm">
+    const rubric = hasScoring
+      ? `<div class="mt-3 space-y-1.5 text-sm">
           <div data-question-target="descLow" class="p-2.5 rounded-lg border transition-all ${value !== undefined && value <= 3 ? "bg-rose-50 border-rose-300 text-rose-700 ring-2 ring-rose-200" : descClass(false) || "bg-rose-50/50 border-rose-100 text-rose-600/80"}">
             <span class="font-medium">1-3:</span> ${this.escape(t(`${base}.scoring.low`))}
           </div>
@@ -311,13 +317,27 @@ export default class extends Controller {
           <div data-question-target="descHigh" class="p-2.5 rounded-lg border transition-all ${value !== undefined && value >= 8 ? "bg-forest-50 border-forest-300 text-forest-700 ring-2 ring-forest-200" : descClass(false) || "bg-forest-50/50 border-forest-100 text-forest-600/80"}">
             <span class="font-medium">8-10:</span> ${this.escape(t(`${base}.scoring.high`))}
           </div>
+        </div>`
+      : ""
+
+    return `
+      <div class="bg-white border border-earth-200 rounded-lg p-5" data-controller="question">
+        <div class="flex items-start justify-between mb-4">
+          <h3 class="text-base font-semibold text-earth-900">${this.escape(t(`${base}.name`))}${badge}</h3>
+          ${info}
         </div>
+
+        <input type="hidden" name="form_responses[${key}]" value="${value ?? ""}" data-question-target="hiddenInput">
+
+        <div class="grid grid-cols-5 sm:gap-2 gap-1.5">${buttons}</div>
+        ${rubric}
       </div>`
   }
 
   updateProgress() {
-    const total = this.config.indicators.length
-    const scored = this.config.indicators.filter((indicator) => this.responses[indicator.key] !== undefined).length
+    const required = this.requiredItems()
+    const total = required.length
+    const scored = required.filter((item) => this.responses[item.key] !== undefined).length
     this.progressTextTarget.textContent = t("questionnaire.indicators_count", { answered: scored, total })
     this.progressBarTarget.style.width = `${total ? Math.round((scored * 100) / total) : 0}%`
   }

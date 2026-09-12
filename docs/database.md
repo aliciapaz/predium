@@ -175,9 +175,9 @@ Individual indicator scores for a form. Replaces the 80+ indicator columns from 
 |--------|------|-------------|-------|
 | `id` | bigint | PK | |
 | `form_id` | bigint | FK → forms, not null | |
-| `indicator_key` | string | not null | Matches YAML config key (e.g., `"soil_coverage"`) |
+| `indicator_key` | string | not null | A principle key (e.g. `"biodiversity"`) or an extension indicator key (e.g. `"soil_coverage"`) |
 | `value` | integer | not null | Score from 1 to 10 |
-| `is_extension` | boolean | default: `false` | `true` for territory-specific indicators |
+| `is_extension` | boolean | default: `false` | `true` when the key comes from a territory extension file; `false` for a principle |
 | `created_at` | datetime | not null | |
 | `updated_at` | datetime | not null | |
 
@@ -189,8 +189,8 @@ Individual indicator scores for a form. Replaces the 80+ indicator columns from 
 **Notes:**
 - `indicator_key` values are stable strings defined in the YAML questionnaire config
 - `value` is validated at the model level to be between 1 and 10
-- `is_extension` allows queries to easily separate core vs. territory-specific scores
-- Core indicators are always present for completed forms; extensions depend on `territory_key`
+- `is_extension` separates Level 1 principle responses (`false`) from Level 2 extension indicator responses (`true`); it is derived from the key, not set by callers
+- A completed form has all six principle responses; its indicator responses are exactly the form's territory chain (a territory change prunes rows outside the new chain)
 
 ---
 

@@ -167,6 +167,8 @@ en:
     dimension_of: "Dimension %{current} of %{total}"
     answered_count: "%{answered}/%{total} answered"
     back_to_farm_info: "Farm Info"
+    principles_title: "Agroecology Principles"
+    no_territory_hint: "No territory selected: only the principles are answered. Choose a territory to add its specific indicators."
 
   # ── Forms Index ────────────────────────────────────────
   forms:
@@ -218,7 +220,7 @@ en:
 
   # ── Results Page ───────────────────────────────────────
   results:
-    category_overview: "Category Overview"
+    category_overview: "Agroecology Principles"
     dimension_scores: "Dimension Scores"
     all_indicators: "All Indicators"
     land_area: "Land Area"
