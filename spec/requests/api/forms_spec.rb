@@ -39,6 +39,44 @@ RSpec.describe("Api::Forms", type: :request) do
     end
   end
 
+  describe "GET /api/forms/:client_id" do
+    it "returns the current user's form with nested responses" do
+      form = create(:form, user: user)
+      create(:form_response, form: form, indicator_key: principle_key, value: 7)
+
+      get "/api/forms/#{form.client_id}"
+
+      expect(response).to(have_http_status(:ok))
+      body = JSON.parse(response.body)["form"]
+      expect(body["client_id"]).to(eq(form.client_id))
+      expect(body["state"]).to(eq(form.state))
+      expect(body["responses"]).to(eq([{ "indicator_key" => principle_key, "value" => 7, "is_extension" => false }]))
+    end
+
+    it "returns 404 for an unknown client_id" do
+      get "/api/forms/#{SecureRandom.uuid}"
+
+      expect(response).to(have_http_status(:not_found))
+    end
+
+    it "returns 404 for another user's form" do
+      other_form = create(:form)
+
+      get "/api/forms/#{other_form.client_id}"
+
+      expect(response).to(have_http_status(:not_found))
+    end
+
+    it "rejects unauthenticated requests with 401 JSON" do
+      form = create(:form, user: user)
+      sign_out user
+
+      get "/api/forms/#{form.client_id}"
+
+      expect(response).to(have_http_status(:unauthorized))
+    end
+  end
+
   describe "PUT /api/forms/:client_id" do
     let(:client_id) { SecureRandom.uuid }
 

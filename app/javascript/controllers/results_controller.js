@@ -3,6 +3,7 @@ import { getForm, getResponses } from "lib/db"
 import { cachedConfig, principles, dimensionIndicators, visibleDimensions } from "lib/config_cache"
 import { load as loadTranslations, t } from "lib/i18n"
 import { calculateScores } from "lib/scoring"
+import { hydrateForm } from "lib/sync"
 
 // Hydrates the results shell from IndexedDB (KTD-4 amended): scores and
 // charts always compute client-side via lib/scoring.js, online and offline.
@@ -14,6 +15,15 @@ export default class extends Controller {
     await loadTranslations()
     this.config = await cachedConfig()
     this.form = await getForm(this.clientIdValue)
+
+    // getForm is a bare cache read; unlike cachedConfig it does not self-heal.
+    // A form completed on another device (or after a cache purge) lives in the
+    // DB but is not in IndexedDB here, and Turbo navigation never fires the
+    // window-load seed. Fetch just this form before giving up.
+    if (!this.form && navigator.onLine) {
+      await hydrateForm(this.clientIdValue)
+      this.form = await getForm(this.clientIdValue)
+    }
 
     if (!this.config || !this.form) {
       this.missingTarget.classList.remove("hidden")

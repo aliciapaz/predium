@@ -7,6 +7,13 @@ module Api
       render(json: { forms: forms.map { |form| serialize_form(form) } })
     end
 
+    def show
+      form = current_user.forms.find_by(client_id: params[:client_id])
+      return render(json: { error: "not_found" }, status: :not_found) unless form
+
+      render(json: { form: serialize_form(form) })
+    end
+
     def update
       invalid = unknown_indicator_errors
       return render(json: { errors: invalid }, status: :unprocessable_entity) if invalid
