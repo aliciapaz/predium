@@ -167,6 +167,8 @@ es:
     dimension_of: "Dimension %{current} de %{total}"
     answered_count: "%{answered}/%{total} respondidos"
     back_to_farm_info: "Info del Predio"
+    principles_title: "Principios Agroecologicos"
+    no_territory_hint: "Sin territorio seleccionado: solo se responden los principios. Elija un territorio para agregar los indicadores especificos."
 
   # ── Indice de Formularios ──────────────────────────────
   forms:
@@ -218,7 +220,7 @@ es:
 
   # ── Pagina de Resultados ───────────────────────────────
   results:
-    category_overview: "Resumen por Categoria"
+    category_overview: "Principios Agroecologicos"
     dimension_scores: "Puntajes por Dimension"
     all_indicators: "Todos los Indicadores"
     land_area: "Superficie"

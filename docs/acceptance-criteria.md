@@ -85,7 +85,7 @@
 
 - [ ] Draft forms persist all entered data (farm info + responses)
 - [ ] User can navigate away and return to a draft form
-- [ ] Draft forms show a progress indicator (e.g., "15/74 indicators completed")
+- [ ] Draft forms show a progress indicator over principles plus the territory's indicators (e.g., "15/78 completed" for a Chile form)
 - [ ] Last modified timestamp is visible
 
 ### 3.3 Complete Form
@@ -103,10 +103,10 @@
 **As a** user, **I want to** view my form results **so that** I can understand the farm's diagnosis.
 
 - [ ] Completed form shows a summary with all scores
-- [ ] Radar/spider chart displays L1 category scores
-- [ ] Bar charts display L2 dimension scores
+- [ ] Radar/spider chart displays the 6 L1 principle scores
+- [ ] Bar charts display L2 dimension scores (dimensions with no indicator for the territory are hidden)
 - [ ] Individual indicator scores are listed by dimension
-- [ ] Territory extension scores are displayed separately (if applicable)
+- [ ] Territory extension indicators show a provenance badge
 
 ### 3.5 Delete Form (Soft)
 
@@ -133,12 +133,12 @@
 
 ### 4.1 Level 1 Entry
 
-**As a** user filling out a form, **I want to** see the 6 top-level categories **so that** I know the assessment structure.
+**As a** user filling out a form, **I want to** score the 6 agroecology principles **so that** I complete the high-level assessment that anchors the diagnosis.
 
-- [ ] Form shows 6 Level-1 categories with their names (translated)
-- [ ] Each L1 category shows the number of L2 indicators it contains
-- [ ] User can navigate to any L1 category to fill in its indicators
-- [ ] L1 scores are calculated as averages of their L2 indicators (not directly entered)
+- [ ] Form shows the 6 Level-1 principles with their names (translated) as the first section
+- [ ] User scores each principle directly on a 1-10 scale
+- [ ] A form with no territory can be completed on the principles alone
+- [ ] L1 scores are the principle answers (not derived from L2)
 
 ### 4.2 Level 2 Entry by Dimension
 
@@ -151,15 +151,15 @@
 - [ ] Progress within the dimension is shown (e.g., "3/5 indicators scored")
 - [ ] User can navigate between dimensions without losing data
 
-### 4.3 Territory Extensions
+### 4.3 Territory Extensions (Level 2 indicators)
 
-**As a** user in a specific territory, **I want to** answer additional territory-specific indicators **so that** my assessment includes local context.
+**As a** user in a specific territory, **I want to** answer that territory's Level 2 indicators **so that** my assessment measures each dimension with locally relevant questions.
 
-- [ ] If a `territory_key` is set on the form, additional indicators appear
-- [ ] Extension indicators are visually distinguished from core indicators
-- [ ] Extension indicators are optional — form can be completed without them
-- [ ] Extension scores are flagged as `is_extension: true` in responses
-- [ ] Extension scores do not affect core L1/L2 calculations
+- [ ] The form's `territory_key` determines which indicators appear, each under its dimension
+- [ ] Dimensions with no indicator for the territory are hidden
+- [ ] Extension indicators show a provenance badge naming their source
+- [ ] Extension indicators are required for completion and feed their dimension's Level 2 score
+- [ ] Extension responses are flagged `is_extension: true`
 
 ### 4.4 Validation
 
@@ -227,8 +227,8 @@
 
 **As a** user viewing results, **I want to** see a radar chart **so that** I can quickly assess overall farm health.
 
-- [ ] Radar chart displays all 6 L1 category scores
-- [ ] Axes are labeled with translated category names
+- [ ] Radar chart displays all 6 Level 1 principle scores
+- [ ] Axes are labeled with translated principle names
 - [ ] Scores range from 0 (center) to 10 (edge)
 - [ ] Chart is responsive and readable on mobile
 

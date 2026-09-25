@@ -71,6 +71,55 @@ export async function pruneStaleExtensions(formClientId, allowedKeys) {
   await db.forms.update(formClientId, { updated_at: new Date().toISOString(), dirty: 1 })
 }
 
+// Config-change migration heal. A refreshed config can (a) remove a key
+// entirely (this refactor's placeholder indicators) or (b) move a key into a
+// territory a given form does not belong to. Either way, drop every local
+// response the form's OWN territory chain no longer allows (regardless of
+// is_extension) and re-enqueue the affected forms so they stop failing every
+// sync with a 422. Allowed keys are resolved per form from its territory, not
+// the global union of all territories: a key valid only for another territory
+// is pruned here instead of surviving to 422-loop against a form that cannot
+// hold it.
+export async function pruneUnknownResponses(config) {
+  const principleKeys = new Set((config.principles || []).map((p) => p.key))
+  const chainByTerritory = territoryChainKeys(config)
+  const forms = await db.forms.toArray()
+  const territoryOf = new Map(forms.map((form) => [form.client_id, form.territory_key]))
+  // Completed forms are locked and server-authoritative; never touch or re-push
+  // them. An orphaned key left on a completed form is inert.
+  const completed = new Set(forms.filter((form) => form.state === "completed").map((form) => form.client_id))
+
+  const isStale = (row) => {
+    if (completed.has(row.form_client_id) || principleKeys.has(row.indicator_key)) return false
+    const chain = chainByTerritory.get(territoryOf.get(row.form_client_id)) || EMPTY_SET
+    return !chain.has(row.indicator_key)
+  }
+  const stale = await db.form_responses.filter(isStale).toArray()
+  if (stale.length === 0) return
+
+  const formIds = [...new Set(stale.map((row) => row.form_client_id))]
+  // One transaction so an interruption can't delete rows without also marking
+  // the form dirty and queued (which would strand orphans server-side).
+  await db.transaction("rw", db.forms, db.form_responses, db.sync_queue, async () => {
+    await db.form_responses.filter(isStale).delete()
+    for (const formClientId of formIds) {
+      await db.forms.update(formClientId, { updated_at: new Date().toISOString(), dirty: 1 })
+      await enqueue(formClientId)
+    }
+  })
+}
+
+const EMPTY_SET = new Set()
+
+// Map of territory_key -> Set of that territory's resolved indicator keys.
+function territoryChainKeys(config) {
+  const map = new Map()
+  Object.entries(config.extensions || {}).forEach(([territory, ext]) => {
+    map.set(territory, new Set((ext.indicators || []).map((indicator) => indicator.key)))
+  })
+  return map
+}
+
 export async function getConfig() {
   return db.questionnaire_config.get("core")
 }

@@ -13,9 +13,12 @@ class Form < ApplicationRecord
 
   before_validation :ensure_client_id, on: :create
 
+  normalizes :territory_key, with: ->(value) { value.strip.presence }
+
   validates :name, presence: true
   validates :client_id, presence: true, uniqueness: true
   validates :land_area, numericality: { greater_than: 0 }, allow_nil: true
+  validates :territory_key, inclusion: { in: ->(_form) { QuestionnaireConfig.extension_keys } }, allow_blank: true
 
   default_scope -> { kept }
 
@@ -55,7 +58,38 @@ class Form < ApplicationRecord
     client_id
   end
 
+  # Keys that must be scored before the form can be completed: the six
+  # principles plus every indicator in the form's resolved territory chain.
+  def required_indicator_keys
+    QuestionnaireConfig.known_indicator_keys(territory_key)
+  end
+
+  # Reads the (preloaded) association rather than querying per call.
+  def scored_keys
+    form_responses.map(&:indicator_key)
+  end
+
+  # i18n keys of the sections still missing a score: Principles first, then each
+  # dimension (in canonical order) that has an unscored chain indicator.
+  def missing_sections
+    missing = required_indicator_keys - scored_keys
+    return [] if missing.empty?
+
+    principle_section(missing) + missing_dimension_sections(missing)
+  end
+
   private
+
+  def principle_section(missing)
+    QuestionnaireConfig.principle_keys.intersect?(missing) ? ["questionnaire.principles_title"] : []
+  end
+
+  def missing_dimension_sections(missing)
+    by_key = QuestionnaireConfig.extension_indicators(territory_key).index_by { |ind| ind[:key] }
+    QuestionnaireConfig.dimensions.filter_map do |dim|
+      dim[:i18n_key] if missing.any? { |key| by_key.dig(key, :dimension) == dim[:key] }
+    end
+  end
 
   def ensure_client_id
     self.client_id ||= SecureRandom.uuid

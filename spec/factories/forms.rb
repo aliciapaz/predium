@@ -5,6 +5,7 @@ FactoryBot.define do
     user
     name { "Test Farm" }
     country { "CL" }
+    territory_key { "chile" }
 
     trait :completed do
       state { "completed" }
@@ -14,8 +15,11 @@ FactoryBot.define do
     trait :completed_with_responses do
       completed
       after(:create) do |form|
-        QuestionnaireConfig.core_indicators.each do |indicator|
-          create(:form_response, form: form, indicator_key: indicator[:key], value: rand(1..10))
+        QuestionnaireConfig.principle_keys.each do |key|
+          create(:form_response, form: form, indicator_key: key, value: rand(1..10))
+        end
+        QuestionnaireConfig.extension_indicator_keys(form.territory_key).each do |key|
+          create(:form_response, form: form, indicator_key: key, value: rand(1..10))
         end
       end
     end

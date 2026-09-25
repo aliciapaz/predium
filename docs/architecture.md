@@ -35,60 +35,58 @@ Indicator keys are stable strings that match the YAML questionnaire config (see 
 
 ---
 
-## ADR-2: YAML-Driven Questionnaire with Standardized Core
+## ADR-2: YAML-Driven Two-Level Questionnaire
 
 **Status:** Accepted
 
 **Context:**
-The questionnaire structure (6 Level-1 categories, 74 Level-2 indicators across 15 dimensions) is the domain heart of the app. It must be:
-- Stable enough for cross-territory comparison
-- Extensible for territory-specific indicators
-- Translatable without touching code
+The questionnaire is the domain heart of the app and is two-level:
+- **Level 1** is six agroecology principles (biodiversity, recycling, system interactions, ecological soil management, ecological pest and disease management, traditional knowledge). They are answered directly on a 1-10 scale and are the entry point to the deeper diagnosis.
+- **Level 2** is dimensions measured by indicators. The dimensions (14, grouped into 6 categories) are shared structure; the indicators are supplied by territory extensions, so the exact Level 2 questions depend on where the farm is.
+
+It must be stable enough for cross-territory comparison (shared principles and dimensions), extensible for territory-specific indicators, and translatable without touching code.
 
 **Decision:**
-Define the questionnaire in YAML configuration files:
+Split structure from content across YAML files:
 
 ```
 config/questionnaire/
-  core.yml                          # 6 L1 + 74 L2 indicators
+  core.yml                          # 6 principles + 6 categories / 14 dimensions (no indicators)
   extensions/
-    chile.yml                       # Chilean-specific indicators
+    chile.yml                       # Chile's Level 2 indicators, each attached to a core dimension
     {territory_key}.yml             # Future territory extensions
 ```
 
-Each indicator entry contains:
+`core.yml` carries principles and the category/dimension tree only. Each extension file lists indicators; an extension may declare `extends: <territory>` to inherit a parent's indicators and add its own (e.g. a future `chiloe` extending `chile`). Keys are globally unique across extension files.
 
 ```yaml
-- key: "soil_coverage"
-  dimension: "soil"
-  level: 2
-  position: 1
-  i18n_key: "questionnaire.soil.soil_coverage"
+# core.yml
+principles:
+  - { key: biodiversity, i18n_key: questionnaire.principles.biodiversity, position: 1 }
+# chile.yml
+indicators:
+  - { key: soil_coverage, dimension: soil_health, i18n_key: questionnaire.indicators.soil_coverage, position: 1 }
 ```
 
-Scoring criteria (low/medium/high descriptions) live in locale files:
+Names (and optional low/medium/high scoring) live in `config/locales/{en,es}/questionnaire.yml`; a question may ship with a name only.
 
-```
-config/locales/
-  en/questionnaire.yml
-  es/questionnaire.yml
-```
-
-A `QuestionnaireConfig` service loads and caches the YAML at boot, providing lookup methods:
+A `QuestionnaireConfig` service loads and caches the YAML (behind a reentrant `Monitor`, because chain resolution recurses under the lock), providing:
 
 ```ruby
-QuestionnaireConfig.core_indicators          # all 74 L2 + 6 L1
-QuestionnaireConfig.dimensions               # 15 dimensions
-QuestionnaireConfig.extension("chile")       # territory-specific indicators
-QuestionnaireConfig.indicator("soil_coverage") # single indicator metadata
+QuestionnaireConfig.principles                    # the 6 Level 1 principles
+QuestionnaireConfig.dimensions                    # 14 dimensions
+QuestionnaireConfig.extension("chile")            # resolved chain: parent indicators + own
+QuestionnaireConfig.extension_indicator_keys(t)   # keys for a territory ([] for blank/unknown)
+QuestionnaireConfig.known_key?(key, territory)    # principle or in the territory chain
 ```
 
 **Consequences:**
-- Core indicators are always comparable across territories
-- Territory extensions are clearly separated and flagged in responses (`is_extension: true`)
-- Adding a territory requires only a new YAML file and locale entries
-- The YAML is cached in IndexedDB for offline form creation (see ADR-3)
-- Changing indicator text is a locale file change, not a code change
+- Comparability rests on the shared principles and shared dimensions, not on a fixed indicator set.
+- Territory extension indicators are scored into their dimension's Level 2 score and rendered under that dimension. A response is flagged `is_extension: true` when its key comes from a territory file (a principle is `false`); the flag now means "from a territory file", computed by membership.
+- Level 1 is the six principle answers (the results radar); there is no category rollup.
+- Adding a territory requires only a new YAML file (optionally `extends` another) and locale entries.
+- The YAML is cached in IndexedDB for offline form creation (see ADR-3); a fingerprint change also prunes local responses whose keys a new config removed.
+- Changing question text is a locale file change, not a code change.
 
 ---
 

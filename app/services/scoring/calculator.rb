@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 module Scoring
+  # Level 1 = the six principles, scored directly. Level 2 = per-dimension means
+  # over the form's resolved territory chain. There is no category rollup.
+  # Kept in parity with app/javascript/lib/scoring.js via
+  # spec/fixtures/scoring_parity.json.
   class Calculator
     attr_reader :form
 
@@ -9,42 +13,38 @@ module Scoring
     end
 
     def call
-      responses = form.form_responses.core.index_by(&:indicator_key)
-
+      responses = form.form_responses.index_by(&:indicator_key)
       indicator_scores = build_indicator_scores(responses)
-      l2_scores = build_l2_scores(indicator_scores)
-      l1_scores = build_l1_scores(l2_scores)
 
       {
         indicator_scores: indicator_scores,
-        l2_scores: l2_scores,
-        l1_scores: l1_scores,
+        l2_scores: build_l2_scores(indicator_scores),
+        l1_scores: build_l1_scores(responses),
       }
     end
 
     private
 
+    def build_l1_scores(responses)
+      QuestionnaireConfig.principle_keys.index_with { |key| responses[key]&.value }
+    end
+
     def build_indicator_scores(responses)
-      QuestionnaireConfig.core_indicators.each_with_object({}) do |ind, hash|
-        response = responses[ind[:key]]
-        hash[ind[:key]] = response&.value
+      chain_indicators.each_with_object({}) do |ind, hash|
+        hash[ind[:key]] = responses[ind[:key]]&.value
       end
     end
 
     def build_l2_scores(indicator_scores)
       QuestionnaireConfig.dimensions.each_with_object({}) do |dim, hash|
-        dim_indicators = QuestionnaireConfig.core_indicators.select { |i| i[:dimension] == dim[:key] }
-        values = dim_indicators.filter_map { |i| indicator_scores[i[:key]] }
+        keys = chain_indicators.select { |ind| ind[:dimension] == dim[:key] }.map { |ind| ind[:key] }
+        values = keys.filter_map { |key| indicator_scores[key] }
         hash[dim[:key]] = values.any? ? (values.sum.to_f / values.size).round(1) : 0
       end
     end
 
-    def build_l1_scores(l2_scores)
-      QuestionnaireConfig.l1_categories.each_with_object({}) do |cat, hash|
-        cat_dimensions = QuestionnaireConfig.dimensions.select { |d| d[:category] == cat[:key] }
-        dim_avgs = cat_dimensions.filter_map { |d| l2_scores[d[:key]] if l2_scores[d[:key]]&.positive? }
-        hash[cat[:key]] = dim_avgs.any? ? (dim_avgs.sum / dim_avgs.size).round(1) : 0
-      end
+    def chain_indicators
+      @chain_indicators ||= QuestionnaireConfig.extension_indicators(form.territory_key)
     end
   end
 end

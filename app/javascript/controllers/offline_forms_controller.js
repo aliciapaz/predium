@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { listForms, getResponses, queueEntries } from "lib/db"
-import { cachedConfig } from "lib/config_cache"
+import { cachedConfig, principles, territoryIndicators } from "lib/config_cache"
 import { load as loadTranslations, t } from "lib/i18n"
 
 // Form list: server-rendered when online; hydrated from IndexedDB when the
@@ -18,13 +18,21 @@ export default class extends Controller {
 
     const drafts = forms.filter((form) => form.state === "draft")
     const completed = forms.filter((form) => form.state === "completed")
-    const total = config ? config.indicators.length : 0
+
+    // Total is per-form: principles plus the form's own territory chain.
+    const requiredKeys = (form) => [
+      ...principles(config).map((p) => p.key),
+      ...territoryIndicators(config, form.territory_key).map((i) => i.key),
+    ]
 
     const cards = async (collection) => {
       const rendered = []
       for (const form of collection) {
         const responses = await getResponses(form.client_id)
-        rendered.push(this.card(form, Object.keys(responses).length, total, pending.has(form.client_id)))
+        const required = config ? requiredKeys(form) : []
+        const total = config ? required.length : Object.keys(responses).length
+        const scored = config ? required.filter((key) => responses[key] !== undefined).length : Object.keys(responses).length
+        rendered.push(this.card(form, scored, total, pending.has(form.client_id)))
       }
       return rendered.join("")
     }
