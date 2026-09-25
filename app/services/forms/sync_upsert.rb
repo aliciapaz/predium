@@ -64,8 +64,15 @@ module Forms
       form.form_responses.where.not(indicator_key: allowed).destroy_all
     end
 
+    # Persist only in-chain keys. An out-of-chain key that reached here is a
+    # re-sent stored row (see unknown_indicator_keys); prune_out_of_chain! has
+    # already dropped it, so skipping it lets the form reconcile rather than
+    # failing FormResponse validation.
     def apply_responses!(form)
+      allowed = QuestionnaireConfig.known_indicator_keys(form.territory_key)
       responses.each do |key, value|
+        next unless allowed.include?(key)
+
         form.form_responses.find_or_initialize_by(indicator_key: key).tap do |response|
           response.value = value
           response.save!
@@ -104,8 +111,17 @@ module Forms
       (time.to_r * 1000).floor
     end
 
+    # A NEW out-of-chain key is rejected (422). A key already stored on the form
+    # is tolerated even when out of the current chain: prune_out_of_chain! plus
+    # apply_responses! reconcile it, so a synced form heals instead of looping.
     def unknown_indicator_keys(form)
-      responses.keys - allowed_keys(form)
+      responses.keys - allowed_keys(form) - persisted_response_keys(form)
+    end
+
+    def persisted_response_keys(form)
+      return [] if form.new_record?
+
+      form.form_responses.pluck(:indicator_key)
     end
 
     # Allow-list is built from the INCOMING territory (the payload's value when it

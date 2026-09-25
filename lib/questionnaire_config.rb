@@ -182,12 +182,14 @@ class QuestionnaireConfig
       raise Error, "Duplicate key in #{territory_key} chain: #{duplicates.join(", ")}" if duplicates.any?
     end
 
-    # A key declared in more than one extension file collides on the shared
-    # locale namespace and the union permit list, so keys are globally unique.
+    # A key declared in more than one extension file, or an indicator key that
+    # collides with a principle key, shares the locale namespace and the union
+    # permit list and would be classified as both levels, so keys are globally
+    # unique across principles and all extension indicators.
     def guard_global_uniqueness!
-      duplicates = extension_keys.flat_map { |key| own_indicator_keys(key) }
-        .tally.select { |_, n| n > 1 }.keys
-      raise Error, "Indicator keys declared in multiple extensions: #{duplicates.join(", ")}" if duplicates.any?
+      keys = principle_keys + extension_keys.flat_map { |key| own_indicator_keys(key) }
+      duplicates = keys.tally.select { |_, n| n > 1 }.keys
+      raise Error, "Keys declared more than once (principles/indicators): #{duplicates.join(", ")}" if duplicates.any?
     end
 
     def own_indicator_keys(territory_key)

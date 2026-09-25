@@ -145,7 +145,19 @@ RSpec.describe(QuestionnaireConfig) do
           })
         end
 
-        expect { described_class.extension("dup_a") }.to(raise_error(QuestionnaireConfig::Error, /multiple extensions/))
+        expect { described_class.extension("dup_a") }.to(raise_error(QuestionnaireConfig::Error, /declared more than once/))
+      end
+    end
+
+    it "raises when an indicator key collides with a principle key" do
+      with_copied_config do |_dir, extensions|
+        write_extension(extensions, "clash", {
+          "territory" => "clash",
+          "i18n_key" => "x.clash",
+          "indicators" => [{ "key" => "biodiversity", "dimension" => "soil_health", "i18n_key" => "x.b", "position" => 1 }],
+        })
+
+        expect { described_class.extension("clash") }.to(raise_error(QuestionnaireConfig::Error, /declared more than once/))
       end
     end
 

@@ -140,6 +140,26 @@ RSpec.describe("Api::Forms", type: :request) do
       expect(form.reload.form_responses.pluck(:indicator_key)).to(contain_exactly(principle_key))
     end
 
+    it "reconciles a re-sent out-of-chain stored row instead of 422-looping" do
+      form = create(:form, user: user, territory_key: nil)
+      create(:form_response, form: form, indicator_key: principle_key, value: 5)
+      # A row that went out-of-chain when its key moved into a territory this form
+      # does not belong to; the client re-sends it (alongside a genuine edit)
+      # before its own heal runs.
+      FormResponse.new(form: form, indicator_key: "soil_coverage", value: 7, is_extension: true).save!(validate: false)
+
+      upsert(
+        form.client_id,
+        form: { territory_key: nil },
+        responses: { principle_key => 6, "soil_coverage" => 7 },
+        base: form.reload.updated_at.iso8601(3),
+      )
+
+      expect(response).to(have_http_status(:ok))
+      expect(form.reload.form_responses.pluck(:indicator_key)).to(contain_exactly(principle_key))
+      expect(form.form_responses.find_by(indicator_key: principle_key).value).to(eq(6))
+    end
+
     context "with a stale draft" do
       let(:form) { create(:form, user: user, name: "Server Name") }
 

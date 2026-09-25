@@ -13,6 +13,8 @@ class Form < ApplicationRecord
 
   before_validation :ensure_client_id, on: :create
 
+  normalizes :territory_key, with: ->(value) { value.strip.presence }
+
   validates :name, presence: true
   validates :client_id, presence: true, uniqueness: true
   validates :land_area, numericality: { greater_than: 0 }, allow_nil: true
