@@ -5,9 +5,9 @@ module Api
     def show
       render(json: {
         fingerprint: QuestionnaireConfig.fingerprint,
+        principles: QuestionnaireConfig.principles,
         categories: QuestionnaireConfig.l1_categories,
         dimensions: QuestionnaireConfig.dimensions,
-        indicators: QuestionnaireConfig.core_indicators,
         extensions: QuestionnaireConfig.extension_keys.index_with { |key| QuestionnaireConfig.extension(key) },
       })
     end

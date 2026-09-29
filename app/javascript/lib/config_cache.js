@@ -1,4 +1,4 @@
-import { getConfig, putConfig, putLocale } from "lib/db"
+import { getConfig, putConfig, putLocale, pruneUnknownResponses } from "lib/db"
 
 // Keeps the questionnaire config and both locales' translations cached in
 // IndexedDB, invalidated by the server-computed content fingerprint (KTD-8).
@@ -18,6 +18,13 @@ export async function refresh() {
     const fresh = await response.json()
     const cached = await getConfig()
     if (!cached || cached.fingerprint !== fresh.fingerprint) {
+      // Prune BEFORE persisting the new fingerprint: if this run is interrupted,
+      // the old fingerprint remains so the heal retries on the next load instead
+      // of being masked by a fingerprint match. A config change can remove keys
+      // (this refactor's placeholders) or move them into another territory;
+      // dropping responses a form's own territory no longer allows stops old
+      // drafts 422-looping. Pruning is idempotent on rerun.
+      await pruneUnknownResponses(fresh)
       await putConfig(fresh)
       await refreshTranslations(fresh.fingerprint)
     }
@@ -38,15 +45,22 @@ async function refreshTranslations(fingerprint) {
   }
 }
 
-export function coreIndicators(config) {
-  return config.indicators || []
+export function principles(config) {
+  return config.principles || []
 }
 
-export function dimensionIndicators(config, dimensionKey) {
-  return coreIndicators(config).filter((indicator) => indicator.dimension === dimensionKey)
-}
-
-export function extensionIndicators(config, territoryKey) {
+// Resolved indicator chain for a form's territory (already flattened server-side).
+export function territoryIndicators(config, territoryKey) {
   if (!territoryKey || !config.extensions || !config.extensions[territoryKey]) return []
   return config.extensions[territoryKey].indicators || []
+}
+
+export function dimensionIndicators(config, dimensionKey, territoryKey) {
+  return territoryIndicators(config, territoryKey).filter((indicator) => indicator.dimension === dimensionKey)
+}
+
+// Dimensions that have at least one indicator for this territory (others hidden).
+export function visibleDimensions(config, territoryKey) {
+  const withIndicators = new Set(territoryIndicators(config, territoryKey).map((i) => i.dimension))
+  return (config.dimensions || []).filter((dimension) => withIndicators.has(dimension.key))
 }
