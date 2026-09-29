@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { newClientId, getForm, saveForm, getResponses, saveResponse, enqueue, pruneStaleExtensions } from "lib/db"
+import { newClientId, getForm, saveForm, getResponses, saveResponse, enqueue, pruneDisallowedResponses } from "lib/db"
 import { cachedConfig, principles, territoryIndicators, dimensionIndicators, visibleDimensions } from "lib/config_cache"
 import { load as loadTranslations, t, has } from "lib/i18n"
 import { syncNow, hydrateForm, csrfToken } from "lib/sync"
@@ -40,6 +40,10 @@ export default class extends Controller {
     }
 
     this.responses = await getResponses(this.clientId)
+    if (await this.dropStaleResponses()) {
+      await enqueue(this.clientId)
+      syncNow()
+    }
     this.currentIndex = 0
 
     this.hydrateFarmFields()
@@ -128,7 +132,7 @@ export default class extends Controller {
     ).map((box) => box.value)
 
     await saveForm(this.form)
-    if (this.form.territory_key !== territoryBefore) await this.dropStaleExtensions()
+    if (this.form.territory_key !== territoryBefore) await this.dropStaleResponses()
     await enqueue(this.clientId)
     this.markSaved()
     if (this.form.name) this.titleTarget.textContent = this.form.name
@@ -137,15 +141,17 @@ export default class extends Controller {
     syncNow()
   }
 
-  // A territory change hides the old extension questions; their saved answers
-  // must also go, or every sync ships keys the new territory disallows.
-  async dropStaleExtensions() {
-    const allowed = territoryIndicators(this.config, this.form.territory_key).map((indicator) => indicator.key)
-    await pruneStaleExtensions(this.clientId, allowed)
-    const allowedSet = new Set(allowed)
+  // Answers outside the form's current questionnaire must go before the next
+  // push, or every sync ships keys the server rejects: the old territory's
+  // questions after a territory change, or legacy rows hydrated from the server
+  // that no questionnaire knows. Returns true when anything was removed.
+  async dropStaleResponses() {
+    const allowed = new Set(this.requiredItems().map((item) => item.key))
+    const removed = await pruneDisallowedResponses(this.clientId, [...allowed])
     Object.keys(this.responses).forEach((key) => {
-      if (!this.isPrinciple(key) && !allowedSet.has(key)) delete this.responses[key]
+      if (!allowed.has(key)) delete this.responses[key]
     })
+    return removed > 0
   }
 
   async persistResponse(key, value) {

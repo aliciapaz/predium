@@ -198,6 +198,24 @@ RSpec.describe("Api::Forms", type: :request) do
       expect(form.form_responses.find_by(indicator_key: principle_key).value).to(eq(6))
     end
 
+    it "heals a stored legacy key no questionnaire knows instead of 422-looping" do
+      form = create(:form, user: user, territory_key: nil)
+      create(:form_response, form: form, indicator_key: principle_key, value: 5)
+      # A pre-refactor row the client hydrated and re-sends unchanged; is_extension
+      # is false because the key was core when it was answered.
+      FormResponse.new(form: form, indicator_key: "legacy_removed_key", value: 5, is_extension: false).save!(validate: false)
+
+      upsert(
+        form.client_id,
+        form: { territory_key: nil },
+        responses: { principle_key => 5, "legacy_removed_key" => 5, "recycling" => 5 },
+        base: form.reload.updated_at.iso8601(3),
+      )
+
+      expect(response).to(have_http_status(:ok))
+      expect(form.reload.form_responses.pluck(:indicator_key)).to(contain_exactly(principle_key, "recycling"))
+    end
+
     context "with a stale draft" do
       let(:form) { create(:form, user: user, name: "Server Name") }
 

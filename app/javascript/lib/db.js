@@ -60,15 +60,19 @@ export async function saveResponse(formClientId, indicatorKey, value, isExtensio
   await db.forms.update(formClientId, { updated_at: new Date().toISOString(), dirty: 1 })
 }
 
-// Drops extension responses no longer allowed by the form's territory so a
-// territory change cannot leave keys the server will reject with 422 forever.
-export async function pruneStaleExtensions(formClientId, allowedKeys) {
+// Drops every response the form's current questionnaire does not allow: answers
+// orphaned by a territory change, or legacy rows hydrated from the server that
+// no questionnaire knows (their is_extension flag is unreliable, so the key set
+// alone decides). Otherwise every sync ships a key the server rejects with 422
+// forever. Marks the form dirty only when something was removed; returns the count.
+export async function pruneDisallowedResponses(formClientId, allowedKeys) {
   const allowed = new Set(allowedKeys)
-  await db.form_responses
+  const removed = await db.form_responses
     .where({ form_client_id: formClientId })
-    .and((row) => row.is_extension && !allowed.has(row.indicator_key))
+    .and((row) => !allowed.has(row.indicator_key))
     .delete()
-  await db.forms.update(formClientId, { updated_at: new Date().toISOString(), dirty: 1 })
+  if (removed > 0) await db.forms.update(formClientId, { updated_at: new Date().toISOString(), dirty: 1 })
+  return removed
 }
 
 // Config-change migration heal. A refreshed config can (a) remove a key

@@ -41,6 +41,13 @@ class Form < ApplicationRecord
     def countries
       distinct.where.not(country: [nil, ""]).pluck(:country).sort
     end
+
+    # Keys already stored on a user's form (discarded or not), so a sync payload
+    # that re-sends a key the current questionnaire no longer knows can be
+    # reconciled instead of rejected.
+    def response_keys_for(user:, client_id:)
+      unscoped.where(user: user).find_by(client_id: client_id)&.form_responses&.pluck(:indicator_key) || []
+    end
   end
 
   aasm column: :state do
