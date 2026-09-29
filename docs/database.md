@@ -33,7 +33,7 @@ Authentication and identity. Single table for all user types (replaces separate 
 | `encrypted_password` | string | not null | Devise authenticatable |
 | `first_name` | string | not null | |
 | `last_name` | string | not null | |
-| `locale` | string | default: `"en"` | User's preferred locale |
+| `locale` | string | default: `"es"` | User's preferred locale |
 | `platform_role` | integer | default: `0` | enum: `regular=0`, `super_admin=1` |
 | `reset_password_token` | string | unique | Devise recoverable |
 | `remember_created_at` | datetime | | Devise rememberable |

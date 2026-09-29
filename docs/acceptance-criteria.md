@@ -329,7 +329,7 @@
 - [ ] User can change locale in profile settings
 - [ ] Locale preference persists across sessions
 - [ ] All UI elements update immediately on locale change
-- [ ] New users default to English unless browser prefers Spanish
+- [ ] New users default to Spanish; they can switch to English in their profile
 
 ### 9.2 Content Translation
 

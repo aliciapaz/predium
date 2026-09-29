@@ -278,7 +278,7 @@ config/locales/
 
 **Key conventions:**
 - All Slim templates use `t()` helper exclusively — no hardcoded strings
-- Default locale: `:en`
+- Default locale: `:es`
 - Available locales: `[:en, :es]`
 - Locale set per-user (stored in `users.locale` column)
 - Locale detected from: user preference → browser `Accept-Language` → default
