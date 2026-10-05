@@ -39,7 +39,7 @@ module Predium
     # config.eager_load_paths << Rails.root.join("extras")
 
     # I18n configuration
-    config.i18n.default_locale = :en
+    config.i18n.default_locale = :es
     config.i18n.available_locales = [:en, :es]
 
     # Don't generate system test files.

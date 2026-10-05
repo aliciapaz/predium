@@ -83,11 +83,12 @@ module Api
       params.fetch(:responses, {}).permit(*known_indicator_keys).to_h
     end
 
+    # Questionnaire keys plus keys already stored on this form: a legacy key the
+    # client has not pruned yet reaches SyncUpsert, which drops it server-side,
+    # instead of being rejected here on every retry.
     def known_indicator_keys
-      @known_indicator_keys ||= QuestionnaireConfig.core_indicators.map { |i| i[:key] } +
-        QuestionnaireConfig.extension_keys.flat_map do |key|
-          QuestionnaireConfig.extension(key)[:indicators].map { |i| i[:key] }
-        end
+      @known_indicator_keys ||= QuestionnaireConfig.principle_keys + QuestionnaireConfig.all_indicator_keys +
+        Form.response_keys_for(user: current_user, client_id: params[:client_id])
     end
 
     def serialize_form(form)
