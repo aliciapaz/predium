@@ -41,7 +41,7 @@ Derive a two-way flag by testing membership in the set whose definition is **clo
 Principles are a fixed, enumerable set of six keys in `core.yml`; "extension" is the open-ended side. So derive the flag from the closed side:
 
 ```ruby
-# after (app/models/form_response.rb) — derived from the closed set, in one place
+# after (app/models/form_response.rb): derived from the closed set, in one place
 def assign_extension_flag
   return if indicator_key.blank?
 
@@ -68,13 +68,13 @@ In this codebase the absence-based flag also fed a downstream offline-sync path 
 
 ## Examples
 
-Before — absence from the set that is about to gain a sibling:
+Before: absence from the set that is about to gain a sibling:
 
 ```ruby
 is_extension = !core_indicator?(key)   # a principle (core, non-indicator) becomes is_extension: true
 ```
 
-After — negation of closed-set membership, computed once:
+After: negation of closed-set membership, computed once:
 
 ```ruby
 is_extension = !principle?(key)        # principles are a fixed set of six; everything else is an indicator
@@ -84,4 +84,4 @@ The tell that you are on the wrong side: adding a new category to the domain for
 
 ## Related
 
-- `docs/solutions/logic-errors/offline-form-sync-clobbers-inflight-edits.md` — the offline-sync layer that consumes `is_extension`; a misderived flag would feed its prune/sync rules the wrong inputs.
+- `docs/solutions/logic-errors/offline-form-sync-clobbers-inflight-edits.md`: the offline-sync layer that consumes `is_extension`; a misderived flag would feed its prune/sync rules the wrong inputs.
