@@ -26,8 +26,8 @@ export default class extends Controller {
       history.replaceState(null, "", this.formPath("/edit"))
     }
 
-    await loadTranslations()
     this.config = await cachedConfig()
+    await loadTranslations()
     if (!this.config) {
       this.indicatorsTarget.innerHTML = `<p class="text-sm text-rose-600">${this.escape(t("offline.config_unavailable"))}</p>`
       return
@@ -64,8 +64,6 @@ export default class extends Controller {
 
   // ── Dimensions ─────────────────────────────────────────
 
-  // Principles first (the Level 1 entry door), then only the dimensions that
-  // have an indicator for this form's territory.
   dimensions() {
     const principlesSection = { key: "principles", i18n_key: "questionnaire.principles_title", principles: true }
     return [principlesSection, ...visibleDimensions(this.config, this.form.territory_key)]
@@ -76,7 +74,6 @@ export default class extends Controller {
     return dimensionIndicators(this.config, dimension.key, this.form.territory_key)
   }
 
-  // Everything that must be scored to complete: principles plus the chain.
   requiredItems() {
     return [...principles(this.config), ...territoryIndicators(this.config, this.form.territory_key)]
   }
@@ -299,7 +296,7 @@ export default class extends Controller {
     }
 
     const badge = indicator.extension
-      ? `<span class="ml-2 inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-earth-100 text-earth-600 align-middle">${this.escape(t("offline.extension_badge"))}</span>`
+      ? `<span class="ml-2 inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-earth-100 text-earth-600 align-middle">${this.escape(t(this.config.extensions[indicator.extension].i18n_key))}</span>`
       : ""
 
     const info = hasDescription

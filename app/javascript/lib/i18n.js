@@ -1,7 +1,6 @@
 import { getLocale, putLocale } from "lib/db"
 
 let translations = null
-let currentLocale = null
 
 export function locale() {
   return document.documentElement.lang || "en"
@@ -11,8 +10,6 @@ export function locale() {
 // works offline, network as fallback for a first-ever visit.
 export async function load() {
   const active = locale()
-  if (translations && currentLocale === active) return translations
-
   const cached = await getLocale(active)
   if (cached) {
     translations = cached.translations
@@ -22,7 +19,6 @@ export async function load() {
     translations = await response.json()
     await putLocale(active, translations, null)
   }
-  currentLocale = active
   return translations
 }
 

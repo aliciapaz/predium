@@ -1,21 +1,27 @@
-import { getConfig, putConfig, putLocale, pruneUnknownResponses } from "lib/db"
+import { getConfig, putConfig, getLocale, putLocale, pruneUnknownResponses } from "lib/db"
 
 // Keeps the questionnaire config and both locales' translations cached in
 // IndexedDB, invalidated by the server-computed content fingerprint (KTD-8).
 export async function cachedConfig() {
   const cached = await getConfig()
-  if (cached) return cached
-  return refresh()
+  if (compatible(cached)) return cached
+  const fresh = await refresh()
+  return compatible(fresh) ? fresh : null
+}
+
+function compatible(config) {
+  return Array.isArray(config?.principles)
 }
 
 export async function refresh() {
   if (!navigator.onLine) return getConfig()
 
   try {
-    const response = await fetch("/api/questionnaire", { headers: { Accept: "application/json" } })
+    const response = await fetch("/api/questionnaire?schema=2", { headers: { Accept: "application/json" } })
     if (!response.ok) return getConfig()
 
     const fresh = await response.json()
+    if (!compatible(fresh)) return getConfig()
     const cached = await getConfig()
     if (!cached || cached.fingerprint !== fresh.fingerprint) {
       // Prune BEFORE persisting the new fingerprint: if this run is interrupted,
@@ -26,8 +32,8 @@ export async function refresh() {
       // drafts 422-looping. Pruning is idempotent on rerun.
       await pruneUnknownResponses(fresh)
       await putConfig(fresh)
-      await refreshTranslations(fresh.fingerprint)
     }
+    await refreshTranslations(fresh.fingerprint)
     return getConfig()
   } catch {
     return getConfig()
@@ -37,7 +43,9 @@ export async function refresh() {
 async function refreshTranslations(fingerprint) {
   for (const locale of ["en", "es"]) {
     try {
-      const response = await fetch(`/translations/${locale}`)
+      const cached = await getLocale(locale)
+      if (cached?.fingerprint === fingerprint) continue
+      const response = await fetch(`/translations/${locale}?v=${encodeURIComponent(fingerprint)}`)
       if (response.ok) await putLocale(locale, await response.json(), fingerprint)
     } catch {
       // offline mid-refresh: keep whatever translation cache we already have

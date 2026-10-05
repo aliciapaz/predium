@@ -85,27 +85,27 @@ export async function pruneDisallowedResponses(formClientId, allowedKeys) {
 // is pruned here instead of surviving to 422-loop against a form that cannot
 // hold it.
 export async function pruneUnknownResponses(config) {
-  const principleKeys = new Set((config.principles || []).map((p) => p.key))
-  const chainByTerritory = territoryChainKeys(config)
-  const forms = await db.forms.toArray()
-  const territoryOf = new Map(forms.map((form) => [form.client_id, form.territory_key]))
-  // Completed forms are locked and server-authoritative; never touch or re-push
-  // them. An orphaned key left on a completed form is inert.
-  const completed = new Set(forms.filter((form) => form.state === "completed").map((form) => form.client_id))
-
-  const isStale = (row) => {
-    if (completed.has(row.form_client_id) || principleKeys.has(row.indicator_key)) return false
-    const chain = chainByTerritory.get(territoryOf.get(row.form_client_id)) || EMPTY_SET
-    return !chain.has(row.indicator_key)
-  }
-  const stale = await db.form_responses.filter(isStale).toArray()
-  if (stale.length === 0) return
-
-  const formIds = [...new Set(stale.map((row) => row.form_client_id))]
   // One transaction so an interruption can't delete rows without also marking
-  // the form dirty and queued (which would strand orphans server-side).
+  // the form dirty and queued, or prune against a territory changed by a save.
   await db.transaction("rw", db.forms, db.form_responses, db.sync_queue, async () => {
-    await db.form_responses.filter(isStale).delete()
+    const principleKeys = new Set((config.principles || []).map((p) => p.key))
+    const chainByTerritory = territoryChainKeys(config)
+    const forms = await db.forms.toArray()
+    const territoryOf = new Map(forms.map((form) => [form.client_id, form.territory_key]))
+    // Completed forms are locked and server-authoritative; never touch or re-push
+    // them. An orphaned key left on a completed form is inert.
+    const completed = new Set(forms.filter((form) => form.state === "completed").map((form) => form.client_id))
+
+    const isStale = (row) => {
+      if (completed.has(row.form_client_id) || principleKeys.has(row.indicator_key)) return false
+      const chain = chainByTerritory.get(territoryOf.get(row.form_client_id)) || EMPTY_SET
+      return !chain.has(row.indicator_key)
+    }
+    const stale = await db.form_responses.filter(isStale).toArray()
+    if (stale.length === 0) return
+
+    const formIds = [...new Set(stale.map((row) => row.form_client_id))]
+    await db.form_responses.bulkDelete(stale.map((row) => [row.form_client_id, row.indicator_key]))
     for (const formClientId of formIds) {
       await db.forms.update(formClientId, { updated_at: new Date().toISOString(), dirty: 1 })
       await enqueue(formClientId)

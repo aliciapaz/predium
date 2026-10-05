@@ -12,8 +12,8 @@ export default class extends Controller {
   static values = { clientId: String }
 
   async connect() {
-    await loadTranslations()
     this.config = await cachedConfig()
+    await loadTranslations()
     this.form = await getForm(this.clientIdValue)
 
     // getForm is a bare cache read; unlike cachedConfig it does not self-heal.
@@ -116,7 +116,7 @@ export default class extends Controller {
           badge = `<span class="inline-flex items-center justify-center w-8 h-8 rounded-md text-sm font-semibold ${cls}">${value}</span>`
         }
         const source = indicator.extension
-          ? `<span class="ml-2 inline-flex items-center px-1.5 py-0.5 text-xs font-medium rounded-full bg-earth-100 text-earth-500">${this.escape(t("offline.extension_badge"))}</span>`
+          ? `<span class="ml-2 inline-flex items-center px-1.5 py-0.5 text-xs font-medium rounded-full bg-earth-100 text-earth-500">${this.escape(t(this.config.extensions[indicator.extension].i18n_key))}</span>`
           : ""
         return `<div class="flex items-center gap-4 px-5 py-2.5 text-sm">
                   <span class="text-earth-600 flex-1">${this.escape(t(`${indicator.i18n_key}.name`))}${source}</span>

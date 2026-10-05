@@ -176,6 +176,14 @@ end
 - Matches the shared parity fixture (`spec/fixtures/scoring_parity.json`) that pins the JS port
 - A form with no territory scores Level 1 only; every dimension is 0
 
+**Client upgrade checks:**
+
+- Start with the previous release's cached questionnaire and translations and an unsynced Chile draft. Open the updated editor and confirm retained answers, including `soil_coverage`, survive and all six principles appear.
+- Repeat the upgrade offline and with a failed config request. The editor reports unavailable config and preserves the draft until it can fetch the compatible schema.
+- Fail one locale request during refresh, then reload online. Its labels recover even when the questionnaire fingerprint already matches. Reload again and use the editor offline to check both cache layers.
+- Change a draft's territory while config pruning runs. Answers valid for the resulting territory survive; completed forms stay untouched.
+- With a child extension, editor and results badges name each indicator's source territory, including inherited parent questions.
+
 ---
 
 ### 4. System Specs (Smoke Tests Only)
