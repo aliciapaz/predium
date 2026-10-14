@@ -1,6 +1,6 @@
 import {
-  getForm, listForms, getResponses, saveForm, queueEntries, dequeue, markAttempt,
-  applyServerForm, markSynced, deleteLocalForm, pendingCount, queueChanged
+  getForm, listForms, snapshotForm, saveForm, queueEntries, dequeue, markAttempt,
+  applyServerForm, acknowledgePush, deleteLocalForm, pendingCount, queueChanged
 } from "lib/db"
 
 // Page-context sync per KTD-6: Background Sync is progressive enhancement
@@ -99,11 +99,12 @@ export async function syncNow() {
 }
 
 async function pushEntry(entry, force = false) {
-  const form = await getForm(entry.form_client_id)
-  if (!form) {
+  const snapshot = await snapshotForm(entry.form_client_id)
+  if (!snapshot) {
     await dequeue(entry.id)
     return true
   }
+  const { form, responses } = snapshot
 
   let response
   try {
@@ -115,7 +116,7 @@ async function pushEntry(entry, force = false) {
         "X-CSRF-Token": csrfToken(),
         Accept: "application/json"
       },
-      body: JSON.stringify(await buildPayload(form, force))
+      body: JSON.stringify(buildPayload(form, responses, force))
     })
   } catch (error) {
     await markAttempt(entry.id, error)
@@ -129,16 +130,7 @@ async function pushEntry(entry, force = false) {
       await deleteLocalForm(form.client_id)
       notify("deleted", { name: form.name })
     } else {
-      const current = await getForm(form.client_id)
-      if (current && current.updated_at !== form.updated_at) {
-        // Edited while the request was in flight: keep the local values and
-        // the queue entry, but record the new server base so the next push is
-        // not rejected as a false conflict.
-        await markSynced(form.client_id, payload.form)
-      } else {
-        await applyServerForm(payload.form)
-        await dequeue(entry.id)
-      }
+      await acknowledgePush(form.client_id, form.local_generation, payload.form, entry.id)
     }
     return true
   }
@@ -158,14 +150,14 @@ async function pushEntry(entry, force = false) {
   return response.status === 422 ? true : false
 }
 
-async function buildPayload(form, force) {
+function buildPayload(form, responses, force) {
   const attributes = {}
   FARM_FIELDS.forEach((field) => { attributes[field] = form[field] ?? null })
   attributes.system_types = form.system_types || []
 
   return {
     form: attributes,
-    responses: await getResponses(form.client_id),
+    responses,
     base_updated_at: form.base_updated_at || null,
     force
   }
