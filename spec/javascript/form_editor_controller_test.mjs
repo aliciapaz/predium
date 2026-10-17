@@ -43,15 +43,25 @@ for (const principles of [true, false]) {
       requiredItems: () => [...indicators, { key: "another_dimension" }],
       isPrinciple: () => principles,
       escape: (text) => text,
-      indicatorsTarget: { innerHTML: "" },
-      dimensionProgressTarget: { textContent: "0/2" },
+      indicatorsTarget: {
+        get innerHTML() { return this.html || "" },
+        set innerHTML(html) {
+          this.html = html
+          editor.dimensionProgressTarget.textContent = ""
+        }
+      },
+      dimensionProgressTarget: { textContent: "" },
       progressTextTarget: { textContent: "" },
       progressBarTarget: { style: {} },
       dimensionNavTarget: { innerHTML: "" },
       saveStateTarget: { textContent: "" },
+      prevButtonTarget: { disabled: false },
+      nextButtonTarget: { classList: { toggle: noop } },
       refreshCompleteState: noop
     })
-    editor.renderIndicators()
+    editor.render()
+    assert.equal(editor.dimensionProgressTarget.textContent, "0/2")
+    assert.equal(editor.progressTextTarget.textContent, "0/3")
     const initialCards = editor.indicatorsTarget.innerHTML
     editor.renderIndicators = () => assert.fail("Answering must preserve the current cards")
 
