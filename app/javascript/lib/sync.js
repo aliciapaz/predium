@@ -154,7 +154,7 @@ async function pushEntry(entry, force = false) {
   }
 
   await markAttempt(entry.id, `HTTP ${response.status}`)
-  notify("error", { status: response.status, name: form.name })
+  notify("error", { httpStatus: response.status, name: form.name })
   return response.status === 422 ? true : false
 }
 

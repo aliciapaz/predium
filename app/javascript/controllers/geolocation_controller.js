@@ -20,7 +20,7 @@ export default class extends Controller {
         this.setCoordinate(this.longitudeTarget, position.coords.longitude)
         this.resetButton()
       },
-      (error) => {
+      () => {
         alert("Unable to retrieve your location. Please enter coordinates manually.")
         this.resetButton()
       },
