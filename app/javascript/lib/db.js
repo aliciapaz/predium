@@ -28,19 +28,27 @@ export async function listForms() {
 export async function saveForm(record) {
   // Callers hold long-lived in-memory copies; a raw put would wipe the sync
   // metadata a concurrent push just recorded. Keep the newest of each side.
-  const existing = await db.forms.get(record.client_id)
-  if (existing) {
-    record.base_updated_at = newest(record.base_updated_at, existing.base_updated_at)
-    record.synchronized_at = newest(record.synchronized_at, existing.synchronized_at)
-  }
-  record.updated_at = new Date().toISOString()
-  record.dirty = 1
-  await db.forms.put(record)
+  await db.transaction("rw", db.forms, async () => {
+    const existing = await db.forms.get(record.client_id)
+    if (existing) {
+      record.base_updated_at = newest(record.base_updated_at, existing.base_updated_at)
+      record.synchronized_at = newest(record.synchronized_at, existing.synchronized_at)
+    }
+    record.local_generation = existing?.local_generation ?? 0
+    touchLocal(record)
+    await db.forms.put(record)
+  })
   return record
 }
 
 function newest(a, b) {
   return [a, b].filter(Boolean).sort().pop() ?? null
+}
+
+function touchLocal(form) {
+  form.updated_at = new Date().toISOString()
+  form.dirty = 1
+  form.local_generation = (form.local_generation || 0) + 1
 }
 
 export async function getResponses(formClientId) {
@@ -51,24 +59,37 @@ export async function getResponses(formClientId) {
 }
 
 export async function saveResponse(formClientId, indicatorKey, value, isExtension = false) {
-  await db.form_responses.put({
-    form_client_id: formClientId,
-    indicator_key: indicatorKey,
-    value: Number(value),
-    is_extension: isExtension
+  await db.transaction("rw", db.forms, db.form_responses, async () => {
+    await db.form_responses.put({
+      form_client_id: formClientId,
+      indicator_key: indicatorKey,
+      value: Number(value),
+      is_extension: isExtension
+    })
+    await db.forms.update(formClientId, touchLocal)
   })
-  await db.forms.update(formClientId, { updated_at: new Date().toISOString(), dirty: 1 })
+}
+
+// The generation must describe the exact response set sent to the server.
+export async function snapshotForm(formClientId) {
+  return db.transaction("r", db.forms, db.form_responses, async () => {
+    const form = await db.forms.get(formClientId)
+    if (!form) return null
+    return { form, responses: await getResponses(formClientId) }
+  })
 }
 
 // Drops extension responses no longer allowed by the form's territory so a
 // territory change cannot leave keys the server will reject with 422 forever.
 export async function pruneStaleExtensions(formClientId, allowedKeys) {
   const allowed = new Set(allowedKeys)
-  await db.form_responses
-    .where({ form_client_id: formClientId })
-    .and((row) => row.is_extension && !allowed.has(row.indicator_key))
-    .delete()
-  await db.forms.update(formClientId, { updated_at: new Date().toISOString(), dirty: 1 })
+  await db.transaction("rw", db.forms, db.form_responses, async () => {
+    await db.form_responses
+      .where({ form_client_id: formClientId })
+      .and((row) => row.is_extension && !allowed.has(row.indicator_key))
+      .delete()
+    await db.forms.update(formClientId, touchLocal)
+  })
 }
 
 export async function getConfig() {
@@ -90,18 +111,20 @@ export async function putLocale(locale, translations, fingerprint) {
 // One queue entry per form: repeated edits collapse into a single upsert
 // whose payload is built from the current store state at drain time.
 export async function enqueue(formClientId) {
-  const existing = await db.sync_queue.where({ form_client_id: formClientId }).first()
-  if (existing) {
-    await db.sync_queue.update(existing.id, { queued_at: new Date().toISOString() })
-  } else {
-    await db.sync_queue.add({
-      form_client_id: formClientId,
-      operation: "upsert",
-      queued_at: new Date().toISOString(),
-      attempts: 0,
-      last_error: null
-    })
-  }
+  await db.transaction("rw", db.sync_queue, async () => {
+    const existing = await db.sync_queue.where({ form_client_id: formClientId }).first()
+    if (existing) {
+      await db.sync_queue.update(existing.id, { queued_at: new Date().toISOString() })
+    } else {
+      await db.sync_queue.add({
+        form_client_id: formClientId,
+        operation: "upsert",
+        queued_at: new Date().toISOString(),
+        attempts: 0,
+        last_error: null
+      })
+    }
+  })
   queueChanged()
 }
 
@@ -127,6 +150,7 @@ export async function pendingCount() {
 // Replaces the local copy with the server's authoritative version.
 export async function applyServerForm(serverForm) {
   await db.transaction("rw", db.forms, db.form_responses, async () => {
+    const existing = await db.forms.get(serverForm.client_id)
     await db.forms.put({
       client_id: serverForm.client_id,
       name: serverForm.name,
@@ -149,6 +173,7 @@ export async function applyServerForm(serverForm) {
       synchronized_at: serverForm.synchronized_at,
       base_updated_at: serverForm.updated_at,
       updated_at: serverForm.updated_at,
+      local_generation: existing?.local_generation ?? 0,
       dirty: 0
     })
     await db.form_responses.where({ form_client_id: serverForm.client_id }).delete()
@@ -170,6 +195,31 @@ export async function markSynced(clientId, serverForm) {
     base_updated_at: serverForm.updated_at,
     synchronized_at: serverForm.synchronized_at
   })
+}
+
+export async function rebaseForm(clientId, updatedAt) {
+  await db.forms.update(clientId, { base_updated_at: updatedAt })
+}
+
+// Settles a successful push in one transaction, so no edit can land between
+// the generation check and the write that would otherwise discard it.
+export async function acknowledgePush(sentForm, serverForm, entryId) {
+  const clientId = sentForm.client_id
+  await db.transaction("rw", db.forms, db.form_responses, db.sync_queue, async () => {
+    const current = await db.forms.get(clientId)
+    if (!current) {
+      await db.sync_queue.delete(entryId)
+      return
+    }
+    // Older open tabs do not advance local_generation when they save.
+    if (current.local_generation !== sentForm.local_generation || current.updated_at !== sentForm.updated_at) {
+      await markSynced(clientId, serverForm)
+      return
+    }
+    await applyServerForm(serverForm)
+    await db.sync_queue.delete(entryId)
+  })
+  queueChanged()
 }
 
 export async function deleteLocalForm(clientId) {
