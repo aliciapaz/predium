@@ -21,6 +21,13 @@ const fixture = `
 
 const target = (name) => document.querySelector(`[data-connectivity-target="${name}"]`)
 
+// connect() fires refresh() without awaiting it, so mount() resolves before
+// the badge is painted; the dot has no class until the first paint.
+async function mountBadge() {
+  await mount(fixture, { connectivity: ConnectivityController })
+  await vi.waitFor(() => expect(target("dot").className).not.toBe(""))
+}
+
 function setOnline(online) {
   vi.spyOn(navigator, "onLine", "get").mockReturnValue(online)
 }
@@ -37,7 +44,7 @@ afterEach(() => unmount())
 
 describe("connectivity controller", () => {
   it("shows a green online badge with no pending count when the queue is empty", async () => {
-    await mount(fixture, { connectivity: ConnectivityController })
+    await mountBadge()
 
     expect(target("label").textContent).toBe("Online")
     expect(target("dot").className).toContain("bg-forest-500")
@@ -49,7 +56,7 @@ describe("connectivity controller", () => {
     await enqueue("form-1")
     await enqueue("form-2")
 
-    await mount(fixture, { connectivity: ConnectivityController })
+    await mountBadge()
 
     expect(target("dot").className).toContain("bg-mustard-500")
     expect(target("pending").textContent).toBe("2 pending")
@@ -59,7 +66,7 @@ describe("connectivity controller", () => {
   it("shows a red offline badge while offline", async () => {
     setOnline(false)
 
-    await mount(fixture, { connectivity: ConnectivityController })
+    await mountBadge()
 
     expect(target("label").textContent).toBe("Offline")
     expect(target("dot").className).toContain("bg-rose-500")
@@ -67,7 +74,7 @@ describe("connectivity controller", () => {
   })
 
   it("repaints when the browser goes offline", async () => {
-    await mount(fixture, { connectivity: ConnectivityController })
+    await mountBadge()
 
     setOnline(false)
     window.dispatchEvent(new Event("offline"))
@@ -76,7 +83,7 @@ describe("connectivity controller", () => {
   })
 
   it("updates the pending count when the sync queue changes", async () => {
-    await mount(fixture, { connectivity: ConnectivityController })
+    await mountBadge()
 
     await enqueue("form-1")
 
@@ -86,13 +93,13 @@ describe("connectivity controller", () => {
   it("shows the last sync time in the sync button tooltip", async () => {
     localStorage.setItem("predium:last_sync", "2026-05-01T12:00:00.000Z")
 
-    await mount(fixture, { connectivity: ConnectivityController })
+    await mountBadge()
 
     expect(target("syncButton").title).toMatch(/^Last sync: .+2026/)
   })
 
   it("resumes a paused sync and syncs when Sync now is pressed", async () => {
-    await mount(fixture, { connectivity: ConnectivityController })
+    await mountBadge()
 
     target("syncButton").click()
 
@@ -102,7 +109,7 @@ describe("connectivity controller", () => {
   })
 
   it("refreshes the badge on sync status events", async () => {
-    await mount(fixture, { connectivity: ConnectivityController })
+    await mountBadge()
     await db.sync_queue.add({ form_client_id: "form-1", queued_at: new Date().toISOString() })
 
     document.dispatchEvent(new CustomEvent("predium:sync-status", { detail: { status: "finished" } }))
@@ -111,7 +118,7 @@ describe("connectivity controller", () => {
   })
 
   it("keeps the session expired label after a needs_login status until the user retries", async () => {
-    await mount(fixture, { connectivity: ConnectivityController })
+    await mountBadge()
 
     document.dispatchEvent(new CustomEvent("predium:sync-status", { detail: { status: "needs_login" } }))
     document.dispatchEvent(new CustomEvent("predium:queue-changed"))
