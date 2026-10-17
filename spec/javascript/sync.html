@@ -1,0 +1,12 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="predium-signed-in" content="true">
+<title>Offline sync regressions</title>
+<script type="importmap">
+{"imports":{"dexie":"/vendor/javascript/dexie.js","lib/db":"/app/javascript/lib/db.js"}}
+</script>
+<p>From the repository root, run <code>python3 -m http.server 8111 --bind 127.0.0.1</code>
+  and open <code>http://127.0.0.1:8111/spec/javascript/sync.html</code> in a fresh browser profile.</p>
+<p>This test clears the Predium IndexedDB database on this origin. All lines below must say PASS.</p>
+<pre id="results">Running...</pre>
+<script type="module" src="./sync_test.js"></script>

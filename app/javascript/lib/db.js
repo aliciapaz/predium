@@ -45,8 +45,6 @@ function newest(a, b) {
   return [a, b].filter(Boolean).sort().pop() ?? null
 }
 
-// Every local edit advances local_generation in the same transaction as the
-// write, so a push that captured the form before the edit can tell it apart.
 function touchLocal(form) {
   form.updated_at = new Date().toISOString()
   form.dirty = 1
@@ -72,8 +70,7 @@ export async function saveResponse(formClientId, indicatorKey, value, isExtensio
   })
 }
 
-// Reads a form and its responses in one transaction so the generation in the
-// snapshot matches exactly the responses that go into the payload.
+// The generation must describe the exact response set sent to the server.
 export async function snapshotForm(formClientId) {
   return db.transaction("r", db.forms, db.form_responses, async () => {
     const form = await db.forms.get(formClientId)
@@ -114,18 +111,20 @@ export async function putLocale(locale, translations, fingerprint) {
 // One queue entry per form: repeated edits collapse into a single upsert
 // whose payload is built from the current store state at drain time.
 export async function enqueue(formClientId) {
-  const existing = await db.sync_queue.where({ form_client_id: formClientId }).first()
-  if (existing) {
-    await db.sync_queue.update(existing.id, { queued_at: new Date().toISOString() })
-  } else {
-    await db.sync_queue.add({
-      form_client_id: formClientId,
-      operation: "upsert",
-      queued_at: new Date().toISOString(),
-      attempts: 0,
-      last_error: null
-    })
-  }
+  await db.transaction("rw", db.sync_queue, async () => {
+    const existing = await db.sync_queue.where({ form_client_id: formClientId }).first()
+    if (existing) {
+      await db.sync_queue.update(existing.id, { queued_at: new Date().toISOString() })
+    } else {
+      await db.sync_queue.add({
+        form_client_id: formClientId,
+        operation: "upsert",
+        queued_at: new Date().toISOString(),
+        attempts: 0,
+        last_error: null
+      })
+    }
+  })
   queueChanged()
 }
 
@@ -203,7 +202,11 @@ export async function markSynced(clientId, serverForm) {
 export async function acknowledgePush(clientId, sentGeneration, serverForm, entryId) {
   await db.transaction("rw", db.forms, db.form_responses, db.sync_queue, async () => {
     const current = await db.forms.get(clientId)
-    if (current && current.local_generation !== sentGeneration) {
+    if (!current) {
+      await db.sync_queue.delete(entryId)
+      return
+    }
+    if (current.local_generation !== sentGeneration) {
       await markSynced(clientId, serverForm)
       return
     }
