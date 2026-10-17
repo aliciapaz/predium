@@ -67,7 +67,7 @@ No third-party HTTP APIs. Authentication is fully local via Devise. The only "ex
 
 ## Agent Workflows
 
-- **Tests:** `bundle exec rspec`
+- **Tests:** `bundle exec rspec`. Testing rules and conventions for both suites live in `docs/testing.md`.
 - **JS tests:** `npm test` (Vitest + jsdom + fake-indexeddb, specs in `spec/javascript/`). `vitest.config.js` mirrors the importmap aliases; `dexie` resolves to the vendored copy.
 - **Lint:** `bundle exec rubocop` (Shopify style + Telos AI Harness cops under `Harness/*`; run `bundle exec rubocop --only Harness` for architecture checks)
 - **JS lint:** `npm run lint` (ESLint flat config in `eslint.config.js`). Node is dev-only: `package.json` holds lint/test tooling, runtime JS still ships through importmap.
