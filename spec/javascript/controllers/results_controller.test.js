@@ -1,0 +1,200 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { applyServerForm, db, saveResponse } from "lib/db"
+import { hydrateForm } from "lib/sync"
+import ResultsController from "controllers/results_controller"
+import { clearDb } from "../support/db"
+import { seedQuestionnaire } from "../support/questionnaire"
+import { mount, unmount } from "../support/stimulus"
+
+vi.mock("lib/sync", async (importOriginal) => ({
+  ...(await importOriginal()),
+  hydrateForm: vi.fn()
+}))
+
+const clientId = "form-1"
+
+const fixture = `
+  <div data-controller="results" data-results-client-id-value="${clientId}">
+    <div data-results-target="missing" class="hidden">Results unavailable</div>
+    <div data-results-target="farmInfo"><p>Loading</p></div>
+    <div data-results-target="radar"></div>
+    <div data-results-target="dimensions"></div>
+    <div data-results-target="indicators"></div>
+  </div>`
+
+function serverForm(overrides = {}) {
+  return {
+    client_id: clientId,
+    name: "La Esperanza",
+    state: "completed",
+    country: "Peru",
+    region: "Cusco",
+    locality: "Pisac",
+    land_area: "4.5",
+    work_force: "3",
+    system_types: ["agriculture", "forestry"],
+    completed_at: "2026-05-01T12:00:00.000Z",
+    updated_at: "2026-05-01T12:00:00.000Z",
+    responses: [
+      { indicator_key: "compaction", value: 2, is_extension: false },
+      { indicator_key: "erosion", value: 4, is_extension: false },
+      { indicator_key: "organic_matter", value: 9, is_extension: false }
+    ],
+    ...overrides
+  }
+}
+
+const target = (name) => document.querySelector(`[data-results-target="${name}"]`)
+
+beforeEach(async () => {
+  await clearDb(db)
+  await seedQuestionnaire()
+  hydrateForm.mockReset().mockResolvedValue(false)
+})
+
+afterEach(() => unmount())
+
+describe("results controller", () => {
+  describe("when the form is not cached on this device", () => {
+    it("hydrates it from the server while online and renders it instead of the missing state", async () => {
+      hydrateForm.mockImplementation(async (id) => {
+        await applyServerForm(serverForm({ client_id: id }))
+        return true
+      })
+
+      await mount(fixture, { results: ResultsController })
+
+      expect(hydrateForm).toHaveBeenCalledWith(clientId)
+      expect(target("missing").classList).toContain("hidden")
+      expect(target("farmInfo").querySelector("h1").textContent).toBe("La Esperanza")
+    })
+
+    it("shows the missing state when the server has no copy either", async () => {
+      await mount(fixture, { results: ResultsController })
+
+      expect(hydrateForm).toHaveBeenCalledWith(clientId)
+      expect(target("missing").classList).not.toContain("hidden")
+      expect(target("farmInfo").innerHTML).toBe("")
+    })
+
+    it("shows the missing state offline without trying the server", async () => {
+      vi.spyOn(navigator, "onLine", "get").mockReturnValue(false)
+
+      await mount(fixture, { results: ResultsController })
+
+      expect(hydrateForm).not.toHaveBeenCalled()
+      expect(target("missing").classList).not.toContain("hidden")
+      expect(target("farmInfo").innerHTML).toBe("")
+    })
+  })
+
+  it("shows the missing state when the questionnaire config is not cached offline", async () => {
+    await applyServerForm(serverForm())
+    await db.questionnaire_config.clear()
+    vi.spyOn(navigator, "onLine", "get").mockReturnValue(false)
+
+    await mount(fixture, { results: ResultsController })
+
+    expect(target("missing").classList).not.toContain("hidden")
+  })
+
+  describe("with the form cached", () => {
+    beforeEach(async () => {
+      await applyServerForm(serverForm())
+    })
+
+    it("does not hit the server", async () => {
+      await mount(fixture, { results: ResultsController })
+
+      expect(hydrateForm).not.toHaveBeenCalled()
+    })
+
+    it("renders the farm summary with location, state, and facts", async () => {
+      await mount(fixture, { results: ResultsController })
+
+      const farmInfo = target("farmInfo")
+      expect(farmInfo.querySelector("h1").textContent).toBe("La Esperanza")
+      expect(farmInfo.textContent).toContain("Pisac, Cusco, Peru")
+      expect(farmInfo.textContent).toContain("Completed")
+      expect(farmInfo.textContent).toContain("4.5 ha")
+      expect(farmInfo.textContent).toContain("3 people")
+      expect(farmInfo.textContent).toContain("Agriculture, Forestry")
+    })
+
+    it("escapes farm data instead of injecting it as HTML", async () => {
+      await applyServerForm(serverForm({ name: "<img src=x onerror=alert(1)>", locality: "<b>Pisac</b>" }))
+
+      await mount(fixture, { results: ResultsController })
+
+      const farmInfo = target("farmInfo")
+      expect(farmInfo.querySelector("img")).toBeNull()
+      expect(farmInfo.querySelector("b")).toBeNull()
+      expect(farmInfo.querySelector("h1").textContent).toBe("<img src=x onerror=alert(1)>")
+    })
+
+    it("renders a colored bar per dimension sized by its score", async () => {
+      await mount(fixture, { results: ResultsController })
+
+      const rows = target("dimensions").children
+      expect(rows).toHaveLength(3)
+
+      const [structure, fertility, supply] = Array.from(rows).map((row) => ({
+        label: row.querySelector("span").textContent,
+        bar: row.querySelector("[style]"),
+        score: row.lastElementChild.textContent
+      }))
+      expect(structure).toMatchObject({ label: "Structure", score: "3.0" })
+      expect(structure.bar.className).toContain("bg-rose-500")
+      expect(structure.bar.style.width).toBe("30%")
+      expect(fertility.score).toBe("9.0")
+      expect(fertility.bar.className).toContain("bg-forest-500")
+      expect(supply.score).toBe("-")
+      expect(supply.bar.style.width).toBe("0%")
+    })
+
+    it("renders indicator badges colored by score range, with a dash for unanswered ones", async () => {
+      await saveResponse(clientId, "irrigation", 6)
+
+      await mount(fixture, { results: ResultsController })
+
+      const badgeFor = (name) => {
+        const row = Array.from(target("indicators").querySelectorAll("span"))
+          .find((span) => span.textContent === name).parentElement
+        return row.lastElementChild
+      }
+      expect(badgeFor("Compaction").textContent).toBe("2")
+      expect(badgeFor("Compaction").className).toContain("bg-rose-100")
+      expect(badgeFor("Erosion").className).toContain("bg-mustard-100")
+      expect(badgeFor("Organic matter").className).toContain("bg-forest-100")
+      expect(badgeFor("Irrigation").textContent).toBe("6")
+    })
+
+    it("shows a dash badge for an indicator with no response", async () => {
+      await db.form_responses.where({ form_client_id: clientId, indicator_key: "compaction" }).delete()
+
+      await mount(fixture, { results: ResultsController })
+
+      const row = Array.from(target("indicators").querySelectorAll("span"))
+        .find((span) => span.textContent === "Compaction").parentElement
+      expect(row.lastElementChild.textContent).toBe("-")
+      expect(row.lastElementChild.className).toContain("text-earth-300")
+    })
+
+    it("mounts the radar chart with translated category labels and category scores", async () => {
+      await mount(fixture, { results: ResultsController })
+
+      const radar = target("radar").querySelector('[data-controller="radar-chart"]')
+      expect(JSON.parse(radar.dataset.radarChartLabelsValue)).toEqual(["Soil", "Water"])
+      expect(JSON.parse(radar.dataset.radarChartScoresValue)).toEqual([6, 0])
+      expect(radar.querySelector('canvas[data-radar-chart-target="canvas"]')).not.toBeNull()
+    })
+
+    it("labels a draft as a draft", async () => {
+      await applyServerForm(serverForm({ state: "draft", completed_at: null }))
+
+      await mount(fixture, { results: ResultsController })
+
+      expect(target("farmInfo").textContent).toContain("Draft")
+    })
+  })
+})

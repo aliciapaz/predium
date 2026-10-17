@@ -193,8 +193,8 @@ export default class extends Controller {
         return
       }
     }
-    this.showHint(t("offline.complete_requires_sync"))
     this.refreshCompleteState()
+    this.showHint(t("offline.complete_requires_sync"))
   }
 
   refreshCompleteState() {

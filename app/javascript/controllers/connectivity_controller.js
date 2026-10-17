@@ -19,7 +19,7 @@ export default class extends Controller {
     const pending = await pendingCount()
     if (token !== this.refreshToken) return
 
-    this.labelTarget.textContent = online ? t("offline.online") : t("offline.offline")
+    this.labelTarget.textContent = online ? t(this.sessionExpired ? "offline.session_expired" : "offline.online") : t("offline.offline")
     this.dotTarget.className = `w-2 h-2 rounded-full ${online ? (pending ? "bg-mustard-500" : "bg-forest-500") : "bg-rose-500"}`
     this.badgeTarget.className = `inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium rounded-full ${
       online ? (pending ? "bg-mustard-50 text-mustard-700" : "bg-forest-50 text-forest-700") : "bg-rose-50 text-rose-700"
@@ -39,13 +39,12 @@ export default class extends Controller {
   }
 
   syncStatusChanged(event) {
-    if (event.detail.status === "needs_login") {
-      this.labelTarget.textContent = t("offline.session_expired")
-    }
+    if (event.detail.status === "needs_login") this.sessionExpired = true
     this.refresh()
   }
 
   syncNow() {
+    this.sessionExpired = false
     resumeAfterLogin()
     syncNow()
   }

@@ -3,8 +3,7 @@
 require "rails_helper"
 
 # Pins the Ruby calculator to spec/fixtures/scoring_parity.json, the shared
-# fixture that app/javascript/lib/scoring.js is manually verified against
-# (the JS port must produce these exact numbers for the same responses).
+# fixture spec/javascript/lib/scoring.test.js also pins the JS port to.
 RSpec.describe(Scoring::Calculator) do
   let(:fixture) { JSON.parse(Rails.root.join("spec/fixtures/scoring_parity.json").read) }
 
