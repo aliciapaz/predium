@@ -50,4 +50,5 @@ export async function unmount() {
   await new Promise((resolve) => setTimeout(resolve, 0))
   application?.stop()
   application = null
+  if (errors.length) throw errors.shift()
 }

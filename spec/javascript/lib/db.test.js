@@ -89,6 +89,7 @@ describe("pruneStaleExtensions", () => {
     await saveResponse("form-1", "ext_kept", 4, true)
     await saveResponse("form-1", "ext_stale", 2, true)
     await saveResponse("form-2", "ext_stale", 2, true)
+    await db.forms.update("form-1", { dirty: 0 })
 
     await pruneStaleExtensions("form-1", ["ext_kept"])
 

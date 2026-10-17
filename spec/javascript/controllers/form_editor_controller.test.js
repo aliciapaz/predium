@@ -349,6 +349,14 @@ describe("form editor controller", () => {
     it("syncs, posts the completion, refreshes the local copy, then visits the results", async () => {
       await seedForm({}, allCoreScored)
       const fetch = stubFetch(async () => ({ ok: true, redirected: true, url: "http://localhost:3000/forms/form-1?locale=es" }))
+      let hydrated = false
+      let hydratedBeforeVisit = false
+      hydrateForm.mockImplementation(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0))
+        hydrated = true
+        return true
+      })
+      window.Turbo.visit.mockImplementation(() => { hydratedBeforeVisit = hydrated })
       await mount(editor({ formsUrl: "/forms?locale=es" }), controllers)
 
       target("completeButton").click()
@@ -360,7 +368,7 @@ describe("form editor controller", () => {
         headers: expect.objectContaining({ "X-CSRF-Token": "editor-token" })
       }))
       expect(hydrateForm).toHaveBeenCalledWith(clientId)
-      expect(hydrateForm.mock.invocationCallOrder[0]).toBeLessThan(window.Turbo.visit.mock.invocationCallOrder[0])
+      expect(hydratedBeforeVisit).toBe(true)
       expect(window.Turbo.visit).toHaveBeenCalledWith("http://localhost:3000/forms/form-1?locale=es", { action: "replace" })
     })
 
