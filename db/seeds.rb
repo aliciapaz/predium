@@ -98,7 +98,9 @@ end
 puts "  Profiles created for all users"
 
 # --- Sample Forms ---
-indicators = QuestionnaireConfig.core_indicators
+principle_keys = QuestionnaireConfig.principle_keys
+chile_keys = QuestionnaireConfig.extension_indicator_keys("chile")
+all_keys = principle_keys + chile_keys
 
 # Completed form for org_admin
 completed_form = org_admin.forms.find_or_initialize_by(name: "Fundo El Roble")
@@ -106,6 +108,7 @@ completed_form.assign_attributes(
   country: "CL",
   region: "Biobío",
   locality: "Chillán",
+  territory_key: "chile",
   land_area: 12.5,
   latitude: -36.6066,
   longitude: -72.1034,
@@ -114,11 +117,8 @@ completed_form.assign_attributes(
   completed_at: 2.days.ago,
 )
 completed_form.save!
-indicators.each do |ind|
-  FormResponse.find_or_create_by!(form: completed_form, indicator_key: ind[:key]) do |r|
-    r.value = rand(3..9)
-    r.is_extension = false
-  end
+all_keys.each do |key|
+  FormResponse.find_or_create_by!(form: completed_form, indicator_key: key) { |r| r.value = rand(3..9) }
 end
 puts "  Completed form: Fundo El Roble (org_admin)"
 
@@ -128,6 +128,7 @@ completed_form2.assign_attributes(
   country: "CL",
   region: "Araucanía",
   locality: "Temuco",
+  territory_key: "chile",
   land_area: 5.0,
   latitude: -38.7359,
   longitude: -72.5904,
@@ -136,11 +137,8 @@ completed_form2.assign_attributes(
   completed_at: 1.week.ago,
 )
 completed_form2.save!
-indicators.each do |ind|
-  FormResponse.find_or_create_by!(form: completed_form2, indicator_key: ind[:key]) do |r|
-    r.value = rand(1..7)
-    r.is_extension = false
-  end
+all_keys.each do |key|
+  FormResponse.find_or_create_by!(form: completed_form2, indicator_key: key) { |r| r.value = rand(1..7) }
 end
 puts "  Completed form: Huerta La Esperanza (member)"
 
@@ -150,16 +148,14 @@ draft_form.assign_attributes(
   country: "CL",
   region: "Maule",
   locality: "Talca",
+  territory_key: "chile",
   land_area: 8.0,
   state: "draft",
 )
 draft_form.save!
-# Partially filled — only first 20 indicators
-indicators.first(20).each do |ind|
-  FormResponse.find_or_create_by!(form: draft_form, indicator_key: ind[:key]) do |r|
-    r.value = rand(1..10)
-    r.is_extension = false
-  end
+# Partially filled: only the first 20 keys (principles plus early chile indicators)
+all_keys.first(20).each do |key|
+  FormResponse.find_or_create_by!(form: draft_form, indicator_key: key) { |r| r.value = rand(1..10) }
 end
 puts "  Draft form (partial): Campo Nuevo (member)"
 
@@ -169,6 +165,7 @@ draft_indie.assign_attributes(
   country: "CL",
   region: "Valparaíso",
   locality: "Limache",
+  territory_key: "chile",
   state: "draft",
 )
 draft_indie.save!
@@ -180,6 +177,7 @@ completed_indie.assign_attributes(
   country: "CL",
   region: "Valparaíso",
   locality: "Quillota",
+  territory_key: "chile",
   land_area: 3.2,
   latitude: -32.8801,
   longitude: -71.2514,
@@ -188,13 +186,29 @@ completed_indie.assign_attributes(
   completed_at: 3.days.ago,
 )
 completed_indie.save!
-indicators.each do |ind|
-  FormResponse.find_or_create_by!(form: completed_indie, indicator_key: ind[:key]) do |r|
-    r.value = rand(4..10)
-    r.is_extension = false
-  end
+all_keys.each do |key|
+  FormResponse.find_or_create_by!(form: completed_indie, indicator_key: key) { |r| r.value = rand(4..10) }
 end
 puts "  Completed form: Quinta Verde (indie user)"
+
+# Completed form seeded from the scoring parity fixture, so the JS scoring gate
+# and the results checklist can compare rendered values against known expectations.
+parity = JSON.parse(Rails.root.join("spec/fixtures/scoring_parity.json").read)
+parity_form = org_admin.forms.find_or_initialize_by(name: "Parity fixture")
+parity_form.assign_attributes(
+  country: "CL",
+  region: "Biobío",
+  territory_key: parity["territory_key"],
+  land_area: 4.0,
+  work_force: 1,
+  state: "completed",
+  completed_at: 1.day.ago,
+)
+parity_form.save!
+parity["responses"].each do |key, value|
+  FormResponse.find_or_create_by!(form: parity_form, indicator_key: key) { |r| r.value = value }
+end
+puts "  Completed form: Parity fixture (org_admin)"
 
 puts ""
 puts "Done! Seed accounts:"

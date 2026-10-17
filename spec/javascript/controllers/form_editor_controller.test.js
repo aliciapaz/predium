@@ -45,6 +45,7 @@ function editor({ id = clientId, formsUrl = "/forms" } = {}) {
         <option value=""></option>
         <option value="andes">Andes</option>
         <option value="coast">Coast</option>
+        <option value="puna">Puna</option>
       </select>
 
       <nav data-form-editor-target="dimensionNav"></nav>
@@ -63,11 +64,18 @@ const controllers = { "form-editor": FormEditorController, question: QuestionCon
 const target = (name) => document.querySelector(`[data-form-editor-target="${name}"]`)
 const field = (name) => document.querySelector(`[data-farm-field="${name}"]`)
 const navLabels = () => Array.from(target("dimensionNav").querySelectorAll("button")).map((b) => b.textContent.trim())
-const cardTitles = () => Array.from(target("indicators").querySelectorAll("h3")).map((h) => h.textContent)
+const titleOf = (h3) => h3.firstChild.textContent
+const badgeOf = (h3) => h3.querySelector("span")?.textContent
+const cardTitles = () => Array.from(target("indicators").querySelectorAll("h3")).map(titleOf)
 
 function card(name) {
   return Array.from(target("indicators").querySelectorAll('[data-controller="question"]'))
-    .find((element) => element.querySelector("h3").textContent === name)
+    .find((element) => titleOf(element.querySelector("h3")) === name)
+}
+
+function showSection(index) {
+  target("dimensionNav").querySelectorAll("button")[index].click()
+  return settle()
 }
 
 function score(name, value) {
@@ -84,6 +92,7 @@ async function seedForm(overrides = {}, responses = []) {
     client_id: clientId,
     name: "La Esperanza",
     state: "draft",
+    territory_key: "andes",
     updated_at: "2026-05-01T12:00:00.000Z",
     responses,
     ...overrides
@@ -94,8 +103,10 @@ function response(key, value, isExtension = false) {
   return { indicator_key: key, value, is_extension: isExtension }
 }
 
-const allCoreScored = [
-  response("compaction", 5), response("erosion", 6), response("organic_matter", 7), response("irrigation", 8)
+const allScored = [
+  response("diversity", 4), response("recycling", 6),
+  response("compaction", 5, true), response("erosion", 6, true),
+  response("organic_matter", 7, true), response("irrigation", 8, true)
 ]
 
 beforeEach(async () => {
@@ -178,25 +189,37 @@ describe("form editor controller", () => {
       expect(checked.map((box) => box.value)).toEqual(["forestry"])
     })
 
-    it("shows the first dimension's indicators with saved scores highlighted", async () => {
-      await seedForm({}, [response("compaction", 2)])
+    it("opens on the principles with saved scores highlighted", async () => {
+      await seedForm({}, [response("diversity", 2)])
 
       await mount(editor(), controllers)
 
-      expect(navLabels()).toEqual(["Structure", "Fertility", "Supply"])
-      expect(cardTitles()).toEqual(["Compaction", "Erosion"])
-      expect(card("Compaction").querySelector('[name="form_responses[compaction]"]').value).toBe("2")
-      expect(card("Compaction").querySelector('[data-value="2"]').className).toContain("bg-rose-100")
-      expect(target("progressText").textContent).toBe("1 of 4 indicators")
-      expect(target("progressBar").style.width).toBe("25%")
+      expect(navLabels()).toEqual(["Principles", "Structure", "Fertility", "Supply"])
+      expect(cardTitles()).toEqual(["Diversity", "Recycling"])
+      expect(card("Diversity").querySelector('[name="form_responses[diversity]"]').value).toBe("2")
+      expect(card("Diversity").querySelector('[data-value="2"]').className).toContain("bg-rose-100")
+      expect(target("progressText").textContent).toBe("1 of 6 indicators")
+      expect(target("progressBar").style.width).toBe("17%")
     })
 
-    it("adds the territory extension as an extra dimension", async () => {
-      await seedForm({ territory_key: "andes" })
+    it("shows only the principles until a territory is chosen", async () => {
+      await seedForm({ territory_key: null })
 
       await mount(editor(), controllers)
 
-      expect(navLabels()).toEqual(["Structure", "Fertility", "Supply", "Andes extension"])
+      expect(navLabels()).toEqual(["Principles"])
+      expect(target("indicators").textContent).toContain("Choose a territory to see its indicators")
+      expect(target("progressText").textContent).toBe("0 of 2 indicators")
+    })
+
+    it("badges each indicator with its source territory, including inherited ones", async () => {
+      await seedForm({ territory_key: "coast" })
+      await mount(editor(), controllers)
+
+      await showSection(3)
+
+      const badges = Array.from(target("indicators").querySelectorAll("h3")).map((h3) => [titleOf(h3), badgeOf(h3)])
+      expect(badges).toEqual([["Irrigation", "Andes extension"], ["Salinity", "Coast extension"]])
     })
 
     it("moves between dimensions with next, previous, and the nav buttons", async () => {
@@ -207,11 +230,10 @@ describe("form editor controller", () => {
 
       target("nextButton").click()
       await settle()
-      expect(cardTitles()).toEqual(["Organic matter"])
+      expect(cardTitles()).toEqual(["Compaction", "Erosion"])
       expect(target("prevButton").disabled).toBe(false)
 
-      target("dimensionNav").querySelectorAll("button")[2].click()
-      await settle()
+      await showSection(3)
       expect(cardTitles()).toEqual(["Irrigation"])
       expect(target("nextButton").classList).toContain("hidden")
 
@@ -225,37 +247,37 @@ describe("form editor controller", () => {
       await seedForm()
       await mount(editor(), controllers)
 
-      score("Erosion", 7)
+      score("Recycling", 7)
 
       await vi.waitFor(() => expect(syncNow).toHaveBeenCalled())
-      expect(await getResponses(clientId)).toEqual({ erosion: 7 })
+      expect(await getResponses(clientId)).toEqual({ recycling: 7 })
+      expect(await db.form_responses.get([clientId, "recycling"])).toMatchObject({ is_extension: false })
       expect((await queueEntries()).map((entry) => entry.form_client_id)).toEqual([clientId])
       expect((await getForm(clientId)).dirty).toBe(1)
       expect(target("saveState").textContent).toBe("Saved on this device")
-      expect(target("progressText").textContent).toBe("1 of 4 indicators")
+      expect(target("progressText").textContent).toBe("1 of 6 indicators")
     })
 
     it("stores a brand new form before its first response", async () => {
       await mount(editor({ id: "" }), controllers)
       const newId = window.location.pathname.split("/")[2]
 
-      score("Compaction", 4)
+      score("Diversity", 4)
 
       await vi.waitFor(() => expect(syncNow).toHaveBeenCalled())
       expect(await getForm(newId)).toMatchObject({ client_id: newId, state: "draft" })
-      expect(await getResponses(newId)).toEqual({ compaction: 4 })
+      expect(await getResponses(newId)).toEqual({ diversity: 4 })
     })
 
-    it("flags extension indicators as extensions", async () => {
-      await seedForm({ territory_key: "andes" })
+    it("flags territory indicators as extensions", async () => {
+      await seedForm()
       await mount(editor(), controllers)
-      target("dimensionNav").querySelectorAll("button")[3].click()
-      await settle()
+      await showSection(1)
 
-      score("Frost", 9)
+      score("Compaction", 9)
 
       await vi.waitFor(() => expect(syncNow).toHaveBeenCalled())
-      const row = await db.form_responses.get([clientId, "frost"])
+      const row = await db.form_responses.get([clientId, "compaction"])
       expect(row).toMatchObject({ value: 9, is_extension: true })
     })
   })
@@ -298,39 +320,49 @@ describe("form editor controller", () => {
       expect(await getForm(clientId)).toMatchObject({ latitude: "-13.400000", longitude: "-71.850000" })
     })
 
-    it("drops answers to the old territory's extension indicators when the territory changes", async () => {
-      await seedForm({ territory_key: "andes" }, [response("compaction", 5), response("frost", 7, true)])
+    it("drops answers to the old territory's indicators when the territory changes", async () => {
+      await seedForm({}, [response("diversity", 5), response("compaction", 7, true)])
+      await mount(editor(), controllers)
+
+      edit(field("territory_key"), "puna")
+
+      await vi.waitFor(() => expect(syncNow).toHaveBeenCalled())
+      expect(await getResponses(clientId)).toEqual({ diversity: 5 })
+      expect(navLabels()).toEqual(["Principles", "Structure"])
+      expect((await getForm(clientId)).territory_key).toBe("puna")
+    })
+
+    it("keeps inherited answers when moving to a child territory", async () => {
+      await seedForm({}, [response("compaction", 7, true)])
       await mount(editor(), controllers)
 
       edit(field("territory_key"), "coast")
 
       await vi.waitFor(() => expect(syncNow).toHaveBeenCalled())
-      expect(await getResponses(clientId)).toEqual({ compaction: 5 })
-      expect(navLabels()).toEqual(["Structure", "Fertility", "Supply", "Coast extension"])
-      expect((await getForm(clientId)).territory_key).toBe("coast")
+      expect(await getResponses(clientId)).toEqual({ compaction: 7 })
     })
 
-    it("keeps extension answers when the territory is unchanged", async () => {
-      await seedForm({ territory_key: "andes" }, [response("frost", 7, true)])
+    it("keeps territory answers when the territory is unchanged", async () => {
+      await seedForm({}, [response("compaction", 7, true)])
       await mount(editor(), controllers)
 
       edit(field("name"), "Renamed")
 
       await vi.waitFor(() => expect(syncNow).toHaveBeenCalled())
-      expect(await getResponses(clientId)).toEqual({ frost: 7 })
+      expect(await getResponses(clientId)).toEqual({ compaction: 7 })
     })
   })
 
   describe("completion", () => {
-    it("keeps Complete disabled until every core indicator is scored", async () => {
-      await seedForm({}, allCoreScored.slice(1))
+    it("keeps Complete disabled until every principle and territory indicator is scored", async () => {
+      await seedForm({}, allScored.slice(1))
       await mount(editor(), controllers)
 
       expect(target("completeButton").disabled).toBe(true)
       expect(target("completeHint").textContent).toBe("Score every indicator to complete")
       expect(target("completeHint").classList).not.toContain("hidden")
 
-      score("Compaction", 3)
+      score("Diversity", 3)
 
       await vi.waitFor(() => expect(target("completeButton").disabled).toBe(false))
       expect(target("completeHint").classList).toContain("hidden")
@@ -338,7 +370,7 @@ describe("form editor controller", () => {
 
     it("keeps Complete disabled offline even when every indicator is scored", async () => {
       vi.spyOn(navigator, "onLine", "get").mockReturnValue(false)
-      await seedForm({}, allCoreScored)
+      await seedForm({}, allScored)
 
       await mount(editor(), controllers)
 
@@ -347,7 +379,7 @@ describe("form editor controller", () => {
     })
 
     it("syncs, posts the completion, refreshes the local copy, then visits the results", async () => {
-      await seedForm({}, allCoreScored)
+      await seedForm({}, allScored)
       const fetch = stubFetch(async () => ({ ok: true, redirected: true, url: "http://localhost:3000/forms/form-1?locale=es" }))
       let hydrated = false
       let hydratedBeforeVisit = false
@@ -373,7 +405,7 @@ describe("form editor controller", () => {
     })
 
     it("does not post while the form still has unsynced edits", async () => {
-      await seedForm({}, allCoreScored)
+      await seedForm({}, allScored)
       await db.forms.update(clientId, { dirty: 1 })
       const fetch = stubFetch()
       await mount(editor(), controllers)
@@ -387,7 +419,7 @@ describe("form editor controller", () => {
     })
 
     it("tells the user why completion did not happen", async () => {
-      await seedForm({}, allCoreScored)
+      await seedForm({}, allScored)
       stubFetch(async () => ({ ok: false, redirected: false, status: 500 }))
       await mount(editor(), controllers)
 
@@ -399,7 +431,7 @@ describe("form editor controller", () => {
     })
 
     it("re-enables Complete when the server rejects the completion", async () => {
-      await seedForm({}, allCoreScored)
+      await seedForm({}, allScored)
       stubFetch(async () => ({ ok: false, redirected: false, status: 500 }))
       await mount(editor(), controllers)
 

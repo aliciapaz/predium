@@ -1,5 +1,5 @@
 import Dexie from "dexie"
-import { db, saveForm, saveResponse, getForm, getResponses, enqueue, queueEntries, pruneStaleExtensions, deleteLocalForm } from "lib/db"
+import { db, saveForm, saveResponse, getForm, getResponses, enqueue, queueEntries, pruneDisallowedResponses, deleteLocalForm } from "lib/db"
 import { syncNow } from "/app/javascript/lib/sync.js"
 
 const results = []
@@ -132,7 +132,7 @@ await test("stale farm records and extension pruning preserve edits during a pus
   }
   respondToPush(async () => {
     await saveForm({ ...staleForm, name: "New name" })
-    await pruneStaleExtensions(clientId, [])
+    await pruneDisallowedResponses(clientId, [])
   })
   await syncNow()
   const current = await getForm(clientId)

@@ -52,13 +52,14 @@ describe("load", () => {
     await expect(i18n.load()).rejects.toThrow("translations fetch failed: 500")
   })
 
-  it("serves repeat loads from memory", async () => {
-    const fetch = stubFetch(async () => jsonResponse({ hello: "Hola" }))
+  it("re-reads IndexedDB on every load so a locale refreshed in the background takes effect", async () => {
+    await dbModule.putLocale("es", { hello: "Hola" }, "v1")
+    const fetch = stubFetch()
     await i18n.load()
-    await clearDb(dbModule.db)
+    await dbModule.putLocale("es", { hello: "Hola de nuevo" }, "v2")
 
-    expect(await i18n.load()).toEqual({ hello: "Hola" })
-    expect(fetch).toHaveBeenCalledTimes(1)
+    expect(await i18n.load()).toEqual({ hello: "Hola de nuevo" })
+    expect(fetch).not.toHaveBeenCalled()
   })
 
   it("reloads when the document language changes", async () => {

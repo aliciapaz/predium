@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import {
-  db, saveForm, getForm, listForms, saveResponse, getResponses, pruneStaleExtensions,
+  db, saveForm, getForm, listForms, saveResponse, getResponses, pruneDisallowedResponses,
   enqueue, dequeue, markAttempt, queueEntries, pendingCount, applyServerForm, markSynced, deleteLocalForm
 } from "lib/db"
 import { clearDb } from "../support/db"
@@ -82,8 +82,8 @@ describe("saveResponse", () => {
   })
 })
 
-describe("pruneStaleExtensions", () => {
-  it("removes only extension responses outside the allowed set", async () => {
+describe("pruneDisallowedResponses", () => {
+  it("removes only responses outside the allowed set", async () => {
     await db.forms.put({ client_id: "form-1", dirty: 0 })
     await saveResponse("form-1", "core", 5)
     await saveResponse("form-1", "ext_kept", 4, true)
@@ -91,7 +91,7 @@ describe("pruneStaleExtensions", () => {
     await saveResponse("form-2", "ext_stale", 2, true)
     await db.forms.update("form-1", { dirty: 0 })
 
-    await pruneStaleExtensions("form-1", ["ext_kept"])
+    expect(await pruneDisallowedResponses("form-1", ["core", "ext_kept"])).toBe(1)
 
     expect(await getResponses("form-1")).toEqual({ core: 5, ext_kept: 4 })
     expect(await getResponses("form-2")).toEqual({ ext_stale: 2 })

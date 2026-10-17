@@ -20,7 +20,7 @@ export default [
     }
   },
   {
-    files: ["spec/javascript/**/*.js", "*.config.js"],
+    files: ["spec/javascript/**/*.{js,mjs}", "*.config.js"],
     languageOptions: {
       globals: { ...globals.browser, ...globals.node }
     }

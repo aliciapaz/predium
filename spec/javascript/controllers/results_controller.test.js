@@ -33,18 +33,25 @@ function serverForm(overrides = {}) {
     land_area: "4.5",
     work_force: "3",
     system_types: ["agriculture", "forestry"],
+    territory_key: "andes",
     completed_at: "2026-05-01T12:00:00.000Z",
     updated_at: "2026-05-01T12:00:00.000Z",
     responses: [
-      { indicator_key: "compaction", value: 2, is_extension: false },
-      { indicator_key: "erosion", value: 4, is_extension: false },
-      { indicator_key: "organic_matter", value: 9, is_extension: false }
+      { indicator_key: "diversity", value: 6, is_extension: false },
+      { indicator_key: "compaction", value: 2, is_extension: true },
+      { indicator_key: "erosion", value: 4, is_extension: true },
+      { indicator_key: "organic_matter", value: 9, is_extension: true }
     ],
     ...overrides
   }
 }
 
 const target = (name) => document.querySelector(`[data-results-target="${name}"]`)
+
+function indicatorRow(name) {
+  return Array.from(target("indicators").querySelectorAll("span"))
+    .find((span) => span.firstChild?.textContent === name).parentElement
+}
 
 beforeEach(async () => {
   await clearDb(db)
@@ -153,15 +160,11 @@ describe("results controller", () => {
     })
 
     it("renders indicator badges colored by score range, with a dash for unanswered ones", async () => {
-      await saveResponse(clientId, "irrigation", 6)
+      await saveResponse(clientId, "irrigation", 6, true)
 
       await mount(fixture, { results: ResultsController })
 
-      const badgeFor = (name) => {
-        const row = Array.from(target("indicators").querySelectorAll("span"))
-          .find((span) => span.textContent === name).parentElement
-        return row.lastElementChild
-      }
+      const badgeFor = (name) => indicatorRow(name).lastElementChild
       expect(badgeFor("Compaction").textContent).toBe("2")
       expect(badgeFor("Compaction").className).toContain("bg-rose-100")
       expect(badgeFor("Erosion").className).toContain("bg-mustard-100")
@@ -174,17 +177,31 @@ describe("results controller", () => {
 
       await mount(fixture, { results: ResultsController })
 
-      const row = Array.from(target("indicators").querySelectorAll("span"))
-        .find((span) => span.textContent === "Compaction").parentElement
+      const row = indicatorRow("Compaction")
       expect(row.lastElementChild.textContent).toBe("-")
       expect(row.lastElementChild.className).toContain("text-earth-300")
     })
 
-    it("mounts the radar chart with translated category labels and category scores", async () => {
+    it("names each indicator's source territory", async () => {
+      await mount(fixture, { results: ResultsController })
+
+      expect(indicatorRow("Compaction").querySelector("span span").textContent).toBe("Andes extension")
+    })
+
+    it("renders only the dimensions the form's territory has indicators for", async () => {
+      await applyServerForm(serverForm({ territory_key: "puna", responses: [] }))
+
+      await mount(fixture, { results: ResultsController })
+
+      expect(Array.from(target("dimensions").children).map((row) => row.querySelector("span").textContent))
+        .toEqual(["Structure"])
+    })
+
+    it("mounts the radar chart with translated principle labels and principle scores", async () => {
       await mount(fixture, { results: ResultsController })
 
       const radar = target("radar").querySelector('[data-controller="radar-chart"]')
-      expect(JSON.parse(radar.dataset.radarChartLabelsValue)).toEqual(["Soil", "Water"])
+      expect(JSON.parse(radar.dataset.radarChartLabelsValue)).toEqual(["Diversity", "Recycling"])
       expect(JSON.parse(radar.dataset.radarChartScoresValue)).toEqual([6, 0])
       expect(radar.querySelector('canvas[data-radar-chart-target="canvas"]')).not.toBeNull()
     })

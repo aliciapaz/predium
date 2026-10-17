@@ -1,0 +1,27 @@
+name: Form editor regression
+
+on:
+  pull_request:
+    paths:
+      - app/javascript/controllers/form_editor_controller.js
+      - spec/javascript/form_editor_controller_test.mjs
+      - .github/workflows/form-editor-regression.yml
+  push:
+    branches: [main, develop]
+    paths:
+      - app/javascript/controllers/form_editor_controller.js
+      - spec/javascript/form_editor_controller_test.mjs
+      - .github/workflows/form-editor-regression.yml
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --experimental-vm-modules --test spec/javascript/form_editor_controller_test.mjs

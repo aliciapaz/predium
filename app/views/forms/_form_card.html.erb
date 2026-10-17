@@ -24,8 +24,9 @@
         </p>
 
         <% if form.draft? %>
-          <% total = QuestionnaireConfig.core_indicators.size %>
-          <% scored = form.form_responses.core.count %>
+          <% required = form.required_indicator_keys %>
+          <% total = required.size %>
+          <% scored = (required & form.scored_keys).size %>
           <% pct = total.positive? ? (scored * 100.0 / total).round : 0 %>
           <div class="mt-3 flex items-center gap-3">
             <div class="flex-1 bg-earth-100 rounded-full h-1.5 max-w-xs">

@@ -38,8 +38,8 @@ If a bug lives in the browser (IndexedDB timing, a controller repainting state, 
 - **Mock at the network boundary.** Stub `fetch` with `stubFetch` and `jsonResponse` (`support/fetch.js`). In controller tests, mock `lib/sync` network functions (`syncNow`, `hydrateForm`) rather than the storage layer.
 - **Online/offline and session.** Toggle with `vi.spyOn(navigator, "onLine", "get")`. Add the signed-in and CSRF meta tags with `signIn()` and remove them with `resetHead()` (`support/dom.js`).
 - **Stimulus controllers.** Use `mount(html, controllers)`, `settle()` and `unmount()` from `support/stimulus.js`. `mount` awaits async `connect()` and fails the test on errors Stimulus would otherwise only log. Build fixture HTML from the real view so targets, values and actions match.
-- **Questionnaire and translations.** `support/questionnaire.js` has a small config (with territory extensions) plus `seedQuestionnaire()` and `seedTranslations()`.
-- **Module state.** `lib/i18n` caches translations for the module's lifetime, so use `vi.resetModules()` plus dynamic imports when a test needs a fresh copy. `lib/sync` keeps `syncing`/`paused` flags; call `resumeAfterLogin()` in `beforeEach`.
+- **Questionnaire and translations.** `support/questionnaire.js` has a small config in the `/api/questionnaire` shape (two principles, indicators only in territory extensions, `coast` extending `andes`) plus `seedQuestionnaire()` and `seedTranslations()`.
+- **Module state.** `lib/i18n` keeps the last loaded map in module state (it re-reads IndexedDB on every `load()`), so use `vi.resetModules()` plus dynamic imports when a test needs a fresh copy. `lib/sync` keeps `syncing`/`paused` flags; call `resumeAfterLogin()` in `beforeEach`.
 - **Events.** `recordEvents(type)` collects `predium:*` event details. Call `removeListeners()` in `afterEach`, or a conflict handler from one test answers the next.
 
 ## Running
@@ -59,3 +59,11 @@ These are checked by hand in a browser:
 - `lib/pwa.js` and the service worker (`app/views/pwa/service-worker.js`): registration, caching strategies, Background Sync, purge on sign-out.
 - Real network and browser timing: going offline mid-sync, multiple tabs, actual IndexedDB quota behavior.
 - Chart rendering and visual layout.
+
+### Client upgrade checks
+
+- Start with the previous release's cached questionnaire and translations and an unsynced Chile draft. Open the updated editor and confirm retained answers, including `soil_coverage`, survive and all six principles appear.
+- Repeat the upgrade offline and with a failed config request. The editor reports unavailable config and preserves the draft until it can fetch the compatible schema.
+- Fail one locale request during refresh, then reload online. Its labels recover even when the questionnaire fingerprint already matches. Reload again and use the editor offline to check both cache layers.
+- Change a draft's territory while config pruning runs. Answers valid for the resulting territory survive; completed forms stay untouched.
+- With a child extension, editor and results badges name each indicator's source territory, including inherited parent questions.
