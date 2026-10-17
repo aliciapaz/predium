@@ -197,16 +197,22 @@ export async function markSynced(clientId, serverForm) {
   })
 }
 
+export async function rebaseForm(clientId, updatedAt) {
+  await db.forms.update(clientId, { base_updated_at: updatedAt })
+}
+
 // Settles a successful push in one transaction, so no edit can land between
 // the generation check and the write that would otherwise discard it.
-export async function acknowledgePush(clientId, sentGeneration, serverForm, entryId) {
+export async function acknowledgePush(sentForm, serverForm, entryId) {
+  const clientId = sentForm.client_id
   await db.transaction("rw", db.forms, db.form_responses, db.sync_queue, async () => {
     const current = await db.forms.get(clientId)
     if (!current) {
       await db.sync_queue.delete(entryId)
       return
     }
-    if (current.local_generation !== sentGeneration) {
+    // Older open tabs do not advance local_generation when they save.
+    if (current.local_generation !== sentForm.local_generation || current.updated_at !== sentForm.updated_at) {
       await markSynced(clientId, serverForm)
       return
     }

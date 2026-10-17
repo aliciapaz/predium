@@ -168,6 +168,49 @@ await test("acknowledgement does not restore a form deleted during the push", as
   assert((await queueEntries()).length === 0, "Deleted form stayed queued")
 })
 
+await test("edits from an older tab survive a push", async () => {
+  respondToPush(async () => {
+    await db.form_responses.put({ form_client_id: clientId, indicator_key: "legacy", value: 8 })
+    const form = await getForm(clientId)
+    await db.forms.update(clientId, { updated_at: new originalDate(new originalDate(form.updated_at).getTime() + 1).toISOString(), dirty: 1 })
+    await enqueue(clientId)
+  })
+  await syncNow()
+  assert((await getResponses(clientId)).legacy === 8, "Older tab's edit was overwritten")
+  const payloads = respondToPush()
+  await syncNow()
+  assert(payloads[0].responses.legacy === 8, "Older tab's edit never reached the server")
+})
+
+await test("keeping local changes pushes farm edits made during the conflict", async () => {
+  let calls = 0
+  let forced
+  window.fetch = async (_url, options) => {
+    const payload = JSON.parse(options.body)
+    if (++calls === 1) return { ok: false, status: 409, json: async () => ({ conflict: {
+      reason: "stale", form: { client_id: clientId, updated_at: "2026-10-17T12:00:02.000Z" }
+    } }) }
+    forced = payload
+    return { ok: true, json: async () => ({ form: {
+      ...payload.form, client_id: clientId, updated_at: "2026-10-17T12:00:03.000Z",
+      responses: Object.entries(payload.responses).map(([indicator_key, value]) => ({ indicator_key, value }))
+    } }) }
+  }
+  const choose = (event) => {
+    event.detail.handled = true
+    saveForm({ client_id: clientId, name: "Edited during conflict", state: "draft" }).then(() => event.detail.resolve("keep"))
+  }
+  document.addEventListener("predium:conflict", choose)
+  try {
+    await syncNow()
+  } finally {
+    document.removeEventListener("predium:conflict", choose)
+  }
+  assert(forced?.force === true, "Keep did not force a new push")
+  assert(forced.form.name === "Edited during conflict", "Keep restored the stale farm snapshot")
+  assert(forced.base_updated_at === "2026-10-17T12:00:02.000Z", "Keep did not advance the server base")
+})
+
 await db.delete()
 document.querySelector("#results").textContent = results.join("\n")
 document.body.dataset.complete = "true"

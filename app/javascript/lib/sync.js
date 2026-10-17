@@ -1,5 +1,5 @@
 import {
-  getForm, listForms, snapshotForm, saveForm, queueEntries, dequeue, markAttempt,
+  getForm, listForms, snapshotForm, rebaseForm, queueEntries, dequeue, markAttempt,
   applyServerForm, acknowledgePush, deleteLocalForm, pendingCount, queueChanged
 } from "lib/db"
 
@@ -130,7 +130,7 @@ async function pushEntry(entry, force = false) {
       await deleteLocalForm(form.client_id)
       notify("deleted", { name: form.name })
     } else {
-      await acknowledgePush(form.client_id, form.local_generation, payload.form, entry.id)
+      await acknowledgePush(form, payload.form, entry.id)
     }
     return true
   }
@@ -175,8 +175,7 @@ async function handleConflict(entry, form, conflict) {
 
   const choice = await askUser(form, conflict.form)
   if (choice === "keep") {
-    form.base_updated_at = conflict.form.updated_at
-    await saveForm(form)
+    await rebaseForm(form.client_id, conflict.form.updated_at)
     return pushEntry(entry, true)
   }
   if (choice === "server") {
