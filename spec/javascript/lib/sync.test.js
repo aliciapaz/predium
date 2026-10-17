@@ -342,7 +342,15 @@ describe("syncNow", () => {
     ])
   })
 
-  it.todo("reports a rejected push as status \"error\" (the HTTP status in detail currently overwrites it)")
+  it("reports a rejected push as status \"error\" with the HTTP status alongside", async () => {
+    await queueLocalForm()
+    stubFetch(async () => jsonResponse({}, 500))
+    const statuses = recordEvents("predium:sync-status")
+
+    await syncNow()
+
+    expect(statuses).toContainEqual({ status: "error", httpStatus: 500, name: "Local name" })
+  })
 
   it("stops draining on any other server error", async () => {
     await queueLocalForm()

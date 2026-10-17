@@ -378,7 +378,17 @@ describe("form editor controller", () => {
       expect(window.Turbo.visit).not.toHaveBeenCalled()
     })
 
-    it.todo("tells the user why completion did not happen (handleComplete shows the hint, then refreshCompleteState hides it again)")
+    it("tells the user why completion did not happen", async () => {
+      await seedForm({}, allCoreScored)
+      stubFetch(async () => ({ ok: false, redirected: false, status: 500 }))
+      await mount(editor(), controllers)
+
+      target("completeButton").click()
+
+      await vi.waitFor(() => expect(target("completeButton").disabled).toBe(false))
+      expect(target("completeHint").classList).not.toContain("hidden")
+      expect(target("completeHint").textContent).toBe("Connect to complete")
+    })
 
     it("re-enables Complete when the server rejects the completion", async () => {
       await seedForm({}, allCoreScored)

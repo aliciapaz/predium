@@ -110,5 +110,18 @@ describe("connectivity controller", () => {
     await vi.waitFor(() => expect(target("pending").textContent).toBe("1 pending"))
   })
 
-  it.todo("keeps the session expired label after a needs_login status (refresh() repaints the label right after)")
+  it("keeps the session expired label after a needs_login status until the user retries", async () => {
+    await mount(fixture, { connectivity: ConnectivityController })
+
+    document.dispatchEvent(new CustomEvent("predium:sync-status", { detail: { status: "needs_login" } }))
+    document.dispatchEvent(new CustomEvent("predium:queue-changed"))
+    await vi.waitFor(() => expect(target("label").textContent).toBe("Session expired"))
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    expect(target("label").textContent).toBe("Session expired")
+
+    target("syncButton").click()
+    document.dispatchEvent(new CustomEvent("predium:queue-changed"))
+
+    await vi.waitFor(() => expect(target("label").textContent).toBe("Online"))
+  })
 })
