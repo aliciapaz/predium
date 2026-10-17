@@ -1,7 +1,21 @@
 import { putConfig, putLocale } from "lib/db"
 
+// Mirrors /api/questionnaire: principles are answered directly, indicators live
+// only in territory extensions, and each extension's chain is already flattened
+// with every indicator tagged by its source territory. coast extends andes.
+const andesIndicators = [
+  { key: "compaction", i18n_key: "indicators.compaction", dimension: "structure", extension: "andes" },
+  { key: "erosion", i18n_key: "indicators.erosion", dimension: "structure", extension: "andes" },
+  { key: "organic_matter", i18n_key: "indicators.organic_matter", dimension: "fertility", extension: "andes" },
+  { key: "irrigation", i18n_key: "indicators.irrigation", dimension: "supply", extension: "andes" }
+]
+
 export const config = {
   fingerprint: "test-fingerprint",
+  principles: [
+    { key: "diversity", i18n_key: "principles.diversity" },
+    { key: "recycling", i18n_key: "principles.recycling" }
+  ],
   categories: [
     { key: "soil", i18n_key: "categories.soil" },
     { key: "water", i18n_key: "categories.water" }
@@ -11,22 +25,22 @@ export const config = {
     { key: "fertility", i18n_key: "dimensions.fertility", category: "soil" },
     { key: "supply", i18n_key: "dimensions.supply", category: "water" }
   ],
-  indicators: [
-    { key: "compaction", i18n_key: "indicators.compaction", dimension: "structure" },
-    { key: "erosion", i18n_key: "indicators.erosion", dimension: "structure" },
-    { key: "organic_matter", i18n_key: "indicators.organic_matter", dimension: "fertility" },
-    { key: "irrigation", i18n_key: "indicators.irrigation", dimension: "supply" }
-  ],
   extensions: {
-    andes: {
-      territory: "andes",
-      i18n_key: "extensions.andes",
-      indicators: [{ key: "frost", i18n_key: "indicators.frost", dimension: "structure", extension: "andes" }]
-    },
+    andes: { territory: "andes", i18n_key: "extensions.andes", extends: null, indicators: andesIndicators },
     coast: {
       territory: "coast",
       i18n_key: "extensions.coast",
-      indicators: [{ key: "salinity", i18n_key: "indicators.salinity", dimension: "supply", extension: "coast" }]
+      extends: "andes",
+      indicators: [
+        ...andesIndicators,
+        { key: "salinity", i18n_key: "indicators.salinity", dimension: "supply", extension: "coast" }
+      ]
+    },
+    puna: {
+      territory: "puna",
+      i18n_key: "extensions.puna",
+      extends: null,
+      indicators: [{ key: "frost", i18n_key: "indicators.frost", dimension: "structure", extension: "puna" }]
     }
   }
 }
@@ -39,6 +53,11 @@ export const translations = {
   "dimensions.supply": "Supply",
   "extensions.andes": "Andes extension",
   "extensions.coast": "Coast extension",
+  "extensions.puna": "Puna extension",
+  "principles.diversity.name": "Diversity",
+  "principles.recycling.name": "Recycling",
+  "questionnaire.principles_title": "Principles",
+  "questionnaire.no_territory_hint": "Choose a territory to see its indicators",
   "indicators.compaction.name": "Compaction",
   "indicators.erosion.name": "Erosion",
   "indicators.organic_matter.name": "Organic matter",
@@ -81,8 +100,6 @@ export async function seedQuestionnaire() {
   await seedTranslations()
 }
 
-// lib/i18n caches the first map it loads for the module's lifetime, so every
-// test in a file must seed the same translations.
 export async function seedTranslations() {
   await putLocale("en", translations, config.fingerprint)
 }

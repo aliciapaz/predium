@@ -38,8 +38,8 @@ If a bug lives in the browser (IndexedDB timing, a controller repainting state, 
 - **Mock at the network boundary.** Stub `fetch` with `stubFetch` and `jsonResponse` (`support/fetch.js`). In controller tests, mock `lib/sync` network functions (`syncNow`, `hydrateForm`) rather than the storage layer.
 - **Online/offline and session.** Toggle with `vi.spyOn(navigator, "onLine", "get")`. Add the signed-in and CSRF meta tags with `signIn()` and remove them with `resetHead()` (`support/dom.js`).
 - **Stimulus controllers.** Use `mount(html, controllers)`, `settle()` and `unmount()` from `support/stimulus.js`. `mount` awaits async `connect()` and fails the test on errors Stimulus would otherwise only log. Build fixture HTML from the real view so targets, values and actions match.
-- **Questionnaire and translations.** `support/questionnaire.js` has a small config (with territory extensions) plus `seedQuestionnaire()` and `seedTranslations()`.
-- **Module state.** `lib/i18n` caches translations for the module's lifetime, so use `vi.resetModules()` plus dynamic imports when a test needs a fresh copy. `lib/sync` keeps `syncing`/`paused` flags; call `resumeAfterLogin()` in `beforeEach`.
+- **Questionnaire and translations.** `support/questionnaire.js` has a small config in the `/api/questionnaire` shape (two principles, indicators only in territory extensions, `coast` extending `andes`) plus `seedQuestionnaire()` and `seedTranslations()`.
+- **Module state.** `lib/i18n` keeps the last loaded map in module state (it re-reads IndexedDB on every `load()`), so use `vi.resetModules()` plus dynamic imports when a test needs a fresh copy. `lib/sync` keeps `syncing`/`paused` flags; call `resumeAfterLogin()` in `beforeEach`.
 - **Events.** `recordEvents(type)` collects `predium:*` event details. Call `removeListeners()` in `afterEach`, or a conflict handler from one test answers the next.
 
 ## Running

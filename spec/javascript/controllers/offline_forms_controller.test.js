@@ -80,17 +80,20 @@ describe("offline forms controller", () => {
       expect(cardFor("Done farm").querySelector("a").textContent).toBe("View results")
     })
 
-    it("shows draft progress against the core indicator count", async () => {
+    it("shows draft progress against the principles plus the form's own territory chain", async () => {
       await seedForm("draft-1", {
         name: "Draft farm",
-        responses: [{ indicator_key: "compaction", value: 3, is_extension: false }]
+        territory_key: "andes",
+        responses: [{ indicator_key: "compaction", value: 3, is_extension: true }]
       })
+      await seedForm("draft-2", { name: "Puna farm", territory_key: "puna" })
 
       await mount(fixture, { "offline-forms": OfflineFormsController })
 
       const card = cardFor("Draft farm")
-      expect(card.textContent).toContain("1 of 4 indicators")
-      expect(card.querySelector(".bg-forest-500").style.width).toBe("25%")
+      expect(card.textContent).toContain("1 of 6 indicators")
+      expect(card.querySelector(".bg-forest-500").style.width).toBe("17%")
+      expect(cardFor("Puna farm").textContent).toContain("0 of 3 indicators")
     })
 
     it("marks forms that are still waiting in the sync queue", async () => {
