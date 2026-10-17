@@ -15,7 +15,7 @@ const FARM_FIELDS = [
 // The server-rendered shell around this controller carries no form data.
 export default class extends Controller {
   static targets = [
-    "title", "saveState", "progressText", "progressBar", "dimensionNav",
+    "title", "saveState", "progressText", "progressBar", "dimensionNav", "dimensionProgress",
     "indicators", "prevButton", "nextButton", "completeForm", "completeButton", "completeHint"
   ]
   static values = { clientId: String, formsUrl: String }
@@ -255,7 +255,6 @@ export default class extends Controller {
   renderIndicators() {
     const dimension = this.dimensions()[this.currentIndex]
     const indicators = this.indicatorsFor(dimension)
-    const answered = indicators.filter((indicator) => this.responses[indicator.key] !== undefined).length
 
     const hint = dimension.principles && !this.form.territory_key
       ? `<p class="text-sm text-earth-500 mt-1">${this.escape(t("questionnaire.no_territory_hint"))}</p>`
@@ -266,7 +265,7 @@ export default class extends Controller {
       <p class="text-sm text-earth-500">
         ${this.escape(t("questionnaire.dimension_of", { current: this.currentIndex + 1, total: this.dimensions().length }))}
         &middot;
-        ${this.escape(t("questionnaire.answered_count", { answered, total: indicators.length }))}
+        <span data-form-editor-target="dimensionProgress"></span>
       </p>${hint}`
 
     this.indicatorsTarget.innerHTML = header + indicators.map((indicator) => this.indicatorCard(indicator)).join("")
@@ -346,6 +345,10 @@ export default class extends Controller {
     const scored = required.filter((item) => this.responses[item.key] !== undefined).length
     this.progressTextTarget.textContent = t("questionnaire.indicators_count", { answered: scored, total })
     this.progressBarTarget.style.width = `${total ? Math.round((scored * 100) / total) : 0}%`
+
+    const indicators = this.indicatorsFor(this.dimensions()[this.currentIndex])
+    const answered = indicators.filter((indicator) => this.responses[indicator.key] !== undefined).length
+    this.dimensionProgressTarget.textContent = t("questionnaire.answered_count", { answered, total: indicators.length })
   }
 
   checkIcon() {
