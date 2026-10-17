@@ -3,880 +3,975 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Predium — Diagnóstico y Transición Agroecológica</title>
+  <title>Predium: diagnóstico agroecológico en terreno</title>
+  <meta name="description" content="Predium es la aplicación para evaluar predios campesinos en terreno, con o sin señal: seis principios agroecológicos, indicadores por territorio y resultados al momento.">
+  <meta name="theme-color" content="#1f4a33">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&amp;family=Outfit:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600&amp;family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&amp;display=swap" rel="stylesheet">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/favicon-180.png">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --green-deep: #0f2a1b;
-      --green-dark: #163d25;
-      --green-mid: #22623a;
-      --green-leaf: #3a9957;
-      --green-bright: #5cc97a;
-      --green-pale: #d4edda;
-      --earth: #a68b5b;
-      --earth-light: #d4c4a0;
-      --cream: #f4f1eb;
-      --cream-dark: #e8e2d6;
-      --gold: #c9a84c;
       --white: #ffffff;
-      --text-dark: #1a1a18;
-      --text-mid: #4a4a42;
-      --text-light: #7a7a6e;
+
+      --forest-50: #f0f7f0;
+      --forest-100: #dceddc;
+      --forest-300: var(--band-num);
+      --forest-500: #348f41;
+      --forest-600: #2a7335;
+      --forest-700: #225c2b;
+      --forest-900: #163d1d;
+
+      --mustard-50: #fef9e7;
+      --mustard-100: #fdf0c4;
+      --mustard-500: #d9960e;
+      --mustard-700: #8f570b;
+
+      --rose-50: #fff1f2;
+      --rose-100: #ffe4e6;
+      --rose-500: #f43f5e;
+      --rose-700: #be123c;
+
+      --display: 'Bricolage Grotesque', 'Avenir Next', sans-serif;
+      --body: 'Atkinson Hyperlegible Next', 'Segoe UI', sans-serif;
+
+      --gutter: 16px;
+      --max: 1120px;
     }
 
+
+    /* The score bands (rose, mustard, forest) are separate tokens because they mirror the app. */
+    :root {
+      --bg: #f4f6f0; --bg-alt: #e6ecdf; --surface: #ffffff;
+      --line: #d5dfcc; --line-soft: #eef2e9; --line-strong: #b3c2a6;
+      --ink: #1a2e22; --ink-soft: #3a4e40; --muted: #56675a;
+      --primary: #24603a; --primary-ink: #1b4a2c; --primary-soft: #ecf3e8; --primary-line: #cfe1c7;
+      --accent: #f2c14e;
+      --band: #173826; --band-ink: #eef3ec; --band-text: #c3d3c4; --band-icon: #f2c14e; --band-num: #f2c14e;
+      --shadow: 20 40 28;
+      --hero-bg: #1f4a33; --hero-deep: #11281b; --hero-ink: #f6f8f2; --hero-soft: #c8d8c8; --hero-line: rgb(255 255 255 / 0.22);
+      --hero-brand: #f6f8f2; --hero-check: #f2c14e; --hero-quiet-hover: rgb(255 255 255 / 0.08);
+      --cta-bg: #f2c14e; --cta-ink: #1a2e22; --cta-hover: #f6d27a;
+      --mark-bg: #f6f8f2; --mark-stem: #1f4a33;
+    }
+
+    .mark-bg { fill: var(--mark-bg); }
+    .mark-hex { stroke: var(--primary-line); }
+    .mark-stem { stroke: var(--mark-stem); }
+    .mark-leaf { fill: color-mix(in srgb, var(--primary) 45%, white); }
+    .mark-seed { fill: var(--accent); }
+    .radar .axis { stroke: var(--line); }
+    .radar .shape { fill: var(--primary); fill-opacity: 0.22; stroke: var(--primary); }
+    .radar .vertex { fill: var(--primary); }
+
+
     html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
     body {
-      font-family: 'Outfit', sans-serif;
-      color: var(--text-dark);
-      background: var(--cream);
-      overflow-x: hidden;
+      font-family: var(--body);
+      font-size: 1.0625rem;
+      line-height: 1.6;
+      color: var(--ink);
+      background: var(--bg);
       -webkit-font-smoothing: antialiased;
     }
 
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      opacity: 0.025;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-      background-size: 256px 256px;
-      pointer-events: none;
-      z-index: 9999;
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid var(--mustard-500); outline-offset: 2px; border-radius: 4px; }
+
+    .wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
+    @media (min-width: 720px) { :root { --gutter: 32px; } }
+
+    h1, h2, h3 { font-family: var(--display); color: var(--ink); font-weight: 700; }
+    h1 {
+      font-size: clamp(2.4rem, 6vw, 4.1rem);
+      font-weight: 800;
+      line-height: 1.02;
+      letter-spacing: -0.025em;
     }
+    h2 {
+      font-size: clamp(1.9rem, 4vw, 2.75rem);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      max-width: 18ch;
+    }
+    h3 { font-size: 1.25rem; line-height: 1.25; letter-spacing: -0.01em; }
+    .lead { font-size: 1.1875rem; color: var(--ink-soft); max-width: 58ch; }
+    p + p { margin-top: 0.75em; }
 
     /* ===== NAV ===== */
-    nav {
-      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
-      padding: 1.25rem 2.5rem;
-      display: flex; align-items: center; justify-content: space-between;
-      transition: background 0.4s, backdrop-filter 0.4s, box-shadow 0.4s;
+    .nav { border-bottom: 1px solid var(--hero-line); background: var(--hero-bg); }
+    .nav .brand { color: var(--hero-brand); }
+    .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 1rem; }
+    .brand {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      font-family: var(--display); font-weight: 800; font-size: 1.35rem;
+      color: var(--primary-ink); text-decoration: none; letter-spacing: -0.02em;
     }
-    nav.scrolled {
-      background: rgba(15, 42, 27, 0.92);
-      backdrop-filter: blur(16px);
-      box-shadow: 0 2px 24px rgba(0,0,0,0.15);
+    .nav-links { display: none; gap: 1.75rem; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--hero-soft); font-size: 0.95rem; }
+    .nav-links a:hover { color: var(--hero-ink); text-decoration: underline; text-underline-offset: 4px; }
+    @media (min-width: 900px) { .nav-links { display: flex; } }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      font-family: var(--body); font-weight: 600; font-size: 1rem;
+      padding: 0.8rem 1.35rem; border-radius: 8px; border: 2px solid transparent;
+      text-decoration: none; cursor: pointer; line-height: 1.2;
     }
-    .nav-logo {
-      font-family: 'Fraunces', serif; font-weight: 700; font-size: 1.6rem;
-      color: var(--white); text-decoration: none; letter-spacing: -0.02em;
-      display: flex; align-items: center; gap: 0.5rem;
-    }
-    .nav-logo .dot {
-      width: 10px; height: 10px; background: var(--green-bright);
-      border-radius: 50%; display: inline-block;
-      animation: pulse-dot 2.5s ease-in-out infinite;
-    }
-    @keyframes pulse-dot {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.4); opacity: 0.6; }
-    }
-    .nav-links { display: flex; gap: 2rem; align-items: center; list-style: none; }
-    .nav-links a {
-      color: rgba(255,255,255,0.8); text-decoration: none;
-      font-size: 0.9rem; font-weight: 400; letter-spacing: 0.02em; transition: color 0.3s;
-    }
-    .nav-links a:hover { color: var(--green-bright); }
-    .nav-cta {
-      background: var(--green-bright) !important; color: var(--green-deep) !important;
-      padding: 0.6rem 1.5rem; border-radius: 100px; font-weight: 600 !important;
-      transition: transform 0.3s, box-shadow 0.3s !important;
-    }
-    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(92,201,122,0.4); }
+    .btn-primary { background: var(--cta-bg); color: var(--cta-ink); }
+    .btn-primary:hover { background: var(--cta-hover); }
+    .btn-quiet { color: var(--primary-ink); border-color: var(--line); background: transparent; }
+    .btn-quiet:hover { border-color: var(--primary-line); background: var(--primary-soft); }
+    .nav .btn { padding: 0.55rem 1rem; font-size: 0.95rem; }
 
     /* ===== HERO ===== */
     .hero {
-      position: relative; min-height: 100vh;
-      background: linear-gradient(165deg, var(--green-deep) 0%, #0d3520 40%, #184a2d 70%, var(--green-mid) 100%);
-      display: flex; align-items: center; overflow: hidden;
+      position: relative; overflow: hidden; padding: 3rem 0 4.5rem;
+      background: linear-gradient(180deg, var(--hero-bg) 0%, #193d2a 55%, var(--hero-deep) 100%);
     }
-    .hero-bg-pattern {
-      position: absolute; inset: 0; opacity: 0.06;
-      background-image:
-        radial-gradient(circle at 20% 80%, var(--green-bright) 1px, transparent 1px),
-        radial-gradient(circle at 80% 20%, var(--green-bright) 1px, transparent 1px),
-        radial-gradient(circle at 50% 50%, var(--green-bright) 0.5px, transparent 0.5px);
-      background-size: 60px 60px, 80px 80px, 40px 40px;
+    .hero-roots { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.55; }
+    @media (min-width: 960px) {
+      .hero-roots {
+        opacity: 1;
+        -webkit-mask-image: linear-gradient(to right, rgb(0 0 0 / 0.35) 0%, rgb(0 0 0 / 0.35) 42%, #000 62%);
+        mask-image: linear-gradient(to right, rgb(0 0 0 / 0.35) 0%, rgb(0 0 0 / 0.35) 42%, #000 62%);
+      }
     }
-    .hero-topo {
-      position: absolute; right: -5%; top: 10%; width: 55%; height: 80%; opacity: 0.07;
+    .hero .wrap { position: relative; }
+    .hero h1 { color: var(--hero-ink); }
+    .hero .lead { color: var(--hero-soft); }
+    .hero .btn-quiet { color: var(--hero-ink); border-color: var(--hero-line); }
+    .hero .btn-quiet:hover { background: var(--hero-quiet-hover); }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 3rem; align-items: center; }
+    @media (min-width: 960px) {
+      .hero { padding: 5rem 0 6rem; }
+      .hero-grid { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 4rem; }
     }
-    .hero-topo svg { width: 100%; height: 100%; }
-    .hero-content {
-      position: relative; z-index: 2; max-width: 1280px; margin: 0 auto;
-      padding: 8rem 2.5rem 5rem;
-      display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 4rem; align-items: center;
+    .hero h1 { max-width: 13ch; margin-bottom: 1.5rem; }
+    .hero .lead { margin-bottom: 2rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+    .hero-facts {
+      display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem;
+      margin-top: 2.25rem; list-style: none; color: var(--hero-soft); font-size: 0.95rem;
     }
-    .hero-tag {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      background: rgba(92,201,122,0.12); border: 1px solid rgba(92,201,122,0.25);
-      color: var(--green-bright); padding: 0.45rem 1rem; border-radius: 100px;
-      font-size: 0.8rem; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;
-      margin-bottom: 1.5rem; animation: fadeSlideUp 0.8s ease-out both;
-    }
-    .hero-tag::before { content: ''; width: 6px; height: 6px; background: var(--green-bright); border-radius: 50%; }
-    .hero h1 {
-      font-family: 'Fraunces', serif; font-size: clamp(2.8rem, 5.5vw, 4.5rem);
-      font-weight: 700; color: var(--white); line-height: 1.08; letter-spacing: -0.03em;
-      margin-bottom: 1.5rem; animation: fadeSlideUp 0.8s 0.15s ease-out both;
-    }
-    .hero h1 em { font-style: italic; color: var(--green-bright); font-weight: 500; }
-    .hero-desc {
-      font-size: 1.15rem; color: rgba(255,255,255,0.7); line-height: 1.65;
-      max-width: 540px; margin-bottom: 2.5rem; font-weight: 300;
-      animation: fadeSlideUp 0.8s 0.3s ease-out both;
-    }
-    .hero-actions {
-      display: flex; gap: 1rem; flex-wrap: wrap;
-      animation: fadeSlideUp 0.8s 0.45s ease-out both;
-    }
+    .hero-facts li { display: inline-flex; align-items: center; gap: 0.45rem; }
+    .hero-facts svg { color: var(--hero-check); flex-shrink: 0; }
 
-    /* ===== BUTTONS ===== */
-    .btn-primary {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      background: var(--green-bright); color: var(--green-deep);
-      padding: 1rem 2rem; border-radius: 100px;
-      font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 600;
-      text-decoration: none; border: none; cursor: pointer;
-      transition: transform 0.3s, box-shadow 0.3s;
+    /* Demo: a working copy of the app's Level 1 scoring */
+    .demo {
+      background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+      padding: 1.25rem; box-shadow: 0 1px 0 var(--line), 0 18px 40px -24px rgb(var(--shadow) / 0.35);
     }
-    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(92,201,122,0.35); }
-    .btn-secondary {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      background: transparent; color: var(--white);
-      padding: 1rem 2rem; border-radius: 100px;
-      font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 400;
-      text-decoration: none; border: 1px solid rgba(255,255,255,0.25); cursor: pointer;
-      transition: border-color 0.3s, background 0.3s;
-    }
-    .btn-secondary:hover { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.05); }
-
-    /* ===== HERO VISUAL: APP MOCKUP ===== */
-    .hero-visual { position: relative; animation: fadeSlideUp 1s 0.5s ease-out both; }
-    .app-mockup {
-      position: relative; background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
-      padding: 1.5rem; backdrop-filter: blur(10px);
-      box-shadow: 0 30px 80px rgba(0,0,0,0.3);
-    }
-    .mockup-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 1.25rem; padding-bottom: 1rem;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-    .mockup-title { color: var(--white); font-size: 0.85rem; font-weight: 500; }
-    .mockup-badge {
-      background: rgba(92,201,122,0.15); color: var(--green-bright);
-      font-size: 0.7rem; padding: 0.3rem 0.7rem; border-radius: 100px;
-      font-weight: 500; display: flex; align-items: center; gap: 0.35rem;
-    }
-    .mockup-badge::before { content: ''; width: 6px; height: 6px; background: var(--green-bright); border-radius: 50%; }
-    .radar-container { display: flex; justify-content: center; margin-bottom: 1.25rem; }
-    .radar-container svg { width: 240px; height: 240px; }
-    .mockup-scores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
-    .score-item { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 0.7rem; text-align: center; }
-    .score-label { font-size: 0.6rem; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.3rem; }
-    .score-value { font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; color: var(--green-bright); }
-    .mockup-floating {
-      position: absolute; bottom: -20px; left: -30px;
-      background: var(--white); border-radius: 14px;
-      padding: 0.9rem 1.2rem; box-shadow: 0 12px 40px rgba(0,0,0,0.2);
-      display: flex; align-items: center; gap: 0.7rem;
-      animation: float 4s ease-in-out infinite;
-    }
-    .mockup-floating .icon-circle {
-      width: 36px; height: 36px; background: var(--green-pale);
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    }
-    .mockup-floating .fl-label { font-size: 0.7rem; color: var(--text-light); }
-    .mockup-floating .fl-value { font-size: 0.9rem; font-weight: 600; color: var(--green-mid); }
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-
-    /* ===== STATS STRIP ===== */
-    .stats-strip { background: var(--green-deep); border-top: 1px solid rgba(255,255,255,0.06); padding: 3rem 2.5rem; }
-    .stats-inner { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
-    .stat { text-align: center; }
-    .stat-number { font-family: 'Fraunces', serif; font-size: 2.4rem; font-weight: 700; color: var(--green-bright); line-height: 1; margin-bottom: 0.4rem; }
-    .stat-label { font-size: 0.8rem; color: rgba(255,255,255,0.5); font-weight: 300; letter-spacing: 0.02em; }
-
-    /* ===== SECTION SHARED ===== */
-    .section-tag {
+    @media (min-width: 520px) { .demo { padding: 1.75rem; } }
+    .demo-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin-bottom: 0.25rem; }
+    .demo-title { font-family: var(--display); font-weight: 700; font-size: 1.05rem; }
+    .demo-status {
       display: inline-flex; align-items: center; gap: 0.4rem;
-      font-size: 0.75rem; font-weight: 500; text-transform: uppercase;
-      letter-spacing: 0.1em; color: var(--green-mid); margin-bottom: 1.25rem;
+      font-size: 0.8rem; font-weight: 600; color: var(--muted);
+      background: var(--bg-alt); padding: 0.2rem 0.6rem; border-radius: 999px; white-space: nowrap;
     }
-    .section-tag::before { content: ''; width: 24px; height: 2px; background: var(--green-mid); }
+    .demo-status::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+    .radar { display: block; width: 100%; max-width: 360px; margin: 0.25rem auto 0.5rem; overflow: visible; }
+    .radar .axis-label { font-family: var(--body); font-size: 11px; fill: var(--muted); cursor: pointer; }
+    .radar .axis-label.is-active { fill: var(--primary-ink); font-weight: 600; }
+    .radar .axis-hit { fill: transparent; cursor: pointer; }
 
-    /* ===== PROBLEM ===== */
-    .problem-section { padding: 7rem 2.5rem; background: var(--cream); position: relative; }
-    .problem-section::before {
-      content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-      width: 1px; height: 60px; background: linear-gradient(to bottom, var(--green-deep), transparent);
+    .question { border-top: 1px solid var(--bg-alt); padding-top: 1rem; }
+    .question-meta { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.2rem; }
+    .question-name { font-family: var(--display); font-weight: 700; font-size: 1.05rem; line-height: 1.3; min-height: 2.6em; margin-bottom: 0.75rem; }
+    .scale { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+    @media (min-width: 560px) { .scale { grid-template-columns: repeat(10, minmax(0, 1fr)); } }
+    .scale button {
+      aspect-ratio: 1; min-height: 44px; border-radius: 8px;
+      border: 2px solid var(--line-strong); background: var(--bg); color: var(--ink-soft);
+      font-family: var(--display); font-weight: 700; font-size: 1rem; cursor: pointer;
     }
-    .problem-inner { max-width: 1080px; margin: 0 auto; }
-    .problem-headline {
-      font-family: 'Fraunces', serif; font-size: clamp(2rem, 4vw, 3rem);
-      font-weight: 700; color: var(--green-deep); line-height: 1.15;
-      letter-spacing: -0.02em; max-width: 750px; margin-bottom: 3.5rem;
+    .scale button:hover { background: var(--bg-alt); }
+    .scale button[aria-checked="true"].band-low { background: var(--rose-100); border-color: var(--rose-500); color: var(--rose-700); box-shadow: 0 0 0 2px #fda4af; }
+    .scale button[aria-checked="true"].band-mid { background: var(--mustard-100); border-color: var(--mustard-500); color: var(--mustard-700); box-shadow: 0 0 0 2px #f9d85a; }
+    .scale button[aria-checked="true"].band-high { background: var(--forest-100); border-color: var(--forest-500); color: var(--forest-700); box-shadow: 0 0 0 2px var(--forest-300); }
+    .scale-legend { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--muted); margin-top: 0.4rem; }
+    .demo-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; }
+    .demo-nav button {
+      font-family: var(--body); font-size: 0.9rem; font-weight: 600; color: var(--primary-ink);
+      background: none; border: none; cursor: pointer; padding: 0.4rem 0.2rem;
+      display: inline-flex; align-items: center; gap: 0.3rem;
     }
-    .problem-headline em { font-style: italic; color: var(--green-mid); }
-    .pain-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-    .pain-card {
-      background: var(--white); border-radius: 16px; padding: 2rem;
-      border: 1px solid var(--cream-dark); transition: transform 0.3s, box-shadow 0.3s;
-      position: relative; overflow: hidden;
-    }
-    .pain-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.06); }
-    .pain-card::before {
-      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
-      background: linear-gradient(90deg, var(--earth), var(--earth-light));
-    }
-    .pain-icon {
-      width: 48px; height: 48px; background: var(--cream); border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.3rem; margin-bottom: 1.25rem;
-    }
-    .pain-card h3 {
-      font-family: 'Fraunces', serif; font-size: 1.15rem; font-weight: 600;
-      color: var(--green-deep); margin-bottom: 0.75rem; line-height: 1.3;
-    }
-    .pain-card p { font-size: 0.9rem; color: var(--text-mid); line-height: 1.6; font-weight: 300; }
+    .demo-nav button:disabled { visibility: hidden; }
+    .dots { display: flex; gap: 6px; }
+    .dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
+    .dots span.is-active { background: var(--primary); }
+    .demo-note { font-size: 0.85rem; color: var(--muted); margin-top: 0.9rem; text-align: center; }
 
-    /* ===== METHODOLOGY (NEW SECTION) ===== */
-    .method-section { padding: 7rem 2.5rem; background: var(--white); }
-    .method-inner { max-width: 1080px; margin: 0 auto; }
-    .method-header { text-align: center; margin-bottom: 4rem; }
-    .method-headline {
-      font-family: 'Fraunces', serif; font-size: clamp(2rem, 4vw, 2.8rem);
-      font-weight: 700; color: var(--green-deep); line-height: 1.15;
-      letter-spacing: -0.02em; margin-bottom: 1rem;
-    }
-    .method-sub {
-      font-size: 1.05rem; color: var(--text-mid); font-weight: 300;
-      max-width: 640px; margin: 0 auto; line-height: 1.6;
-    }
-    .method-levels {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;
-      margin-bottom: 3rem;
-    }
-    .method-level {
-      background: var(--cream); border-radius: 20px; padding: 2.5rem 2rem;
-      position: relative; text-align: center;
-      border: 1px solid var(--cream-dark); transition: transform 0.3s, box-shadow 0.3s;
-    }
-    .method-level:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.06); }
-    .method-level-tag {
-      display: inline-block; font-size: 0.65rem; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 0.12em;
-      color: var(--white); background: var(--green-mid);
-      padding: 0.3rem 0.8rem; border-radius: 100px; margin-bottom: 1.25rem;
-    }
-    .method-level h3 {
-      font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700;
-      color: var(--green-deep); margin-bottom: 0.75rem; line-height: 1.3;
-    }
-    .method-level p { font-size: 0.88rem; color: var(--text-mid); line-height: 1.6; font-weight: 300; }
-    .method-level-icon {
-      font-size: 2.2rem; margin-bottom: 1rem;
-    }
-    .method-arrow {
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.75rem; color: var(--text-light); gap: 0.5rem;
-      margin-top: 2rem; font-weight: 300;
-    }
-    .method-arrow svg { opacity: 0.4; }
-
-    /* ===== DIMENSIONS SHOWCASE ===== */
-    .dimensions-section { padding: 5rem 2.5rem 7rem; background: var(--white); }
-    .dimensions-inner { max-width: 1080px; margin: 0 auto; }
-    .dimensions-header { text-align: center; margin-bottom: 3rem; }
-    .dimensions-headline {
-      font-family: 'Fraunces', serif; font-size: clamp(1.6rem, 3vw, 2.2rem);
-      font-weight: 700; color: var(--green-deep); line-height: 1.2;
-      margin-bottom: 0.75rem;
-    }
-    .dimensions-sub { font-size: 0.95rem; color: var(--text-mid); font-weight: 300; }
-    .dim-grid {
-      display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem;
-    }
-    .dim-chip {
-      background: var(--cream); border: 1px solid var(--cream-dark);
-      border-radius: 12px; padding: 1.2rem 1rem; text-align: center;
-      transition: transform 0.2s, border-color 0.3s;
-    }
-    .dim-chip:hover { transform: translateY(-2px); border-color: var(--green-leaf); }
-    .dim-chip-icon { font-size: 1.4rem; margin-bottom: 0.5rem; }
-    .dim-chip-name {
-      font-size: 0.75rem; font-weight: 500; color: var(--green-deep);
-      line-height: 1.3;
+    /* ===== SECTIONS ===== */
+    .section { padding: 4.5rem 0; border-top: 1px solid var(--line); }
+    @media (min-width: 960px) { .section { padding: 6.5rem 0; } }
+    .section-head { display: grid; gap: 1.25rem; margin-bottom: 3rem; }
+    @media (min-width: 960px) {
+      .section-head { grid-template-columns: 1fr 1fr; gap: 4rem; align-items: end; }
     }
 
-    /* ===== FEATURES ===== */
-    .features-section { padding: 7rem 2.5rem; background: var(--cream); position: relative; }
-    .features-inner { max-width: 1080px; margin: 0 auto; }
-    .features-header { text-align: center; margin-bottom: 4.5rem; }
-    .features-headline {
-      font-family: 'Fraunces', serif; font-size: clamp(2rem, 4vw, 3rem);
-      font-weight: 700; color: var(--green-deep); line-height: 1.15;
-      letter-spacing: -0.02em; margin-bottom: 1rem;
-    }
-    .features-sub {
-      font-size: 1.05rem; color: var(--text-mid); font-weight: 300;
-      max-width: 600px; margin: 0 auto; line-height: 1.6;
-    }
-    .feature-row {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
-      align-items: center; margin-bottom: 5rem;
-    }
-    .feature-row:nth-child(even) { direction: rtl; }
-    .feature-row:nth-child(even) > * { direction: ltr; }
-    .feature-text .feature-number {
-      font-family: 'Fraunces', serif; font-size: 0.8rem; color: var(--green-leaf);
-      font-weight: 500; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;
-    }
-    .feature-number::after { content: ''; flex: 1; height: 1px; background: var(--green-pale); max-width: 60px; }
-    .feature-text h3 {
-      font-family: 'Fraunces', serif; font-size: 1.7rem; font-weight: 700;
-      color: var(--green-deep); line-height: 1.2; letter-spacing: -0.01em; margin-bottom: 1rem;
-    }
-    .feature-text p {
-      font-size: 0.95rem; color: var(--text-mid); line-height: 1.7;
-      font-weight: 300; margin-bottom: 1.5rem;
-    }
-    .feature-benefit {
-      display: flex; align-items: center; gap: 0.5rem;
-      font-size: 0.85rem; font-weight: 500; color: var(--green-mid);
-    }
-    .feature-benefit svg { flex-shrink: 0; }
-    .feature-visual {
-      background: linear-gradient(135deg, var(--green-deep), var(--green-dark));
-      border-radius: 20px; padding: 2rem; min-height: 320px;
-      display: flex; align-items: center; justify-content: center;
-      position: relative; overflow: hidden;
-    }
-    .feature-visual::after {
-      content: ''; position: absolute; inset: 0;
-      background:
-        radial-gradient(circle at 30% 70%, rgba(92,201,122,0.1) 0%, transparent 50%),
-        radial-gradient(circle at 70% 30%, rgba(201,168,76,0.08) 0%, transparent 50%);
-    }
-    .fv-content { position: relative; z-index: 1; text-align: center; color: var(--white); }
-    .fv-icon {
-      width: 64px; height: 64px; border: 2px solid rgba(255,255,255,0.15);
-      border-radius: 16px; display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 1rem; font-size: 1.8rem; background: rgba(255,255,255,0.05);
-    }
-    .fv-label { font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.35rem; }
-    .fv-big { font-family: 'Fraunces', serif; font-size: 2.5rem; font-weight: 700; color: var(--green-bright); }
-    .fv-detail { font-size: 0.85rem; color: rgba(255,255,255,0.55); margin-top: 0.5rem; }
-
-    /* ===== HOW IT WORKS ===== */
-    .how-section { padding: 7rem 2.5rem; background: var(--white); }
-    .how-inner { max-width: 1080px; margin: 0 auto; }
-    .how-header { text-align: center; margin-bottom: 4rem; }
-    .how-headline {
-      font-family: 'Fraunces', serif; font-size: clamp(2rem, 4vw, 2.8rem);
-      font-weight: 700; color: var(--green-deep); line-height: 1.15;
-      letter-spacing: -0.02em; margin-bottom: 1rem;
-    }
-    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; position: relative; }
-    .steps::before {
-      content: ''; position: absolute; top: 38px; left: 12.5%; width: 75%; height: 2px;
-      background: linear-gradient(90deg, var(--green-bright), var(--green-leaf), var(--green-mid), var(--earth));
-      opacity: 0.25;
-    }
-    .step { text-align: center; position: relative; }
-    .step-num {
-      width: 48px; height: 48px; background: var(--green-deep); color: var(--green-bright);
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700;
-      margin: 0 auto 1.25rem; position: relative; z-index: 1;
-      box-shadow: 0 4px 15px rgba(15,42,27,0.2);
-    }
-    .step h4 { font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 600; color: var(--green-deep); margin-bottom: 0.6rem; }
-    .step p { font-size: 0.85rem; color: var(--text-mid); line-height: 1.55; font-weight: 300; }
-
-    /* ===== TESTIMONIAL ===== */
-    .social-section {
-      padding: 6rem 2.5rem;
-      background: linear-gradient(165deg, var(--green-deep) 0%, #184a2d 100%);
-      position: relative; overflow: hidden;
-    }
-    .social-section::before {
-      content: ''; position: absolute; inset: 0; opacity: 0.04;
-      background-image:
-        radial-gradient(circle at 25% 75%, var(--green-bright) 1px, transparent 1px),
-        radial-gradient(circle at 75% 25%, var(--green-bright) 1px, transparent 1px);
-      background-size: 50px 50px, 70px 70px;
-    }
-    .social-inner { max-width: 800px; margin: 0 auto; text-align: center; position: relative; z-index: 1; }
-    .quote-mark { font-family: 'Fraunces', serif; font-size: 5rem; color: var(--green-bright); opacity: 0.3; line-height: 1; margin-bottom: -1rem; }
-    .testimonial-text {
-      font-family: 'Fraunces', serif; font-size: clamp(1.3rem, 2.5vw, 1.7rem);
-      font-weight: 300; font-style: italic; color: var(--white);
-      line-height: 1.55; margin-bottom: 2rem; opacity: 0.9;
-    }
-    .testimonial-author { display: flex; align-items: center; justify-content: center; gap: 1rem; }
-    .author-avatar {
-      width: 48px; height: 48px; background: linear-gradient(135deg, var(--green-mid), var(--green-bright));
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-size: 1.2rem; font-weight: 600; color: var(--white);
-    }
-    .author-info { text-align: left; }
-    .author-name { font-weight: 600; color: var(--white); font-size: 0.95rem; }
-    .author-role { font-size: 0.8rem; color: rgba(255,255,255,0.5); font-weight: 300; }
-
-    /* ===== CTA ===== */
-    .cta-section { padding: 7rem 2.5rem; background: var(--cream); text-align: center; }
-    .cta-inner { max-width: 680px; margin: 0 auto; }
-    .cta-headline {
-      font-family: 'Fraunces', serif; font-size: clamp(2rem, 4vw, 3rem);
-      font-weight: 700; color: var(--green-deep); line-height: 1.15;
-      letter-spacing: -0.02em; margin-bottom: 1rem;
-    }
-    .cta-desc { font-size: 1.05rem; color: var(--text-mid); font-weight: 300; line-height: 1.6; margin-bottom: 2.5rem; }
-    .cta-form { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
-    .cta-input {
-      flex: 1; min-width: 260px; max-width: 360px; padding: 1rem 1.5rem;
-      border: 2px solid var(--cream-dark); border-radius: 100px;
-      font-family: 'Outfit', sans-serif; font-size: 0.95rem;
-      background: var(--white); color: var(--text-dark); outline: none;
-      transition: border-color 0.3s;
-    }
-    .cta-input:focus { border-color: var(--green-leaf); }
-    .cta-note { font-size: 0.78rem; color: var(--text-light); font-weight: 300; }
-
-    /* ===== FOOTER ===== */
-    footer { background: var(--green-deep); padding: 3.5rem 2.5rem 2rem; color: rgba(255,255,255,0.4); }
-    .footer-inner {
-      max-width: 1080px; margin: 0 auto; display: flex;
-      justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
-    }
-    .footer-logo { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 700; color: var(--white); }
-    .footer-links { display: flex; gap: 2rem; list-style: none; }
-    .footer-links a { color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.85rem; transition: color 0.3s; }
-    .footer-links a:hover { color: var(--green-bright); }
-    .footer-copy {
-      width: 100%; text-align: center; font-size: 0.75rem; margin-top: 2rem;
-      padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.06);
+    /* Method: two levels */
+    .levels { display: grid; gap: 1.5rem; margin-bottom: 4rem; }
+    @media (min-width: 820px) { .levels { grid-template-columns: 1fr 1fr; gap: 2.5rem; } }
+    .level { border-left: 3px solid var(--primary); padding: 0.25rem 0 0.25rem 1.25rem; }
+    .level h3 { margin-bottom: 0.5rem; }
+    .level p { color: var(--ink-soft); max-width: 52ch; }
+    .level ul { list-style: none; margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .level li {
+      font-size: 0.85rem; padding: 0.2rem 0.65rem; border-radius: 999px;
+      background: var(--primary-soft); color: var(--primary-ink); border: 1px solid var(--primary-line);
     }
 
-    /* ===== ANIMATIONS ===== */
-    @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease-out, transform 0.7s ease-out; }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .areas-title { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.5rem 2rem; margin-bottom: 1.25rem; }
+    .areas-title p { color: var(--muted); font-size: 0.95rem; max-width: 52ch; }
+    .areas { display: grid; gap: 0; border-top: 2px solid var(--ink); }
+    @media (min-width: 720px) { .areas { grid-template-columns: 1fr 1fr; column-gap: 3rem; } }
+    @media (min-width: 1040px) { .areas { grid-template-columns: repeat(3, 1fr); } }
+    .area { padding: 1.25rem 0 1.5rem; border-bottom: 1px solid var(--line); }
+    .area-name { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
+    .area-name svg { color: var(--primary); flex-shrink: 0; }
+    .area-name h3 { font-size: 1.1rem; }
+    .dims { list-style: none; display: grid; gap: 0.45rem; }
+    .dims li { display: grid; grid-template-columns: 1fr 64px 2.2rem; align-items: center; gap: 0.75rem; font-size: 0.95rem; }
+    .dims .count { text-align: right; font-family: var(--display); font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
+    .dims .meter { height: 6px; background: var(--bg-alt); border-radius: 999px; overflow: hidden; }
+    .dims .meter i { display: block; height: 100%; background: var(--primary); border-radius: 999px; }
+    .dims li.is-empty { color: var(--muted); }
+    .dims li.is-empty .count { color: var(--muted); font-weight: 400; }
 
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 900px) {
-      .hero-content { grid-template-columns: 1fr; padding-top: 7rem; }
-      .hero-visual { order: -1; max-width: 420px; margin: 0 auto; }
-      .stats-inner { grid-template-columns: repeat(2, 1fr); }
-      .pain-cards { grid-template-columns: 1fr; }
-      .method-levels { grid-template-columns: 1fr; }
-      .dim-grid { grid-template-columns: repeat(3, 1fr); }
-      .feature-row, .feature-row:nth-child(even) { grid-template-columns: 1fr; direction: ltr; gap: 2rem; }
-      .steps { grid-template-columns: repeat(2, 1fr); gap: 2rem; }
-      .steps::before { display: none; }
-      .nav-links { display: none; }
+    .territory {
+      display: grid; gap: 2rem; margin-top: 4rem; padding: 1.5rem 1.25rem; border-radius: 12px;
+      background: var(--bg-alt);
     }
-    @media (max-width: 600px) {
-      .stats-inner { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-      .dim-grid { grid-template-columns: repeat(2, 1fr); }
-      .steps { grid-template-columns: 1fr; }
+    @media (min-width: 820px) { .territory { grid-template-columns: 1fr 1.1fr; gap: 3rem; padding: 2.5rem; align-items: center; } }
+    .territory h3 { font-size: clamp(1.4rem, 2.6vw, 1.75rem); margin-bottom: 0.75rem; }
+    .territory p { color: var(--ink-soft); max-width: 54ch; }
+    .chain { display: grid; gap: 0.6rem; }
+    .chain-row {
+      display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 0.9rem;
+      background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.85rem 1rem;
     }
+    .chain-row.is-planned { background: transparent; border-style: dashed; }
+    .chain-row.is-nested { margin-left: 0.75rem; }
+    .chain-row.is-nested-2 { margin-left: 1.5rem; }
+    @media (max-width: 519px) {
+      .chain-row { grid-template-columns: auto 1fr; }
+      .chain-row .tag { grid-column: 2; justify-self: start; }
+    }
+    @media (min-width: 520px) {
+      .chain-row.is-nested { margin-left: 1.5rem; }
+      .chain-row.is-nested-2 { margin-left: 3rem; }
+    }
+    .chain-row strong { font-family: var(--display); font-size: 1.05rem; }
+    .chain-row small { display: block; color: var(--muted); font-size: 0.85rem; }
+    .chain-row .tag { font-size: 0.8rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 999px; white-space: nowrap; }
+    .tag-live { background: var(--primary-line); color: var(--primary-ink); }
+    .tag-planned { background: var(--mustard-50); color: var(--mustard-700); border: 1px solid var(--mustard-100); }
+    .chain-row svg { color: var(--primary); }
+
+    /* Field: dark band */
+    .field { background: var(--band); color: var(--band-ink); border-top: none; }
+    .field h2 { color: var(--white); }
+    .field .lead { color: var(--band-text); }
+    .steps { list-style: none; display: grid; gap: 2.25rem; counter-reset: step; }
+    @media (min-width: 720px) { .steps { grid-template-columns: 1fr 1fr; gap: 2.5rem 3rem; } }
+    @media (min-width: 1040px) { .steps { grid-template-columns: repeat(4, 1fr); gap: 2rem; } }
+    .step { counter-increment: step; position: relative; padding-top: 1.25rem; border-top: 1px solid rgba(255, 255, 255, 0.18); }
+    .step-icon {
+      width: 48px; height: 48px; border-radius: 10px; display: grid; place-items: center;
+      background: rgba(255, 255, 255, 0.07); color: var(--band-icon); margin-bottom: 1.1rem;
+    }
+    .step h3 { color: var(--white); font-size: 1.15rem; margin-bottom: 0.5rem; }
+    .step h3::before { content: counter(step) ". "; color: var(--band-num); }
+    .step p { color: var(--band-text); font-size: 0.98rem; }
+    .sync-chip {
+      display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 0.9rem;
+      font-size: 0.8rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 999px;
+      background: var(--mustard-50); color: var(--mustard-700);
+    }
+    .sync-chip::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--mustard-500); }
+
+    /* Results */
+    .results-grid { display: grid; gap: 3rem; align-items: start; }
+    @media (min-width: 960px) { .results-grid { grid-template-columns: 0.9fr 1.1fr; gap: 4rem; } }
+    .results-grid h2 { margin-bottom: 1.25rem; }
+    .results-list { list-style: none; margin-top: 1.75rem; display: grid; gap: 0.9rem; }
+    .results-list li { display: grid; grid-template-columns: 24px 1fr; gap: 0.75rem; }
+    .results-list svg { color: var(--primary); margin-top: 2px; }
+    .results-list strong { display: block; font-weight: 600; }
+    .results-list span { color: var(--ink-soft); font-size: 0.98rem; }
+    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    .panel-head { padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--bg-alt); display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+    .panel-head h3 { font-size: 1.05rem; }
+    .panel-head small { color: var(--muted); font-size: 0.85rem; }
+    .bars { list-style: none; }
+    .bars li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) 2.5rem; align-items: center; gap: 0.75rem; padding: 0.6rem 1.25rem; font-size: 0.92rem; }
+    .bars li + li { border-top: 1px solid var(--line-soft); }
+    @media (max-width: 519px) {
+      .bars li { grid-template-columns: 1fr 2.5rem; row-gap: 0.4rem; }
+      .bars .track { grid-column: 1 / -1; grid-row: 2; }
+    }
+    .bars .track { height: 12px; background: var(--bg-alt); border-radius: 999px; overflow: hidden; }
+    .bars .track i { display: block; height: 100%; border-radius: 999px; }
+    .bars .val { text-align: right; font-family: var(--display); font-weight: 700; font-variant-numeric: tabular-nums; }
+    .lo { background: var(--rose-500); }
+    .md { background: var(--mustard-500); }
+    .hi { background: var(--forest-500); }
+    .legend { display: flex; gap: 1.25rem; flex-wrap: wrap; padding: 0.9rem 1.25rem; border-top: 1px solid var(--bg-alt); font-size: 0.85rem; color: var(--muted); }
+    .legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+    /* Teams */
+    .features { display: grid; gap: 2rem; }
+    @media (min-width: 720px) { .features { grid-template-columns: 1fr 1fr; gap: 2.5rem 3rem; } }
+    .feature { display: grid; grid-template-columns: 44px 1fr; gap: 1rem; }
+    .feature-icon {
+      width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center;
+      background: var(--primary-soft); color: var(--primary-ink); border: 1px solid var(--primary-line);
+    }
+    .feature h3 { font-size: 1.1rem; margin-bottom: 0.3rem; }
+    .feature p { color: var(--ink-soft); font-size: 0.98rem; max-width: 46ch; }
+
+    .next {
+      margin-top: 4rem; padding-top: 2rem; border-top: 1px dashed var(--line);
+      display: grid; gap: 1.25rem;
+    }
+    @media (min-width: 820px) { .next { grid-template-columns: 14rem 1fr; gap: 3rem; } }
+    .next h3 { font-size: 1.15rem; }
+    .next h3 small { display: block; font-family: var(--body); font-weight: 400; font-size: 0.9rem; color: var(--muted); margin-top: 0.3rem; }
+    .next ul { list-style: none; display: grid; gap: 0.75rem; }
+    @media (min-width: 720px) { .next ul { grid-template-columns: 1fr 1fr; gap: 0.75rem 2rem; } }
+    .next li { display: grid; grid-template-columns: 20px 1fr; gap: 0.6rem; font-size: 0.98rem; color: var(--ink-soft); }
+    .next li svg { color: var(--accent); margin-top: 3px; }
+
+    /* Access */
+    .access { background: var(--bg-alt); }
+    .access-grid { display: grid; gap: 2.5rem; }
+    @media (min-width: 960px) { .access-grid { grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; } }
+    .access h2 { margin-bottom: 1.25rem; }
+    .form { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 1.5rem; display: grid; gap: 1.1rem; }
+    @media (min-width: 520px) { .form { padding: 2rem; } }
+    .field-row label { display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.35rem; }
+    .field-row label small { font-weight: 400; color: var(--muted); }
+    .field-row input {
+      width: 100%; font: inherit; font-size: 1rem; color: var(--ink);
+      padding: 0.75rem 0.9rem; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface);
+    }
+    .field-row input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-line); }
+    .form .btn { width: 100%; }
+    .form-note { font-size: 0.88rem; color: var(--muted); }
+    .hp { position: absolute; left: -9999px; }
+
+    /* Footer */
+    footer { background: var(--band); color: var(--band-text); padding: 2.5rem 0; font-size: 0.92rem; }
+    footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem 2rem; align-items: center; }
+    footer .brand { color: var(--white); font-size: 1.2rem; }
+    footer a { color: var(--band-ink); }
+    footer a:hover { color: var(--white); }
+    .foot-links { display: flex; gap: 1.5rem; list-style: none; }
   </style>
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="apple-touch-icon" href="/favicon-180.png">
 </head>
 <body>
 
-<!-- NAV -->
-<nav id="navbar">
-  <a href="#" class="nav-logo"><span class="dot"></span>Predium</a>
-  <ul class="nav-links">
-    <li><a href="#problema">El Problema</a></li>
-    <li><a href="#metodologia">Metodología</a></li>
-    <li><a href="#funciones">Funciones</a></li>
-    <li><a href="#cta" class="nav-cta">Solicitar Acceso</a></li>
-  </ul>
-</nav>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-soil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 11h19"/><path d="M4 15.5h3.5M10.5 15.5h3M16.5 15.5h3.5M6 20h3M12.5 20h5"/><path d="M12 11V6"/><path d="M12 7.5c0-2.4 1.7-3.9 4.3-3.9 0 2.4-1.7 3.9-4.3 3.9z"/><path d="M12 9c0-1.9-1.4-3.2-3.5-3.2 0 1.9 1.4 3.2 3.5 3.2z"/></symbol>
+    <symbol id="i-water" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.6 4.3 6 7.5 6 10.6a6 6 0 0 1-12 0C6 10.5 8.4 7.3 12 3z"/><path d="M9 14.2c.3 1.6 1.4 2.6 3 2.8"/></symbol>
+    <symbol id="i-bio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-9"/><path d="M12 12C8 12 5.5 9.5 5.5 6c3.6 0 6.5 2.4 6.5 6z"/><path d="M12 15.5c3.6 0 6.2-2.4 6.2-5.7-3.4 0-6.2 2.2-6.2 5.7z"/><circle cx="16.8" cy="4.8" r="1.6"/></symbol>
+    <symbol id="i-plan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9.5 10v10M15.5 10v10"/><path d="M6.5 7h3"/><path d="M12.5 14.5l1.2 1.2 2.3-2.3" /></symbol>
+    <symbol id="i-people" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c.6-3.6 2.9-5.6 6-5.6s5.4 2 6 5.6"/><circle cx="17.2" cy="9.4" r="2.4"/><path d="M16 14.5c.4-.1.8-.1 1.2-.1 2.4 0 3.9 1.7 4.3 4.6"/></symbol>
+    <symbol id="i-resilience" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M18.2 2.8v3.9h-3.9"/><path d="M12 17v-4.5"/><path d="M12 13.5c0-2.1 1.5-3.6 3.6-3.6 0 2.1-1.5 3.6-3.6 3.6z"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M12 7v6.5M9.3 11 12 13.7 14.7 11"/><path d="M10.5 18.5h3"/></symbol>
+    <symbol id="i-nosignal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 20v-2.5M9 20v-5.5M13.5 20v-8.5M18 20V7"/><path d="M3 4.5l17 15"/></symbol>
+    <symbol id="i-sync" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 10.5A7.7 7.7 0 0 0 5.6 7.2L4 9"/><path d="M4 4.5V9h4.5"/><path d="M4.5 13.5a7.7 7.7 0 0 0 13.9 3.3L20 15"/><path d="M20 19.5V15h-4.5"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10.5" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><path d="M9.4 15.7l1.8 1.8 3.4-3.4"/></symbol>
+    <symbol id="i-org" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20.5h18"/><path d="M5 20.5V9.5l7-5 7 5v11"/><path d="M10 20.5v-5h4v5"/><path d="M9.5 11h5"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.6 3.7 5.6 3.7 9s-1.3 6.4-3.7 9c-2.4-2.6-3.7-5.6-3.7-9S9.6 5.6 12 3z"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5 12 13l8.5-6.5"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></symbol>
+    <symbol id="i-radar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7.8 4.5v9L12 21l-7.8-4.5v-9z"/><path d="M12 7.5l3.5 3-1 4.5h-5l-1.5-3.5z" fill="currentColor" fill-opacity=".18"/></symbol>
+    <symbol id="i-bars" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M4 12h16M4 18h7"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 8.5h8M8 12.5h8M8 16.5h5"/></symbol>
+    <symbol id="i-farm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20.5h18"/><path d="M4.5 20.5V11l5-4 5 4v9.5"/><path d="M8 20.5v-4h3v4"/><path d="M14.5 13.5h5v7"/><path d="M17 13.5V9"/></symbol>
+    <symbol id="i-dot" viewBox="0 0 20 20"><circle cx="10" cy="10" r="3.5" fill="currentColor"/></symbol>
+    <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-bg-pattern"></div>
-  <div class="hero-topo">
-    <svg viewBox="0 0 600 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M50 400 Q150 350 250 380 Q350 410 450 350 Q550 290 600 310" stroke="rgba(92,201,122,0.5)" stroke-width="1.5" fill="none"/>
-      <path d="M0 350 Q100 300 200 330 Q300 360 400 300 Q500 240 600 260" stroke="rgba(92,201,122,0.4)" stroke-width="1.5" fill="none"/>
-      <path d="M30 300 Q130 250 230 280 Q330 310 430 250 Q530 190 600 210" stroke="rgba(92,201,122,0.3)" stroke-width="1.5" fill="none"/>
-      <path d="M0 250 Q100 200 200 230 Q300 260 400 200 Q500 140 600 160" stroke="rgba(92,201,122,0.25)" stroke-width="1.5" fill="none"/>
-      <path d="M50 200 Q150 150 250 180 Q350 210 450 150 Q550 90 600 110" stroke="rgba(92,201,122,0.2)" stroke-width="1.5" fill="none"/>
-      <path d="M0 150 Q100 100 200 130 Q300 160 400 100 Q500 40 600 60" stroke="rgba(92,201,122,0.15)" stroke-width="1.5" fill="none"/>
-    </svg>
-  </div>
-
-  <div class="hero-content">
-    <div class="hero-text">
-      <div class="hero-tag">Transición Agroecológica Digital</div>
-      <h1>Diagnostica. Transforma.<br><em>Regenera.</em></h1>
-      <p class="hero-desc">La herramienta digital para el diagnóstico agroecológico de predios campesinos. Evalúa principios, dimensiones e indicadores en terreno — sin internet — y acompaña el proceso de transición con datos confiables y reportes profesionales.</p>
-      <div class="hero-actions">
-        <a href="#cta" class="btn-primary">
-          Solicitar Acceso Anticipado
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
-        <a href="#metodologia" class="btn-secondary">Ver la Metodología</a>
-      </div>
-    </div>
-
-    <div class="hero-visual">
-      <div class="app-mockup">
-        <div class="mockup-header">
-          <span class="mockup-title">Diagnóstico — Finca La Esperanza</span>
-          <span class="mockup-badge">Modo Sin Conexión</span>
-        </div>
-        <div class="radar-container">
-          <svg viewBox="0 0 240 240">
-            <!-- Radar grid -->
-            <polygon points="120,25 185,55 205,120 185,185 120,215 55,185 35,120 55,55" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-            <polygon points="120,48 170,70 185,120 170,170 120,192 70,170 55,120 70,70" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-            <polygon points="120,72 155,85 165,120 155,155 120,168 85,155 75,120 85,85" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
-            <!-- Data: agroecological principles -->
-            <polygon points="120,32 178,60 198,125 170,180 85,190 40,140 50,58" fill="rgba(92,201,122,0.15)" stroke="rgba(92,201,122,0.8)" stroke-width="2"/>
-            <circle cx="120" cy="32" r="4" fill="#5cc97a"/>
-            <circle cx="178" cy="60" r="4" fill="#5cc97a"/>
-            <circle cx="198" cy="125" r="4" fill="#5cc97a"/>
-            <circle cx="170" cy="180" r="4" fill="#5cc97a"/>
-            <circle cx="85" cy="190" r="4" fill="#5cc97a"/>
-            <circle cx="40" cy="140" r="4" fill="#5cc97a"/>
-            <circle cx="50" cy="58" r="4" fill="#5cc97a"/>
-            <!-- Labels: agroecological principles -->
-            <text x="120" y="17" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-size="7" font-family="Outfit">Biodiversidad</text>
-            <text x="210" y="55" text-anchor="start" fill="rgba(255,255,255,0.55)" font-size="7" font-family="Outfit">Reciclaje</text>
-            <text x="215" y="128" text-anchor="start" fill="rgba(255,255,255,0.55)" font-size="7" font-family="Outfit">Manejo suelo</text>
-            <text x="178" y="197" text-anchor="start" fill="rgba(255,255,255,0.55)" font-size="7" font-family="Outfit">Control plagas</text>
-            <text x="75" y="207" text-anchor="end" fill="rgba(255,255,255,0.55)" font-size="7" font-family="Outfit">Interacciones</text>
-            <text x="25" y="148" text-anchor="end" fill="rgba(255,255,255,0.55)" font-size="7" font-family="Outfit">Saber trad.</text>
-            <text x="35" y="52" text-anchor="end" fill="rgba(255,255,255,0.55)" font-size="7" font-family="Outfit">Agua</text>
-          </svg>
-        </div>
-        <div class="mockup-scores">
-          <div class="score-item">
-            <div class="score-label">Global</div>
-            <div class="score-value">6.8</div>
-          </div>
-          <div class="score-item">
-            <div class="score-label">Suelo</div>
-            <div class="score-value">7.5</div>
-          </div>
-          <div class="score-item">
-            <div class="score-label">Biodiv.</div>
-            <div class="score-value">8.2</div>
-          </div>
-          <div class="score-item">
-            <div class="score-label">Reciclaje</div>
-            <div class="score-value">5.9</div>
-          </div>
-          <div class="score-item">
-            <div class="score-label">Diseño</div>
-            <div class="score-value">6.1</div>
-          </div>
-          <div class="score-item">
-            <div class="score-label">Saberes</div>
-            <div class="score-value">7.8</div>
-          </div>
-        </div>
-      </div>
-      <div class="mockup-floating">
-        <div class="icon-circle">
-          <svg width="18" height="18" fill="none" stroke="#22623a" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
-        </div>
-        <div>
-          <div class="fl-label">Línea base</div>
-          <div class="fl-value">Lista para el plan de trabajo</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- STATS -->
-<div class="stats-strip">
-  <div class="stats-inner">
-    <div class="stat">
-      <div class="stat-number">15</div>
-      <div class="stat-label">Dimensiones Agroecológicas</div>
-    </div>
-    <div class="stat">
-      <div class="stat-number">3</div>
-      <div class="stat-label">Niveles de Diagnóstico</div>
-    </div>
-    <div class="stat">
-      <div class="stat-number">100%</div>
-      <div class="stat-label">Funciona Sin Internet</div>
-    </div>
-    <div class="stat">
-      <div class="stat-number">1–10</div>
-      <div class="stat-label">Escala Estandarizada</div>
-    </div>
-  </div>
-</div>
-
-<!-- PROBLEMA -->
-<section class="problem-section" id="problema">
-  <div class="problem-inner">
-    <div class="section-tag">La realidad de hoy</div>
-    <h2 class="problem-headline reveal">La transición agroecológica no puede depender de <em>formularios de papel.</em></h2>
-    <div class="pain-cards">
-      <div class="pain-card reveal">
-        <div class="pain-icon">📋</div>
-        <h3>Diagnósticos que se pierden en hojas sueltas</h3>
-        <p>Los extensionistas recorren el predio con formularios impresos, después transcriben a mano los datos a hojas de cálculo. Cada paso introduce errores y retrasa semanas la línea base que debería iniciar el proceso de transición.</p>
-      </div>
-      <div class="pain-card reveal">
-        <div class="pain-icon">🔀</div>
-        <h3>Criterios dispares entre evaluadores</h3>
-        <p>Sin descriptores estandarizados para cada indicador, cada profesional interpreta la escala 1 a 10 de manera diferente. El resultado: datos incomparables entre predios que debilitan cualquier análisis territorial o propuesta de política pública.</p>
-      </div>
-      <div class="pain-card reveal">
-        <div class="pain-icon">📄</div>
-        <h3>Sin seguimiento del proceso de transición</h3>
-        <p>Completar el diagnóstico inicial es solo el comienzo. Pero monitorear la evolución del agroecosistema a lo largo del tiempo — comparar líneas base, medir avances, ajustar el rediseño predial — es casi imposible con datos dispersos en distintos formatos.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- METODOLOGÍA -->
-<section class="method-section" id="metodologia">
-  <div class="method-inner">
-    <div class="method-header">
-      <div class="section-tag" style="justify-content:center;">Metodología de diagnóstico</div>
-      <h2 class="method-headline reveal">Tres niveles de diagnóstico,<br>una sola herramienta</h2>
-      <p class="method-sub reveal">Predium digitaliza la metodología de diagnóstico agroecológico en tres etapas progresivas — desde los principios globales hasta los indicadores específicos de cada dimensión.</p>
-    </div>
-
-    <div class="method-levels">
-      <div class="method-level reveal">
-        <div class="method-level-tag">Etapa I</div>
-        <div class="method-level-icon">🌿</div>
-        <h3>Principios Agroecológicos</h3>
-        <p>Evaluación global del agroecosistema en función de seis principios: biodiversidad, reciclaje, manejo ecológico de suelo, control natural de plagas, interrelación entre subsistemas y aplicación de saberes tradicionales.</p>
-      </div>
-      <div class="method-level reveal">
-        <div class="method-level-tag">Etapa II</div>
-        <div class="method-level-icon">📐</div>
-        <h3>Dimensiones del Agroecosistema</h3>
-        <p>Análisis del estado general a través de 15 dimensiones ecológico-productivas, socioculturales y económicas — desde calidad de suelo y manejo de agua hasta diseño predial e ingresos familiares.</p>
-      </div>
-      <div class="method-level reveal">
-        <div class="method-level-tag">Etapa III</div>
-        <div class="method-level-icon">🔬</div>
-        <h3>Indicadores Específicos</h3>
-        <p>Evaluación detallada de cada dimensión mediante indicadores con descriptores claros en tres estados (1, 5 y 10). Cobertura de suelo, actividad biológica, rotaciones, policultivos, erosión y muchos más.</p>
-      </div>
-    </div>
-
-    <div class="method-arrow reveal">
-      <span>Cada etapa genera un gráfico radial que permite visualizar el estado del predio e identificar las áreas prioritarias para el plan de transición</span>
-    </div>
-  </div>
-</section>
-
-<!-- DIMENSIONES -->
-<section class="dimensions-section">
-  <div class="dimensions-inner">
-    <div class="dimensions-header reveal">
-      <h3 class="dimensions-headline">Las 15 dimensiones que Predium evalúa</h3>
-      <p class="dimensions-sub">Basadas en la metodología de diagnóstico agroecológico para agricultura familiar campesina</p>
-    </div>
-    <div class="dim-grid reveal">
-      <div class="dim-chip"><div class="dim-chip-icon">🌱</div><div class="dim-chip-name">Calidad de Suelo</div></div>
-      <div class="dim-chip"><div class="dim-chip-icon">🔄</div><div class="dim-chip-name">Manejo Ecológico de Suelo</div></div>
-      <div class="dim-chip"><div class="dim-chip-icon">💧</div><div class="dim-chip-name">Disponibilidad y Conservación de Agua</div></div>
-      <div class="dim-chip"><div class="dim-chip-icon">🐛</div><div class="dim-chip-name">Control Natural de Plagas</div></div>
-      <div class="dim-chip"><div class="dim-chip-icon">🌾</div><div class="dim-chip-name">Diversidad Productiva</div></div>
-      <div class="dim-chip"><div class="dim-chip-icon">🌳</div><div class="dim-chip-name">Vegetación y Biodiversidad</div></div>
-      <div class="dim-chip"><div class="dim-chip-icon">♻️</div><div class="dim-chip-name">Reciclaje y Residuos</div></div>
-      <div class="dim-chip"><div class="dim-chip-icon">🗺️</div><div class="dim-chip-name">Diseño General del Predio</div></div>
-      <div class="dim-chip"><div class="dim-chip-icon">🐄</div><div class="dim-chip-name">Sanidad de los Sistemas</div></div>
-      <div class="dim-chip"><div class="dim-chip-icon">🌿</div><div class="dim-chip-name">Vida del Suelo y Espacios Naturales</div></div>
-      <div class="dim-chip"><div class="dim-chip-icon">🧬</div><div class="dim-chip-name">Semillas y Material Genético</div></div>
-      <div class="dim-chip"><div class="dim-chip-icon">🏡</div><div class="dim-chip-name">Autosuficiencia Alimentaria</div></div>
-      <div class="dim-chip"><div class="dim-chip-icon">📦</div><div class="dim-chip-name">Orientación Productiva y Comercial</div></div>
-      <div class="dim-chip"><div class="dim-chip-icon">👥</div><div class="dim-chip-name">Organización y Redes</div></div>
-      <div class="dim-chip"><div class="dim-chip-icon">💡</div><div class="dim-chip-name">Saberes Tradicionales</div></div>
-    </div>
-  </div>
-</section>
-
-<!-- FUNCIONES -->
-<section class="features-section" id="funciones">
-  <div class="features-inner">
-    <div class="features-header">
-      <div class="section-tag" style="justify-content:center;">Capacidades</div>
-      <h2 class="features-headline reveal">Diseñado para el terreno.<br>Confiable para las instituciones.</h2>
-      <p class="features-sub reveal">Tres capacidades que transforman el diagnóstico agroecológico desde una tarea dispersa en papel hacia un proceso estandarizado con datos accionables.</p>
-    </div>
-
-    <div class="feature-row reveal">
-      <div class="feature-text">
-        <div class="feature-number">01 — Sin Conexión</div>
-        <h3>Diagnóstico completo sin señal de internet</h3>
-        <p>Realiza la evaluación de las tres etapas del diagnóstico agroecológico en cualquier dispositivo, incluso en predios sin cobertura de celular. Los datos se sincronizan automáticamente cuando vuelve la conectividad — sin formularios de papel, sin transcripción, sin demoras.</p>
-        <div class="feature-benefit">
-          <svg width="16" height="16" fill="none" stroke="#3a9957" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-          La línea base se genera en la misma visita de campo
-        </div>
-      </div>
-      <div class="feature-visual">
-        <div class="fv-content">
-          <div class="fv-icon">📡</div>
-          <div class="fv-label">Conectividad requerida</div>
-          <div class="fv-big">0%</div>
-          <div class="fv-detail">Funcional en zonas rurales sin cobertura</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="feature-row reveal">
-      <div class="feature-text">
-        <div class="feature-number">02 — Escala Estandarizada</div>
-        <h3>Descriptores claros para cada indicador</h3>
-        <p>Cada indicador tiene criterios descriptivos en tres estados (1, 5 y 10) que guían la puntuación del evaluador. Cobertura de suelo, erosión, actividad biológica, rotaciones — todos con la misma escala. Cualquier extensionista produce resultados replicables y comparables.</p>
-        <div class="feature-benefit">
-          <svg width="16" height="16" fill="none" stroke="#3a9957" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-          Datos comparables entre predios, territorios y temporadas
-        </div>
-      </div>
-      <div class="feature-visual">
-        <div class="fv-content">
-          <div class="fv-icon">📊</div>
-          <div class="fv-label">Escala de evaluación</div>
-          <div class="fv-big">1–10</div>
-          <div class="fv-detail">Con descriptores en niveles 1 · 5 · 10</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="feature-row reveal">
-      <div class="feature-text">
-        <div class="feature-number">03 — Gráficos Radiales Instantáneos</div>
-        <h3>La fotografía del agroecosistema, lista al momento</h3>
-        <p>Genera reportes PDF con gráficos radiales que representan el estado de los principios, dimensiones e indicadores — la misma representación recomendada por la metodología de diagnóstico. Entrega una línea base visual al agricultor antes de salir del predio.</p>
-        <div class="feature-benefit">
-          <svg width="16" height="16" fill="none" stroke="#3a9957" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-          Del diagnóstico al plan de transición en segundos
-        </div>
-      </div>
-      <div class="feature-visual">
-        <div class="fv-content">
-          <div class="fv-icon">📑</div>
-          <div class="fv-label">Generación de reportes</div>
-          <div class="fv-big">Instantáneo</div>
-          <div class="fv-detail">PDF con gráficos radiales y análisis por dimensión</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CÓMO FUNCIONA -->
-<section class="how-section" id="como">
-  <div class="how-inner">
-    <div class="how-header">
-      <div class="section-tag" style="justify-content:center;">Flujo de trabajo</div>
-      <h2 class="how-headline reveal">De la llegada al predio<br>al plan de transición</h2>
-    </div>
-    <div class="steps">
-      <div class="step reveal">
-        <div class="step-num">1</div>
-        <h4>Abrir Diagnóstico</h4>
-        <p>Selecciona el predio y comienza la evaluación guiada por las tres etapas del diagnóstico — sin necesidad de internet.</p>
-      </div>
-      <div class="step reveal">
-        <div class="step-num">2</div>
-        <h4>Evaluar en Terreno</h4>
-        <p>Recorre los principios, dimensiones e indicadores junto al agricultor. Los descriptores en pantalla guían la asignación de valores en la escala 1-10.</p>
-      </div>
-      <div class="step reveal">
-        <div class="step-num">3</div>
-        <h4>Generar Línea Base</h4>
-        <p>Con un toque genera el reporte PDF con gráficos radiales — la fotografía del agroecosistema que identifica las áreas prioritarias del rediseño predial.</p>
-      </div>
-      <div class="step reveal">
-        <div class="step-num">4</div>
-        <h4>Monitorear la Transición</h4>
-        <p>Con conexión, los datos se sincronizan. Compara evaluaciones en el tiempo para medir avances, ajustar el plan y demostrar resultados a financiadores.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- TESTIMONIO -->
-<section class="social-section">
-  <div class="social-inner reveal">
-    <div class="quote-mark">"</div>
-    <p class="testimonial-text">La transición agroecológica necesita datos claros para avanzar. Con Predium podemos generar la línea base de un predio campesino en una sola visita y entregarle al agricultor un gráfico radial que entiende de inmediato — incluso a tres horas de la antena más cercana.</p>
-    <div class="testimonial-author">
-      <div class="author-avatar">MC</div>
-      <div class="author-info">
-        <div class="author-name">María Cifuentes</div>
-        <div class="author-role">Extensionista, Programa Piloto de Transición Agroecológica</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA -->
-<section class="cta-section" id="cta">
-  <div class="cta-inner">
-    <div class="section-tag" style="justify-content:center;">Comienza ahora</div>
-    <h2 class="cta-headline reveal">¿Listo para digitalizar el diagnóstico agroecológico?</h2>
-    <p class="cta-desc reveal">Únete a organizaciones de extensión, ONG y universidades de América Latina en el programa piloto. Lleva la metodología de transición agroecológica a cada predio campesino que visites — con datos estandarizados y reportes profesionales.</p>
-    <form class="cta-form reveal" action="https://formspree.io/f/mwvrqdya" method="POST">
-      <input type="email" name="email" class="cta-input" placeholder="Tu correo electrónico institucional" required>
-      <button type="submit" class="btn-primary">
-        Solicitar Acceso
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </button>
-    </form>
-    <p class="cta-note reveal">Gratuito para participantes del piloto. No requiere tarjeta de crédito.</p>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div class="footer-inner">
-    <div class="footer-logo">Predium</div>
-    <ul class="footer-links">
-      <li><a href="https://github.com/aliciapaz/predium" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-      <li><a href="#">Nosotros</a></li>
-      <li><a href="#">Documentación</a></li>
-      <li><a href="#">Contacto</a></li>
-      <li><a href="#">Privacidad</a></li>
+<header class="nav">
+  <div class="wrap">
+    <a href="#" class="brand" aria-label="Predium, inicio">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true">
+        <rect class="mark-bg" width="32" height="32" rx="8"/>
+        <path class="mark-hex" d="M16 5.5l9.1 5.25v10.5L16 26.5l-9.1-5.25v-10.5z" fill="none" stroke-width="1.2" stroke-opacity=".55"/>
+        <path class="mark-stem" d="M16 25V14" stroke-width="2.2" stroke-linecap="round"/>
+        <path class="mark-leaf" d="M16 15.5c0-4.4-2.9-7-7-7 0 4.2 2.8 7 7 7z"/>
+        <path class="mark-seed" d="M16 19.5c0-3.4 2.3-5.5 5.6-5.5 0 3.3-2.3 5.5-5.6 5.5z"/>
+      </svg>
+      Predium
+    </a>
+    <ul class="nav-links">
+      <li><a href="#metodo">Cómo se evalúa</a></li>
+      <li><a href="#terreno">En terreno</a></li>
+      <li><a href="#resultados">Resultados</a></li>
+      <li><a href="#equipos">Para equipos</a></li>
     </ul>
-    <div class="footer-copy">© 2026 Predium. Diagnóstico y transición agroecológica para la agricultura familiar campesina.</div>
+    <a href="#acceso" class="btn btn-primary">Solicitar invitación</a>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <canvas class="hero-roots" aria-hidden="true"></canvas>
+  <div class="wrap hero-grid">
+    <div>
+      <h1>Diagnóstico agroecológico en el predio, con o sin señal.</h1>
+      <p class="lead">Predium es la aplicación con la que equipos técnicos evalúan predios campesinos en terreno. Se califican los seis principios de la agroecología y los indicadores de cada territorio en una escala de 1 a 10, y los resultados quedan a la vista antes de salir del predio.</p>
+      <div class="actions">
+        <a href="#acceso" class="btn btn-primary">Solicitar invitación</a>
+        <a href="#metodo" class="btn btn-quiet">Ver cómo se evalúa</a>
+      </div>
+      <ul class="hero-facts">
+        <li><svg width="18" height="18" aria-hidden="true"><use href="#i-check"/></svg>Funciona sin internet</li>
+        <li><svg width="18" height="18" aria-hidden="true"><use href="#i-check"/></svg>Se usa desde el teléfono</li>
+        <li><svg width="18" height="18" aria-hidden="true"><use href="#i-check"/></svg>Español e inglés</li>
+      </ul>
+    </div>
+
+    <div class="demo" id="demo">
+      <div class="demo-head">
+        <span class="demo-title">Nivel 1: principios</span>
+        <span class="demo-status">Sin conexión</span>
+      </div>
+      <svg class="radar" id="radar" viewBox="0 0 360 290" role="img" aria-labelledby="radar-desc">
+        <desc id="radar-desc">Gráfico radial con el puntaje de los seis principios agroecológicos.</desc>
+      </svg>
+      <div class="question">
+        <p class="question-meta" id="q-meta">Principio 1 de 6</p>
+        <p class="question-name" id="q-name"></p>
+        <div class="scale" id="scale" role="radiogroup" aria-labelledby="q-name"></div>
+        <div class="scale-legend" aria-hidden="true"><span>1 bajo</span><span>10 alto</span></div>
+        <div class="demo-nav">
+          <button type="button" id="prev"><svg width="16" height="16" aria-hidden="true"><use href="#i-chev-l"/></svg>Anterior</button>
+          <div class="dots" id="dots" aria-hidden="true"></div>
+          <button type="button" id="next">Siguiente<svg width="16" height="16" aria-hidden="true"><use href="#i-chev-r"/></svg></button>
+        </div>
+      </div>
+      <p class="demo-note">Toca un puntaje. Así se califica en la app.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="metodo">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Dos niveles en una sola visita</h2>
+      <p class="lead">El diagnóstico parte con una mirada general al sistema y baja al detalle de lo que se observa en el predio. Las dos partes usan la misma escala de 1 a 10.</p>
+    </div>
+
+    <div class="levels">
+      <div class="level">
+        <h3>Nivel 1: seis principios</h3>
+        <p>Cada principio se califica directamente. Es la mirada de conjunto del agroecosistema y se muestra como un gráfico radial.</p>
+        <ul>
+          <li>Biodiversidad</li>
+          <li>Reciclaje</li>
+          <li>Interacción entre componentes</li>
+          <li>Manejo ecológico del suelo</li>
+          <li>Manejo ecológico de plagas y enfermedades</li>
+          <li>Conocimiento tradicional</li>
+        </ul>
+      </div>
+      <div class="level">
+        <h3>Nivel 2: indicadores del territorio</h3>
+        <p>Preguntas concretas sobre lo que se ve en terreno: cobertura de suelo, cercos vivos, policultivos, origen de las semillas. Cada indicador pertenece a una dimensión, y el puntaje de la dimensión es el promedio de sus indicadores.</p>
+      </div>
+    </div>
+
+    <div class="areas-title">
+      <h3>14 dimensiones en 6 áreas</h3>
+      <p>La cifra es cuántos indicadores tiene hoy el cuestionario de Chile en cada dimensión. Las que aún no tienen indicadores no aparecen en el cuestionario.</p>
+    </div>
+    <div class="areas">
+      <div class="area">
+        <div class="area-name"><svg width="24" height="24" aria-hidden="true"><use href="#i-soil"/></svg><h3>Suelo</h3></div>
+        <ul class="dims">
+          <li>Salud del suelo<span class="meter"><i style="width:100%"></i></span><span class="count">12</span></li>
+          <li>Manejo del suelo<span class="meter"><i style="width:58%"></i></span><span class="count">7</span></li>
+        </ul>
+      </div>
+      <div class="area">
+        <div class="area-name"><svg width="24" height="24" aria-hidden="true"><use href="#i-water"/></svg><h3>Agua</h3></div>
+        <ul class="dims">
+          <li>Disponibilidad de agua<span class="meter"><i style="width:25%"></i></span><span class="count">3</span></li>
+          <li class="is-empty">Calidad del agua<span class="meter"></span><span class="count">0</span></li>
+          <li class="is-empty">Gestión del agua<span class="meter"></span><span class="count">0</span></li>
+        </ul>
+      </div>
+      <div class="area">
+        <div class="area-name"><svg width="24" height="24" aria-hidden="true"><use href="#i-bio"/></svg><h3>Biodiversidad</h3></div>
+        <ul class="dims">
+          <li>Diversidad de cultivos<span class="meter"><i style="width:50%"></i></span><span class="count">6</span></li>
+          <li>Diversidad del ecosistema<span class="meter"><i style="width:75%"></i></span><span class="count">9</span></li>
+        </ul>
+      </div>
+      <div class="area">
+        <div class="area-name"><svg width="24" height="24" aria-hidden="true"><use href="#i-plan"/></svg><h3>Manejo</h3></div>
+        <ul class="dims">
+          <li>Planificación del predio<span class="meter"><i style="width:25%"></i></span><span class="count">3</span></li>
+          <li>Gestión de insumos<span class="meter"><i style="width:50%"></i></span><span class="count">6</span></li>
+          <li>Manejo animal<span class="meter"><i style="width:25%"></i></span><span class="count">3</span></li>
+        </ul>
+      </div>
+      <div class="area">
+        <div class="area-name"><svg width="24" height="24" aria-hidden="true"><use href="#i-people"/></svg><h3>Socioeconómico</h3></div>
+        <ul class="dims">
+          <li>Viabilidad económica<span class="meter"><i style="width:50%"></i></span><span class="count">6</span></li>
+          <li>Bienestar social<span class="meter"><i style="width:83%"></i></span><span class="count">10</span></li>
+        </ul>
+      </div>
+      <div class="area">
+        <div class="area-name"><svg width="24" height="24" aria-hidden="true"><use href="#i-resilience"/></svg><h3>Resiliencia</h3></div>
+        <ul class="dims">
+          <li class="is-empty">Adaptación climática<span class="meter"></span><span class="count">0</span></li>
+          <li>Resiliencia del sistema<span class="meter"><i style="width:58%"></i></span><span class="count">7</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="territory">
+      <div>
+        <h3>Cada territorio trae sus propias preguntas</h3>
+        <p>Lo que conviene observar en un predio cambia de un territorio a otro. Por eso los indicadores se organizan por territorio: un territorio nuevo puede partir de otro y sumar lo propio, sin perder las respuestas ya registradas.</p>
+        <p>Si un predio aún no tiene territorio asignado, se evalúan solo los seis principios.</p>
+      </div>
+      <div class="chain">
+        <div class="chain-row">
+          <svg width="24" height="24" aria-hidden="true"><use href="#i-radar"/></svg>
+          <div><strong>Principios</strong><small>6 preguntas, en todos los predios</small></div>
+          <span class="tag tag-live">Disponible</span>
+        </div>
+        <div class="chain-row is-nested">
+          <svg width="24" height="24" aria-hidden="true"><use href="#i-map"/></svg>
+          <div><strong>Chile</strong><small>72 indicadores en 11 dimensiones</small></div>
+          <span class="tag tag-live">Disponible</span>
+        </div>
+        <div class="chain-row is-nested-2 is-planned">
+          <svg width="24" height="24" aria-hidden="true"><use href="#i-map"/></svg>
+          <div><strong>Chiloé</strong><small>Los 72 de Chile más los propios de la isla</small></div>
+          <span class="tag tag-planned">En preparación</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section field" id="terreno">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Hecho para donde no llega la señal</h2>
+      <p class="lead">Todo el diagnóstico se hace en el teléfono, sin conexión. Internet solo hace falta al principio y al final.</p>
+    </div>
+    <ol class="steps">
+      <li class="step">
+        <div class="step-icon"><svg width="26" height="26" aria-hidden="true"><use href="#i-download"/></svg></div>
+        <h3>Conéctate una vez</h3>
+        <p>Al iniciar sesión con internet, el cuestionario y tus diagnósticos quedan guardados en el teléfono. La app se puede instalar en la pantalla de inicio.</p>
+      </li>
+      <li class="step">
+        <div class="step-icon"><svg width="26" height="26" aria-hidden="true"><use href="#i-nosignal"/></svg></div>
+        <h3>Evalúa sin señal</h3>
+        <p>Cada respuesta se guarda en el dispositivo al instante. Registra los datos del agricultor, la superficie, el tipo de sistema y la ubicación por GPS.</p>
+      </li>
+      <li class="step">
+        <div class="step-icon"><svg width="26" height="26" aria-hidden="true"><use href="#i-sync"/></svg></div>
+        <h3>Sincroniza al volver</h3>
+        <p>Cuando vuelve la señal, los cambios suben solos. Si el mismo diagnóstico cambió en otro dispositivo, la app pregunta qué versión conservar.</p>
+        <span class="sync-chip">3 pendientes</span>
+      </li>
+      <li class="step">
+        <div class="step-icon"><svg width="26" height="26" aria-hidden="true"><use href="#i-lock"/></svg></div>
+        <h3>Completa el diagnóstico</h3>
+        <p>Al completarlo, queda respaldado en el servidor y sus puntajes ya no cambian. Por eso este paso necesita conexión.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="section" id="resultados">
+  <div class="wrap results-grid">
+    <div>
+      <h2>Resultados que se leen ahí mismo</h2>
+      <p class="lead">Apenas terminas de calificar, la app arma los resultados del predio. También funcionan sin conexión, así que se pueden revisar con el agricultor antes de irse.</p>
+      <ul class="results-list">
+        <li><svg width="22" height="22" aria-hidden="true"><use href="#i-farm"/></svg><div><strong>Resumen del predio</strong><span>Agricultor, ubicación, superficie, mano de obra y tipo de sistema.</span></div></li>
+        <li><svg width="22" height="22" aria-hidden="true"><use href="#i-radar"/></svg><div><strong>Radial de principios</strong><span>Los seis principios de un vistazo.</span></div></li>
+        <li><svg width="22" height="22" aria-hidden="true"><use href="#i-bars"/></svg><div><strong>Puntaje por dimensión</strong><span>Con color según el nivel, para ver dónde empezar.</span></div></li>
+        <li><svg width="22" height="22" aria-hidden="true"><use href="#i-list"/></svg><div><strong>Todos los indicadores</strong><span>Cada respuesta, agrupada por dimensión.</span></div></li>
+      </ul>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <h3>Puntajes por dimensión</h3>
+        <small>Ejemplo con el cuestionario de Chile</small>
+      </div>
+      <ul class="bars">
+        <li>Salud del suelo<span class="track"><i class="md" style="width:64%"></i></span><span class="val">6.4</span></li>
+        <li>Manejo del suelo<span class="track"><i class="md" style="width:51%"></i></span><span class="val">5.1</span></li>
+        <li>Disponibilidad de agua<span class="track"><i class="lo" style="width:37%"></i></span><span class="val">3.7</span></li>
+        <li>Diversidad de cultivos<span class="track"><i class="hi" style="width:78%"></i></span><span class="val">7.8</span></li>
+        <li>Diversidad del ecosistema<span class="track"><i class="md" style="width:69%"></i></span><span class="val">6.9</span></li>
+        <li>Planificación del predio<span class="track"><i class="md" style="width:43%"></i></span><span class="val">4.3</span></li>
+        <li>Gestión de insumos<span class="track"><i class="md" style="width:56%"></i></span><span class="val">5.6</span></li>
+        <li>Manejo animal<span class="track"><i class="hi" style="width:70%"></i></span><span class="val">7.0</span></li>
+        <li>Viabilidad económica<span class="track"><i class="md" style="width:48%"></i></span><span class="val">4.8</span></li>
+        <li>Bienestar social<span class="track"><i class="hi" style="width:82%"></i></span><span class="val">8.2</span></li>
+        <li>Resiliencia del sistema<span class="track"><i class="md" style="width:61%"></i></span><span class="val">6.1</span></li>
+      </ul>
+      <div class="legend">
+        <span><i class="lo"></i>Bajo, menos de 4</span>
+        <span><i class="md"></i>Medio, de 4 a 6.9</span>
+        <span><i class="hi"></i>Alto, 7 o más</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="equipos">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Para equipos de extensión</h2>
+      <p class="lead">Predium está pensado para programas donde varias personas evalúan predios y alguien necesita ver el conjunto.</p>
+    </div>
+    <div class="features">
+      <div class="feature">
+        <span class="feature-icon"><svg width="24" height="24" aria-hidden="true"><use href="#i-org"/></svg></span>
+        <div><h3>Organizaciones con sus miembros</h3><p>Cada equipo trabaja dentro de su organización. Quienes la administran ven todos sus diagnósticos y los buscan por predio o por estado.</p></div>
+      </div>
+      <div class="feature">
+        <span class="feature-icon"><svg width="24" height="24" aria-hidden="true"><use href="#i-globe"/></svg></span>
+        <div><h3>En español y en inglés</h3><p>La app está en español y cada persona puede cambiar a inglés cuando quiera.</p></div>
+      </div>
+      <div class="feature">
+        <span class="feature-icon"><svg width="24" height="24" aria-hidden="true"><use href="#i-mail"/></svg></span>
+        <div><h3>Acceso por invitación</h3><p>Durante el piloto, las cuentas se crean solo por invitación. Los datos de los predios no quedan abiertos al público.</p></div>
+      </div>
+      <div class="feature">
+        <span class="feature-icon"><svg width="24" height="24" aria-hidden="true"><use href="#i-code"/></svg></span>
+        <div><h3>Código a la vista</h3><p>El código de Predium es público en <a href="https://github.com/aliciapaz/predium" target="_blank" rel="noopener noreferrer">GitHub</a>.</p></div>
+      </div>
+    </div>
+
+    <div class="next">
+      <h3>Lo que viene<small>En desarrollo para las próximas versiones.</small></h3>
+      <ul>
+        <li><svg width="20" height="20" aria-hidden="true"><use href="#i-dot"/></svg>Informe en PDF para entregar al agricultor.</li>
+        <li><svg width="20" height="20" aria-hidden="true"><use href="#i-dot"/></svg>Nuevos territorios, empezando por Chiloé.</li>
+        <li><svg width="20" height="20" aria-hidden="true"><use href="#i-dot"/></svg>Vista agregada de los diagnósticos de un programa.</li>
+        <li><svg width="20" height="20" aria-hidden="true"><use href="#i-dot"/></svg>Exportar los datos para análisis.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section access" id="acceso">
+  <div class="wrap access-grid">
+    <div>
+      <h2>Súmate al piloto</h2>
+      <p class="lead">Estamos abriendo Predium a equipos de extensión, ONG y universidades que acompañan la transición agroecológica. Déjanos tu correo y te escribimos para crear tu cuenta.</p>
+    </div>
+    <form class="form" action="https://formspree.io/f/mwvrqdya" method="POST">
+      <input type="hidden" name="_subject" value="Solicitud de invitación a Predium">
+      <div class="field-row">
+        <label for="email">Correo electrónico</label>
+        <input type="email" id="email" name="email" autocomplete="email" required>
+      </div>
+      <div class="field-row">
+        <label for="organizacion">Organización <small>(opcional)</small></label>
+        <input type="text" id="organizacion" name="organizacion" autocomplete="organization">
+      </div>
+      <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button type="submit" class="btn btn-primary">Solicitar invitación</button>
+      <p class="form-note">Sin costo durante el piloto. Usamos tu correo solo para contactarte por Predium.</p>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="brand">Predium</span>
+    <span>Diagnóstico agroecológico para la agricultura familiar campesina.</span>
+    <ul class="foot-links">
+      <li><a href="https://github.com/aliciapaz/predium" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+      <li><a href="#acceso">Contacto</a></li>
+    </ul>
   </div>
 </footer>
 
 <script>
-  const nav = document.getElementById('navbar');
-  window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 60); });
-  const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry, i) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => { entry.target.classList.add('visible'); }, i * 80);
-        observer.unobserve(entry.target);
-      }
+  (function () {
+    var principles = [
+      { short: 'Biodiversidad', name: 'Biodiversidad' },
+      { short: 'Reciclaje', name: 'Reciclaje' },
+      { short: 'Interacciones', name: 'Interacción entre los componentes del sistema: animal, agrícola, forestal y otros' },
+      { short: 'Suelo', name: 'Manejo ecológico del suelo' },
+      { short: 'Plagas', name: 'Manejo ecológico de plagas y enfermedades' },
+      { short: 'Saber tradicional', name: 'Bases culturales y conocimiento tradicional en el manejo del sistema' }
+    ];
+    var scores = [8, 5, 6, 4, 3, 7];
+    var current = 0;
+
+    var NS = 'http://www.w3.org/2000/svg';
+    var cx = 180, cy = 145, R = 105;
+    var radar = document.getElementById('radar');
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function point(i, value) {
+      var angle = (-90 + i * 60) * Math.PI / 180;
+      var r = R * value / 10;
+      return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
+    }
+    function hexPoints(value) {
+      return principles.map(function (_, i) { return point(i, value).join(','); }).join(' ');
+    }
+    function el(tag, attrs) {
+      var node = document.createElementNS(NS, tag);
+      for (var k in attrs) node.setAttribute(k, attrs[k]);
+      return node;
+    }
+
+    // Bands follow the app's results thresholds: below 4, 4 to 6.9, 7 and up.
+    radar.appendChild(el('polygon', { points: hexPoints(10), fill: '#f0f7f0', stroke: '#dceddc' }));
+    radar.appendChild(el('polygon', { points: hexPoints(7), fill: '#fef9e7', stroke: '#fdf0c4' }));
+    radar.appendChild(el('polygon', { points: hexPoints(4), fill: '#fff1f2', stroke: '#ffe4e6' }));
+    principles.forEach(function (_, i) {
+      var end = point(i, 10);
+      radar.appendChild(el('line', { x1: cx, y1: cy, x2: end[0], y2: end[1], class: 'axis', 'stroke-width': 1 }));
     });
-  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
-  reveals.forEach(el => observer.observe(el));
+    var shape = el('polygon', { class: 'shape', 'stroke-width': 2.5, 'stroke-linejoin': 'round' });
+    radar.appendChild(shape);
+    var vertices = principles.map(function () {
+      var c = el('circle', { r: 4, class: 'vertex' });
+      radar.appendChild(c);
+      return c;
+    });
+    var labels = principles.map(function (p, i) {
+      var pos = point(i, 12.4);
+      var anchor = Math.abs(pos[0] - cx) < 1 ? 'middle' : (pos[0] > cx ? 'start' : 'end');
+      var g = el('g', {});
+      var text = el('text', { x: pos[0], y: pos[1] + 4, 'text-anchor': anchor, class: 'axis-label' });
+      text.textContent = p.short;
+      g.appendChild(text);
+      g.addEventListener('click', function () { show(i); });
+      radar.appendChild(g);
+      return text;
+    });
+
+    var drawn = scores.slice();
+    function draw(values) {
+      var pts = values.map(function (v, i) { return point(i, v); });
+      shape.setAttribute('points', pts.map(function (p) { return p.join(','); }).join(' '));
+      vertices.forEach(function (c, i) {
+        c.setAttribute('cx', pts[i][0]);
+        c.setAttribute('cy', pts[i][1]);
+        c.setAttribute('r', i === current ? 6 : 4);
+      });
+    }
+    function animateTo(target) {
+      if (reduceMotion) { drawn = target.slice(); draw(drawn); return; }
+      var from = drawn.slice(), start = null;
+      function frame(t) {
+        if (start === null) start = t;
+        var k = Math.min((t - start) / 260, 1);
+        var ease = 1 - Math.pow(1 - k, 3);
+        drawn = from.map(function (v, i) { return v + (target[i] - v) * ease; });
+        draw(drawn);
+        if (k < 1) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    var scale = document.getElementById('scale');
+    var buttons = [];
+    for (var n = 1; n <= 10; n++) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = n;
+      b.setAttribute('role', 'radio');
+      b.className = n <= 3 ? 'band-low' : (n <= 7 ? 'band-mid' : 'band-high');
+      b.dataset.value = n;
+      b.addEventListener('click', function (e) {
+        scores[current] = Number(e.currentTarget.dataset.value);
+        render();
+        animateTo(scores);
+        document.dispatchEvent(new CustomEvent('predium:score', { detail: scores[current] }));
+      });
+      scale.appendChild(b);
+      buttons.push(b);
+    }
+    scale.addEventListener('keydown', function (e) {
+      var delta = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[e.key];
+      if (!delta) return;
+      e.preventDefault();
+      scores[current] = Math.min(10, Math.max(1, scores[current] + delta));
+      render();
+      buttons[scores[current] - 1].focus();
+      animateTo(scores);
+    });
+
+    var dots = document.getElementById('dots');
+    principles.forEach(function () { dots.appendChild(document.createElement('span')); });
+    var prev = document.getElementById('prev');
+    var next = document.getElementById('next');
+    prev.addEventListener('click', function () { show(current - 1); });
+    next.addEventListener('click', function () { show(current + 1); });
+
+    function show(i) {
+      current = Math.max(0, Math.min(principles.length - 1, i));
+      render();
+      draw(drawn);
+    }
+    function render() {
+      document.getElementById('q-meta').textContent = 'Principio ' + (current + 1) + ' de ' + principles.length;
+      document.getElementById('q-name').textContent = principles[current].name;
+      buttons.forEach(function (b, idx) {
+        var on = idx + 1 === scores[current];
+        b.setAttribute('aria-checked', on ? 'true' : 'false');
+        b.tabIndex = on ? 0 : -1;
+      });
+      labels.forEach(function (t, idx) { t.classList.toggle('is-active', idx === current); });
+      Array.prototype.forEach.call(dots.children, function (d, idx) { d.classList.toggle('is-active', idx === current); });
+      prev.disabled = current === 0;
+      next.disabled = current === principles.length - 1;
+    }
+
+    render();
+    draw(drawn);
+  })();
+</script>
+
+<script>
+  (function () {
+    var canvas = document.querySelector('.hero-roots');
+    var hero = canvas.parentElement;
+    var ctx = canvas.getContext('2d');
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var STEP = 2.4, MAX_ROOTS = 700;
+    var roots = [], width = 0, height = 0, seed = 7, running = false;
+
+    function rand() {
+      seed = (seed * 16807) % 2147483647;
+      return (seed - 1) / 2147483646;
+    }
+
+    // speed is steps per frame; delay holds a root back so tips don't advance in a line.
+    function spawn(x, y, angle, w, depth, life, speed, delay) {
+      if (roots.length >= MAX_ROOTS) return;
+      roots.push({ x: x, y: y, angle: angle, w: w, depth: depth, life: life, speed: speed, delay: delay || 0, progress: 0, alive: true });
+    }
+
+    function seedRoots() {
+      roots = [];
+      seed = 7;
+      var count = Math.max(4, Math.round(width / 110));
+      for (var i = 0; i < count; i++) {
+        var x = (i + 0.5) * width / count + (rand() - 0.5) * 60;
+        spawn(x, -4, Math.PI / 2 + (rand() - 0.5) * 0.5, 2.6 + rand() * 1.8, 0, (height / STEP) * (0.55 + rand() * 0.6), 0.145 + rand() * 0.175, rand() * 150);
+      }
+    }
+
+    // Roots wander, bend back toward gravity, thin out and branch.
+    function grow(r) {
+      r.angle += (rand() - 0.5) * 0.32;
+      r.angle += (Math.PI / 2 - r.angle) * 0.035;
+      var nx = r.x + Math.cos(r.angle) * STEP;
+      var ny = r.y + Math.sin(r.angle) * STEP;
+      ctx.strokeStyle = 'rgba(232, 220, 190, ' + (0.3 - r.depth * 0.04) + ')';
+      ctx.lineWidth = r.w;
+      ctx.beginPath();
+      ctx.moveTo(r.x, r.y);
+      ctx.lineTo(nx, ny);
+      ctx.stroke();
+      r.x = nx; r.y = ny;
+      r.w *= 0.996;
+      r.life -= 1;
+      if (r.depth < 5 && r.w > 0.7 && rand() < 0.022) {
+        var side = rand() < 0.5 ? -1 : 1;
+        spawn(r.x, r.y, r.angle + side * (0.5 + rand() * 0.6), r.w * 0.62, r.depth + 1, 40 + rand() * 140, r.speed * (0.5 + rand() * 0.35));
+      }
+      if (r.life <= 0 || r.w < 0.35 || r.y > height + 10 || r.x < -10 || r.x > width + 10) {
+        r.alive = false;
+        if (r.depth >= 2 && rand() < 0.14) {
+          ctx.fillStyle = 'rgba(242, 193, 78, 0.55)';
+          ctx.beginPath();
+          ctx.arc(r.x, r.y, 1.4 + rand() * 1.4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    function tick() {
+      var active = false;
+      for (var i = 0; i < roots.length; i++) {
+        var r = roots[i];
+        if (!r.alive) continue;
+        active = true;
+        if (r.delay > 0) { r.delay -= 1; continue; }
+        r.progress += r.speed;
+        while (r.progress >= 1 && r.alive) { r.progress -= 1; grow(r); }
+      }
+      return active;
+    }
+
+    function loop() {
+      if (tick()) { requestAnimationFrame(loop); } else { running = false; }
+    }
+
+    function start() {
+      if (reduceMotion) { while (tick()) {} return; }
+      if (!running) { running = true; requestAnimationFrame(loop); }
+    }
+
+    function resize(instant) {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = hero.clientWidth;
+      height = hero.clientHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.lineCap = 'round';
+      seedRoots();
+      if (instant) { while (tick()) {} } else { start(); }
+    }
+
+    var resizeTimer;
+    window.addEventListener('resize', function () {
+      if (hero.clientWidth === width) return;
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () { resize(true); }, 150);
+    });
+
+    // A higher score grows a thicker root.
+    document.addEventListener('predium:score', function (e) {
+      spawn(width * (0.05 + rand() * 0.9), -4, Math.PI / 2 + (rand() - 0.5) * 0.4, 0.8 + e.detail * 0.28, 0, (height / STEP) * (0.5 + rand() * 0.4), 0.24 + rand() * 0.12);
+      start();
+    });
+
+    resize(false);
+  })();
 </script>
 
 </body>
