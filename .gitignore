@@ -42,3 +42,6 @@ development.log
 
 # Ignore test coverage reports
 /coverage
+
+# JavaScript dev tooling (lint + tests only; runtime JS ships via importmap)
+/node_modules
