@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Predium: diagnóstico agroecológico en terreno</title>
-  <meta name="description" content="Predium es la aplicación para evaluar predios campesinos en terreno, con o sin señal: seis principios agroecológicos, indicadores por territorio y resultados al momento.">
+  <title data-en="Predium: agroecological farm diagnosis in the field">Predium: diagnóstico agroecológico en terreno</title>
+  <meta name="description" content="Predium es la aplicación para evaluar predios campesinos en terreno, con o sin señal: seis principios agroecológicos, indicadores por territorio y resultados al momento." data-en-content="Predium is the app for assessing smallholder farms in the field, with or without signal: six agroecological principles, territory-specific indicators and results on the spot.">
   <meta name="theme-color" content="#1f4a33">
+  <link rel="alternate" hreflang="es" href="https://prediumapp.org/?lang=es">
+  <link rel="alternate" hreflang="en" href="https://prediumapp.org/?lang=en">
+  <link rel="alternate" hreflang="x-default" href="https://prediumapp.org/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600&amp;family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&amp;display=swap" rel="stylesheet">
@@ -129,6 +132,16 @@
     .btn-quiet { color: var(--primary-ink); border-color: var(--line); background: transparent; }
     .btn-quiet:hover { border-color: var(--primary-line); background: var(--primary-soft); }
     .nav .btn { padding: 0.55rem 1rem; font-size: 0.95rem; }
+    .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+    /* Phones can't fit the language toggle and the CTA; the hero repeats the CTA just below. */
+    @media (max-width: 479px) { .nav-actions .btn { display: none; } }
+    .lang { display: inline-flex; border: 1px solid var(--hero-line); border-radius: 8px; padding: 2px; }
+    .lang button {
+      min-width: 2.5rem; min-height: 2.25rem; border: none; border-radius: 6px; background: transparent;
+      font-family: var(--body); font-weight: 600; font-size: 0.85rem; color: var(--hero-soft); cursor: pointer;
+    }
+    .lang button:hover { color: var(--hero-ink); background: var(--hero-quiet-hover); }
+    .lang button[aria-pressed="true"] { background: var(--hero-ink); color: var(--hero-bg); }
 
     /* ===== HERO ===== */
     .hero {
@@ -410,7 +423,7 @@
 
 <header class="nav">
   <div class="wrap">
-    <a href="#" class="brand" aria-label="Predium, inicio">
+    <a href="#" class="brand" aria-label="Predium, inicio" data-en-aria-label="Predium, home">
       <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true">
         <rect class="mark-bg" width="32" height="32" rx="8"/>
         <path class="mark-hex" d="M16 5.5l9.1 5.25v10.5L16 26.5l-9.1-5.25v-10.5z" fill="none" stroke-width="1.2" stroke-opacity=".55"/>
@@ -421,12 +434,18 @@
       Predium
     </a>
     <ul class="nav-links">
-      <li><a href="#metodo">Cómo se evalúa</a></li>
-      <li><a href="#terreno">En terreno</a></li>
-      <li><a href="#resultados">Resultados</a></li>
-      <li><a href="#equipos">Para equipos</a></li>
+      <li><a href="#metodo" data-en="How it works">Cómo se evalúa</a></li>
+      <li><a href="#terreno" data-en="In the field">En terreno</a></li>
+      <li><a href="#resultados" data-en="Results">Resultados</a></li>
+      <li><a href="#equipos" data-en="For teams">Para equipos</a></li>
     </ul>
-    <a href="#acceso" class="btn btn-primary">Solicitar invitación</a>
+    <div class="nav-actions">
+      <div class="lang" role="group" aria-label="Idioma" data-en-aria-label="Language">
+        <button type="button" data-lang="es" lang="es" aria-label="Español" aria-pressed="true">ES</button>
+        <button type="button" data-lang="en" lang="en" aria-label="English" aria-pressed="false">EN</button>
+      </div>
+      <a href="#acceso" class="btn btn-primary" data-en="Request an invite">Solicitar invitación</a>
+    </div>
   </div>
 </header>
 
@@ -436,39 +455,39 @@
   <canvas class="hero-roots" aria-hidden="true"></canvas>
   <div class="wrap hero-grid">
     <div>
-      <h1>Diagnóstico agroecológico en el predio, con o sin señal.</h1>
-      <p class="lead">Predium es la aplicación con la que equipos técnicos evalúan predios campesinos en terreno. Se califican los seis principios de la agroecología y los indicadores de cada territorio en una escala de 1 a 10, y los resultados quedan a la vista antes de salir del predio.</p>
+      <h1 data-en="Agroecological diagnosis on the farm, with or without signal.">Diagnóstico agroecológico en el predio, con o sin señal.</h1>
+      <p class="lead" data-en="Predium is the app technical teams use to assess smallholder farms in the field. They score the six principles of agroecology and each territory's indicators on a scale of 1 to 10, and the results are ready before they leave the farm.">Predium es la aplicación con la que equipos técnicos evalúan predios campesinos en terreno. Se califican los seis principios de la agroecología y los indicadores de cada territorio en una escala de 1 a 10, y los resultados quedan a la vista antes de salir del predio.</p>
       <div class="actions">
-        <a href="#acceso" class="btn btn-primary">Solicitar invitación</a>
-        <a href="#metodo" class="btn btn-quiet">Ver cómo se evalúa</a>
+        <a href="#acceso" class="btn btn-primary" data-en="Request an invite">Solicitar invitación</a>
+        <a href="#metodo" class="btn btn-quiet" data-en="See how it works">Ver cómo se evalúa</a>
       </div>
       <ul class="hero-facts">
-        <li><svg width="18" height="18" aria-hidden="true"><use href="#i-check"/></svg>Funciona sin internet</li>
-        <li><svg width="18" height="18" aria-hidden="true"><use href="#i-check"/></svg>Se usa desde el teléfono</li>
-        <li><svg width="18" height="18" aria-hidden="true"><use href="#i-check"/></svg>Español e inglés</li>
+        <li><svg width="18" height="18" aria-hidden="true"><use href="#i-check"/></svg><span data-en="Works offline">Funciona sin internet</span></li>
+        <li><svg width="18" height="18" aria-hidden="true"><use href="#i-check"/></svg><span data-en="Runs on your phone">Se usa desde el teléfono</span></li>
+        <li><svg width="18" height="18" aria-hidden="true"><use href="#i-check"/></svg><span data-en="Spanish and English">Español e inglés</span></li>
       </ul>
     </div>
 
     <div class="demo" id="demo">
       <div class="demo-head">
-        <span class="demo-title">Nivel 1: principios</span>
-        <span class="demo-status">Sin conexión</span>
+        <span class="demo-title" data-en="Level 1: principles">Nivel 1: principios</span>
+        <span class="demo-status" data-en="Offline">Sin conexión</span>
       </div>
       <svg class="radar" id="radar" viewBox="0 0 360 290" role="img" aria-labelledby="radar-desc">
-        <desc id="radar-desc">Gráfico radial con el puntaje de los seis principios agroecológicos.</desc>
+        <desc id="radar-desc" data-en="Radar chart with the scores of the six agroecological principles.">Gráfico radial con el puntaje de los seis principios agroecológicos.</desc>
       </svg>
       <div class="question">
         <p class="question-meta" id="q-meta">Principio 1 de 6</p>
         <p class="question-name" id="q-name"></p>
         <div class="scale" id="scale" role="radiogroup" aria-labelledby="q-name"></div>
-        <div class="scale-legend" aria-hidden="true"><span>1 bajo</span><span>10 alto</span></div>
+        <div class="scale-legend" aria-hidden="true"><span data-en="1 low">1 bajo</span><span data-en="10 high">10 alto</span></div>
         <div class="demo-nav">
-          <button type="button" id="prev"><svg width="16" height="16" aria-hidden="true"><use href="#i-chev-l"/></svg>Anterior</button>
+          <button type="button" id="prev"><svg width="16" height="16" aria-hidden="true"><use href="#i-chev-l"/></svg><span data-en="Previous">Anterior</span></button>
           <div class="dots" id="dots" aria-hidden="true"></div>
-          <button type="button" id="next">Siguiente<svg width="16" height="16" aria-hidden="true"><use href="#i-chev-r"/></svg></button>
+          <button type="button" id="next"><span data-en="Next">Siguiente</span><svg width="16" height="16" aria-hidden="true"><use href="#i-chev-r"/></svg></button>
         </div>
       </div>
-      <p class="demo-note">Toca un puntaje. Así se califica en la app.</p>
+      <p class="demo-note" data-en="Tap a score. This is how scoring works in the app.">Toca un puntaje. Así se califica en la app.</p>
     </div>
   </div>
 </section>
@@ -476,101 +495,101 @@
 <section class="section" id="metodo">
   <div class="wrap">
     <div class="section-head">
-      <h2>Dos niveles en una sola visita</h2>
-      <p class="lead">El diagnóstico parte con una mirada general al sistema y baja al detalle de lo que se observa en el predio. Las dos partes usan la misma escala de 1 a 10.</p>
+      <h2 data-en="Two levels in a single visit">Dos niveles en una sola visita</h2>
+      <p class="lead" data-en="The diagnosis starts with a broad look at the whole system and narrows down to what you can observe on the farm. Both levels use the same scale of 1 to 10.">El diagnóstico parte con una mirada general al sistema y baja al detalle de lo que se observa en el predio. Las dos partes usan la misma escala de 1 a 10.</p>
     </div>
 
     <div class="levels">
       <div class="level">
-        <h3>Nivel 1: seis principios</h3>
-        <p>Cada principio se califica directamente. Es la mirada de conjunto del agroecosistema y se muestra como un gráfico radial.</p>
+        <h3 data-en="Level 1: six principles">Nivel 1: seis principios</h3>
+        <p data-en="Each principle is scored directly. It gives the big picture of the agroecosystem and is shown as a radar chart.">Cada principio se califica directamente. Es la mirada de conjunto del agroecosistema y se muestra como un gráfico radial.</p>
         <ul>
-          <li>Biodiversidad</li>
-          <li>Reciclaje</li>
-          <li>Interacción entre componentes</li>
-          <li>Manejo ecológico del suelo</li>
-          <li>Manejo ecológico de plagas y enfermedades</li>
-          <li>Conocimiento tradicional</li>
+          <li data-en="Biodiversity">Biodiversidad</li>
+          <li data-en="Recycling">Reciclaje</li>
+          <li data-en="Interaction between components">Interacción entre componentes</li>
+          <li data-en="Ecological soil management">Manejo ecológico del suelo</li>
+          <li data-en="Ecological pest and disease management">Manejo ecológico de plagas y enfermedades</li>
+          <li data-en="Traditional knowledge">Conocimiento tradicional</li>
         </ul>
       </div>
       <div class="level">
-        <h3>Nivel 2: indicadores del territorio</h3>
-        <p>Preguntas concretas sobre lo que se ve en terreno: cobertura de suelo, cercos vivos, policultivos, origen de las semillas. Cada indicador pertenece a una dimensión, y el puntaje de la dimensión es el promedio de sus indicadores.</p>
+        <h3 data-en="Level 2: territory indicators">Nivel 2: indicadores del territorio</h3>
+        <p data-en="Concrete questions about what you see in the field: ground cover, living fences, polycultures, where the seeds come from. Each indicator belongs to a dimension, and a dimension's score is the average of its indicators.">Preguntas concretas sobre lo que se ve en terreno: cobertura de suelo, cercos vivos, policultivos, origen de las semillas. Cada indicador pertenece a una dimensión, y el puntaje de la dimensión es el promedio de sus indicadores.</p>
       </div>
     </div>
 
     <div class="areas-title">
-      <h3>14 dimensiones en 6 áreas</h3>
-      <p>La cifra es cuántos indicadores tiene hoy el cuestionario de Chile en cada dimensión. Las que aún no tienen indicadores no aparecen en el cuestionario.</p>
+      <h3 data-en="14 dimensions in 6 areas">14 dimensiones en 6 áreas</h3>
+      <p data-en="The number is how many indicators the Chile questionnaire has in each dimension today. Dimensions with no indicators yet don't appear in the questionnaire.">La cifra es cuántos indicadores tiene hoy el cuestionario de Chile en cada dimensión. Las que aún no tienen indicadores no aparecen en el cuestionario.</p>
     </div>
     <div class="areas">
       <div class="area">
-        <div class="area-name"><svg width="24" height="24" aria-hidden="true"><use href="#i-soil"/></svg><h3>Suelo</h3></div>
+        <div class="area-name"><svg width="24" height="24" aria-hidden="true"><use href="#i-soil"/></svg><h3 data-en="Soil">Suelo</h3></div>
         <ul class="dims">
-          <li>Salud del suelo<span class="meter"><i style="width:100%"></i></span><span class="count">12</span></li>
-          <li>Manejo del suelo<span class="meter"><i style="width:58%"></i></span><span class="count">7</span></li>
+          <li><span data-en="Soil health">Salud del suelo</span><span class="meter"><i style="width:100%"></i></span><span class="count">12</span></li>
+          <li><span data-en="Soil management">Manejo del suelo</span><span class="meter"><i style="width:58%"></i></span><span class="count">7</span></li>
         </ul>
       </div>
       <div class="area">
-        <div class="area-name"><svg width="24" height="24" aria-hidden="true"><use href="#i-water"/></svg><h3>Agua</h3></div>
+        <div class="area-name"><svg width="24" height="24" aria-hidden="true"><use href="#i-water"/></svg><h3 data-en="Water">Agua</h3></div>
         <ul class="dims">
-          <li>Disponibilidad de agua<span class="meter"><i style="width:25%"></i></span><span class="count">3</span></li>
-          <li class="is-empty">Calidad del agua<span class="meter"></span><span class="count">0</span></li>
-          <li class="is-empty">Gestión del agua<span class="meter"></span><span class="count">0</span></li>
+          <li><span data-en="Water availability">Disponibilidad de agua</span><span class="meter"><i style="width:25%"></i></span><span class="count">3</span></li>
+          <li class="is-empty"><span data-en="Water quality">Calidad del agua</span><span class="meter"></span><span class="count">0</span></li>
+          <li class="is-empty"><span data-en="Water management">Gestión del agua</span><span class="meter"></span><span class="count">0</span></li>
         </ul>
       </div>
       <div class="area">
-        <div class="area-name"><svg width="24" height="24" aria-hidden="true"><use href="#i-bio"/></svg><h3>Biodiversidad</h3></div>
+        <div class="area-name"><svg width="24" height="24" aria-hidden="true"><use href="#i-bio"/></svg><h3 data-en="Biodiversity">Biodiversidad</h3></div>
         <ul class="dims">
-          <li>Diversidad de cultivos<span class="meter"><i style="width:50%"></i></span><span class="count">6</span></li>
-          <li>Diversidad del ecosistema<span class="meter"><i style="width:75%"></i></span><span class="count">9</span></li>
+          <li><span data-en="Crop diversity">Diversidad de cultivos</span><span class="meter"><i style="width:50%"></i></span><span class="count">6</span></li>
+          <li><span data-en="Ecosystem diversity">Diversidad del ecosistema</span><span class="meter"><i style="width:75%"></i></span><span class="count">9</span></li>
         </ul>
       </div>
       <div class="area">
-        <div class="area-name"><svg width="24" height="24" aria-hidden="true"><use href="#i-plan"/></svg><h3>Manejo</h3></div>
+        <div class="area-name"><svg width="24" height="24" aria-hidden="true"><use href="#i-plan"/></svg><h3 data-en="Management">Manejo</h3></div>
         <ul class="dims">
-          <li>Planificación del predio<span class="meter"><i style="width:25%"></i></span><span class="count">3</span></li>
-          <li>Gestión de insumos<span class="meter"><i style="width:50%"></i></span><span class="count">6</span></li>
-          <li>Manejo animal<span class="meter"><i style="width:25%"></i></span><span class="count">3</span></li>
+          <li><span data-en="Farm planning">Planificación del predio</span><span class="meter"><i style="width:25%"></i></span><span class="count">3</span></li>
+          <li><span data-en="Input management">Gestión de insumos</span><span class="meter"><i style="width:50%"></i></span><span class="count">6</span></li>
+          <li><span data-en="Animal management">Manejo animal</span><span class="meter"><i style="width:25%"></i></span><span class="count">3</span></li>
         </ul>
       </div>
       <div class="area">
-        <div class="area-name"><svg width="24" height="24" aria-hidden="true"><use href="#i-people"/></svg><h3>Socioeconómico</h3></div>
+        <div class="area-name"><svg width="24" height="24" aria-hidden="true"><use href="#i-people"/></svg><h3 data-en="Socioeconomic">Socioeconómico</h3></div>
         <ul class="dims">
-          <li>Viabilidad económica<span class="meter"><i style="width:50%"></i></span><span class="count">6</span></li>
-          <li>Bienestar social<span class="meter"><i style="width:83%"></i></span><span class="count">10</span></li>
+          <li><span data-en="Economic viability">Viabilidad económica</span><span class="meter"><i style="width:50%"></i></span><span class="count">6</span></li>
+          <li><span data-en="Social wellbeing">Bienestar social</span><span class="meter"><i style="width:83%"></i></span><span class="count">10</span></li>
         </ul>
       </div>
       <div class="area">
-        <div class="area-name"><svg width="24" height="24" aria-hidden="true"><use href="#i-resilience"/></svg><h3>Resiliencia</h3></div>
+        <div class="area-name"><svg width="24" height="24" aria-hidden="true"><use href="#i-resilience"/></svg><h3 data-en="Resilience">Resiliencia</h3></div>
         <ul class="dims">
-          <li class="is-empty">Adaptación climática<span class="meter"></span><span class="count">0</span></li>
-          <li>Resiliencia del sistema<span class="meter"><i style="width:58%"></i></span><span class="count">7</span></li>
+          <li class="is-empty"><span data-en="Climate adaptation">Adaptación climática</span><span class="meter"></span><span class="count">0</span></li>
+          <li><span data-en="System resilience">Resiliencia del sistema</span><span class="meter"><i style="width:58%"></i></span><span class="count">7</span></li>
         </ul>
       </div>
     </div>
 
     <div class="territory">
       <div>
-        <h3>Cada territorio trae sus propias preguntas</h3>
-        <p>Lo que conviene observar en un predio cambia de un territorio a otro. Por eso los indicadores se organizan por territorio: un territorio nuevo puede partir de otro y sumar lo propio, sin perder las respuestas ya registradas.</p>
-        <p>Si un predio aún no tiene territorio asignado, se evalúan solo los seis principios.</p>
+        <h3 data-en="Each territory brings its own questions">Cada territorio trae sus propias preguntas</h3>
+        <p data-en="What's worth observing on a farm changes from one territory to the next. That's why indicators are organized by territory: a new territory can start from an existing one and add its own, without losing the answers already recorded.">Lo que conviene observar en un predio cambia de un territorio a otro. Por eso los indicadores se organizan por territorio: un territorio nuevo puede partir de otro y sumar lo propio, sin perder las respuestas ya registradas.</p>
+        <p data-en="If a farm doesn't have a territory assigned yet, only the six principles are scored.">Si un predio aún no tiene territorio asignado, se evalúan solo los seis principios.</p>
       </div>
       <div class="chain">
         <div class="chain-row">
           <svg width="24" height="24" aria-hidden="true"><use href="#i-radar"/></svg>
-          <div><strong>Principios</strong><small>6 preguntas, en todos los predios</small></div>
-          <span class="tag tag-live">Disponible</span>
+          <div><strong data-en="Principles">Principios</strong><small data-en="6 questions, on every farm">6 preguntas, en todos los predios</small></div>
+          <span class="tag tag-live" data-en="Available">Disponible</span>
         </div>
         <div class="chain-row is-nested">
           <svg width="24" height="24" aria-hidden="true"><use href="#i-map"/></svg>
-          <div><strong>Chile</strong><small>72 indicadores en 11 dimensiones</small></div>
-          <span class="tag tag-live">Disponible</span>
+          <div><strong>Chile</strong><small data-en="72 indicators in 11 dimensions">72 indicadores en 11 dimensiones</small></div>
+          <span class="tag tag-live" data-en="Available">Disponible</span>
         </div>
         <div class="chain-row is-nested-2 is-planned">
           <svg width="24" height="24" aria-hidden="true"><use href="#i-map"/></svg>
-          <div><strong>Chiloé</strong><small>Los 72 de Chile más los propios de la isla</small></div>
-          <span class="tag tag-planned">En preparación</span>
+          <div><strong>Chiloé</strong><small data-en="Chile's 72 plus the island's own">Los 72 de Chile más los propios de la isla</small></div>
+          <span class="tag tag-planned" data-en="In preparation">En preparación</span>
         </div>
       </div>
     </div>
@@ -580,30 +599,30 @@
 <section class="section field" id="terreno">
   <div class="wrap">
     <div class="section-head">
-      <h2>Hecho para donde no llega la señal</h2>
-      <p class="lead">Todo el diagnóstico se hace en el teléfono, sin conexión. Internet solo hace falta al principio y al final.</p>
+      <h2 data-en="Built for places the signal doesn't reach">Hecho para donde no llega la señal</h2>
+      <p class="lead" data-en="The whole diagnosis happens on the phone, offline. You only need internet at the start and at the end.">Todo el diagnóstico se hace en el teléfono, sin conexión. Internet solo hace falta al principio y al final.</p>
     </div>
     <ol class="steps">
       <li class="step">
         <div class="step-icon"><svg width="26" height="26" aria-hidden="true"><use href="#i-download"/></svg></div>
-        <h3>Conéctate una vez</h3>
-        <p>Al iniciar sesión con internet, el cuestionario y tus diagnósticos quedan guardados en el teléfono. La app se puede instalar en la pantalla de inicio.</p>
+        <h3 data-en="Connect once">Conéctate una vez</h3>
+        <p data-en="When you sign in with internet, the questionnaire and your diagnoses are saved on the phone. The app can be installed on the home screen.">Al iniciar sesión con internet, el cuestionario y tus diagnósticos quedan guardados en el teléfono. La app se puede instalar en la pantalla de inicio.</p>
       </li>
       <li class="step">
         <div class="step-icon"><svg width="26" height="26" aria-hidden="true"><use href="#i-nosignal"/></svg></div>
-        <h3>Evalúa sin señal</h3>
-        <p>Cada respuesta se guarda en el dispositivo al instante. Registra los datos del agricultor, la superficie, el tipo de sistema y la ubicación por GPS.</p>
+        <h3 data-en="Assess without signal">Evalúa sin señal</h3>
+        <p data-en="Every answer is saved on the device instantly. Record the farmer's details, the farm area, the type of system and the GPS location.">Cada respuesta se guarda en el dispositivo al instante. Registra los datos del agricultor, la superficie, el tipo de sistema y la ubicación por GPS.</p>
       </li>
       <li class="step">
         <div class="step-icon"><svg width="26" height="26" aria-hidden="true"><use href="#i-sync"/></svg></div>
-        <h3>Sincroniza al volver</h3>
-        <p>Cuando vuelve la señal, los cambios suben solos. Si el mismo diagnóstico cambió en otro dispositivo, la app pregunta qué versión conservar.</p>
-        <span class="sync-chip">3 pendientes</span>
+        <h3 data-en="Sync when you're back">Sincroniza al volver</h3>
+        <p data-en="When the signal comes back, changes upload on their own. If the same diagnosis changed on another device, the app asks which version to keep.">Cuando vuelve la señal, los cambios suben solos. Si el mismo diagnóstico cambió en otro dispositivo, la app pregunta qué versión conservar.</p>
+        <span class="sync-chip" data-en="3 pending">3 pendientes</span>
       </li>
       <li class="step">
         <div class="step-icon"><svg width="26" height="26" aria-hidden="true"><use href="#i-lock"/></svg></div>
-        <h3>Completa el diagnóstico</h3>
-        <p>Al completarlo, queda respaldado en el servidor y sus puntajes ya no cambian. Por eso este paso necesita conexión.</p>
+        <h3 data-en="Complete the diagnosis">Completa el diagnóstico</h3>
+        <p data-en="Once completed, it's backed up on the server and its scores no longer change. That's why this step needs a connection.">Al completarlo, queda respaldado en el servidor y sus puntajes ya no cambian. Por eso este paso necesita conexión.</p>
       </li>
     </ol>
   </div>
@@ -612,37 +631,37 @@
 <section class="section" id="resultados">
   <div class="wrap results-grid">
     <div>
-      <h2>Resultados que se leen ahí mismo</h2>
-      <p class="lead">Apenas terminas de calificar, la app arma los resultados del predio. También funcionan sin conexión, así que se pueden revisar con el agricultor antes de irse.</p>
+      <h2 data-en="Results you can read on the spot">Resultados que se leen ahí mismo</h2>
+      <p class="lead" data-en="As soon as you finish scoring, the app puts together the farm's results. They work offline too, so you can go over them with the farmer before you leave.">Apenas terminas de calificar, la app arma los resultados del predio. También funcionan sin conexión, así que se pueden revisar con el agricultor antes de irse.</p>
       <ul class="results-list">
-        <li><svg width="22" height="22" aria-hidden="true"><use href="#i-farm"/></svg><div><strong>Resumen del predio</strong><span>Agricultor, ubicación, superficie, mano de obra y tipo de sistema.</span></div></li>
-        <li><svg width="22" height="22" aria-hidden="true"><use href="#i-radar"/></svg><div><strong>Radial de principios</strong><span>Los seis principios de un vistazo.</span></div></li>
-        <li><svg width="22" height="22" aria-hidden="true"><use href="#i-bars"/></svg><div><strong>Puntaje por dimensión</strong><span>Con color según el nivel, para ver dónde empezar.</span></div></li>
-        <li><svg width="22" height="22" aria-hidden="true"><use href="#i-list"/></svg><div><strong>Todos los indicadores</strong><span>Cada respuesta, agrupada por dimensión.</span></div></li>
+        <li><svg width="22" height="22" aria-hidden="true"><use href="#i-farm"/></svg><div><strong data-en="Farm summary">Resumen del predio</strong><span data-en="Farmer, location, area, labor and type of system.">Agricultor, ubicación, superficie, mano de obra y tipo de sistema.</span></div></li>
+        <li><svg width="22" height="22" aria-hidden="true"><use href="#i-radar"/></svg><div><strong data-en="Principles radar">Radial de principios</strong><span data-en="All six principles at a glance.">Los seis principios de un vistazo.</span></div></li>
+        <li><svg width="22" height="22" aria-hidden="true"><use href="#i-bars"/></svg><div><strong data-en="Score by dimension">Puntaje por dimensión</strong><span data-en="Color-coded by level, to see where to start.">Con color según el nivel, para ver dónde empezar.</span></div></li>
+        <li><svg width="22" height="22" aria-hidden="true"><use href="#i-list"/></svg><div><strong data-en="Every indicator">Todos los indicadores</strong><span data-en="Each answer, grouped by dimension.">Cada respuesta, agrupada por dimensión.</span></div></li>
       </ul>
     </div>
     <div class="panel">
       <div class="panel-head">
-        <h3>Puntajes por dimensión</h3>
-        <small>Ejemplo con el cuestionario de Chile</small>
+        <h3 data-en="Dimension scores">Puntajes por dimensión</h3>
+        <small data-en="Example with the Chile questionnaire">Ejemplo con el cuestionario de Chile</small>
       </div>
       <ul class="bars">
-        <li>Salud del suelo<span class="track"><i class="md" style="width:64%"></i></span><span class="val">6.4</span></li>
-        <li>Manejo del suelo<span class="track"><i class="md" style="width:51%"></i></span><span class="val">5.1</span></li>
-        <li>Disponibilidad de agua<span class="track"><i class="lo" style="width:37%"></i></span><span class="val">3.7</span></li>
-        <li>Diversidad de cultivos<span class="track"><i class="hi" style="width:78%"></i></span><span class="val">7.8</span></li>
-        <li>Diversidad del ecosistema<span class="track"><i class="md" style="width:69%"></i></span><span class="val">6.9</span></li>
-        <li>Planificación del predio<span class="track"><i class="md" style="width:43%"></i></span><span class="val">4.3</span></li>
-        <li>Gestión de insumos<span class="track"><i class="md" style="width:56%"></i></span><span class="val">5.6</span></li>
-        <li>Manejo animal<span class="track"><i class="hi" style="width:70%"></i></span><span class="val">7.0</span></li>
-        <li>Viabilidad económica<span class="track"><i class="md" style="width:48%"></i></span><span class="val">4.8</span></li>
-        <li>Bienestar social<span class="track"><i class="hi" style="width:82%"></i></span><span class="val">8.2</span></li>
-        <li>Resiliencia del sistema<span class="track"><i class="md" style="width:61%"></i></span><span class="val">6.1</span></li>
+        <li><span data-en="Soil health">Salud del suelo</span><span class="track"><i class="md" style="width:64%"></i></span><span class="val">6.4</span></li>
+        <li><span data-en="Soil management">Manejo del suelo</span><span class="track"><i class="md" style="width:51%"></i></span><span class="val">5.1</span></li>
+        <li><span data-en="Water availability">Disponibilidad de agua</span><span class="track"><i class="lo" style="width:37%"></i></span><span class="val">3.7</span></li>
+        <li><span data-en="Crop diversity">Diversidad de cultivos</span><span class="track"><i class="hi" style="width:78%"></i></span><span class="val">7.8</span></li>
+        <li><span data-en="Ecosystem diversity">Diversidad del ecosistema</span><span class="track"><i class="md" style="width:69%"></i></span><span class="val">6.9</span></li>
+        <li><span data-en="Farm planning">Planificación del predio</span><span class="track"><i class="md" style="width:43%"></i></span><span class="val">4.3</span></li>
+        <li><span data-en="Input management">Gestión de insumos</span><span class="track"><i class="md" style="width:56%"></i></span><span class="val">5.6</span></li>
+        <li><span data-en="Animal management">Manejo animal</span><span class="track"><i class="hi" style="width:70%"></i></span><span class="val">7.0</span></li>
+        <li><span data-en="Economic viability">Viabilidad económica</span><span class="track"><i class="md" style="width:48%"></i></span><span class="val">4.8</span></li>
+        <li><span data-en="Social wellbeing">Bienestar social</span><span class="track"><i class="hi" style="width:82%"></i></span><span class="val">8.2</span></li>
+        <li><span data-en="System resilience">Resiliencia del sistema</span><span class="track"><i class="md" style="width:61%"></i></span><span class="val">6.1</span></li>
       </ul>
       <div class="legend">
-        <span><i class="lo"></i>Bajo, menos de 4</span>
-        <span><i class="md"></i>Medio, de 4 a 6.9</span>
-        <span><i class="hi"></i>Alto, 7 o más</span>
+        <span><i class="lo"></i><span data-en="Low, under 4">Bajo, menos de 4</span></span>
+        <span><i class="md"></i><span data-en="Medium, 4 to 6.9">Medio, de 4 a 6.9</span></span>
+        <span><i class="hi"></i><span data-en="High, 7 or more">Alto, 7 o más</span></span>
       </div>
     </div>
   </div>
@@ -651,35 +670,35 @@
 <section class="section" id="equipos">
   <div class="wrap">
     <div class="section-head">
-      <h2>Para equipos de extensión</h2>
-      <p class="lead">Predium está pensado para programas donde varias personas evalúan predios y alguien necesita ver el conjunto.</p>
+      <h2 data-en="For extension teams">Para equipos de extensión</h2>
+      <p class="lead" data-en="Predium is designed for programs where several people assess farms and someone needs to see the whole picture.">Predium está pensado para programas donde varias personas evalúan predios y alguien necesita ver el conjunto.</p>
     </div>
     <div class="features">
       <div class="feature">
         <span class="feature-icon"><svg width="24" height="24" aria-hidden="true"><use href="#i-org"/></svg></span>
-        <div><h3>Organizaciones con sus miembros</h3><p>Cada equipo trabaja dentro de su organización. Quienes la administran ven todos sus diagnósticos y los buscan por predio o por estado.</p></div>
+        <div><h3 data-en="Organizations and their members">Organizaciones con sus miembros</h3><p data-en="Each team works inside its own organization. Its admins see all of its diagnoses and can search them by farm or by status.">Cada equipo trabaja dentro de su organización. Quienes la administran ven todos sus diagnósticos y los buscan por predio o por estado.</p></div>
       </div>
       <div class="feature">
         <span class="feature-icon"><svg width="24" height="24" aria-hidden="true"><use href="#i-globe"/></svg></span>
-        <div><h3>En español y en inglés</h3><p>La app está en español y cada persona puede cambiar a inglés cuando quiera.</p></div>
+        <div><h3 data-en="In Spanish and English">En español y en inglés</h3><p data-en="The app is in Spanish, and anyone can switch to English whenever they like.">La app está en español y cada persona puede cambiar a inglés cuando quiera.</p></div>
       </div>
       <div class="feature">
         <span class="feature-icon"><svg width="24" height="24" aria-hidden="true"><use href="#i-mail"/></svg></span>
-        <div><h3>Acceso por invitación</h3><p>Durante el piloto, las cuentas se crean solo por invitación. Los datos de los predios no quedan abiertos al público.</p></div>
+        <div><h3 data-en="Invite-only access">Acceso por invitación</h3><p data-en="During the pilot, accounts are created by invitation only. Farm data is not open to the public.">Durante el piloto, las cuentas se crean solo por invitación. Los datos de los predios no quedan abiertos al público.</p></div>
       </div>
       <div class="feature">
         <span class="feature-icon"><svg width="24" height="24" aria-hidden="true"><use href="#i-code"/></svg></span>
-        <div><h3>Código a la vista</h3><p>El código de Predium es público en <a href="https://github.com/aliciapaz/predium" target="_blank" rel="noopener noreferrer">GitHub</a>.</p></div>
+        <div><h3 data-en="Open source">Código a la vista</h3><p><span data-en="Predium's source code is public on">El código de Predium es público en</span> <a href="https://github.com/aliciapaz/predium" target="_blank" rel="noopener noreferrer">GitHub</a>.</p></div>
       </div>
     </div>
 
     <div class="next">
-      <h3>Lo que viene<small>En desarrollo para las próximas versiones.</small></h3>
+      <h3><span data-en="What's next">Lo que viene</span><small data-en="In development for upcoming versions.">En desarrollo para las próximas versiones.</small></h3>
       <ul>
-        <li><svg width="20" height="20" aria-hidden="true"><use href="#i-dot"/></svg>Informe en PDF para entregar al agricultor.</li>
-        <li><svg width="20" height="20" aria-hidden="true"><use href="#i-dot"/></svg>Nuevos territorios, empezando por Chiloé.</li>
-        <li><svg width="20" height="20" aria-hidden="true"><use href="#i-dot"/></svg>Vista agregada de los diagnósticos de un programa.</li>
-        <li><svg width="20" height="20" aria-hidden="true"><use href="#i-dot"/></svg>Exportar los datos para análisis.</li>
+        <li><svg width="20" height="20" aria-hidden="true"><use href="#i-dot"/></svg><span data-en="A PDF report to hand to the farmer.">Informe en PDF para entregar al agricultor.</span></li>
+        <li><svg width="20" height="20" aria-hidden="true"><use href="#i-dot"/></svg><span data-en="New territories, starting with Chiloé.">Nuevos territorios, empezando por Chiloé.</span></li>
+        <li><svg width="20" height="20" aria-hidden="true"><use href="#i-dot"/></svg><span data-en="A combined view of a program's diagnoses.">Vista agregada de los diagnósticos de un programa.</span></li>
+        <li><svg width="20" height="20" aria-hidden="true"><use href="#i-dot"/></svg><span data-en="Data export for analysis.">Exportar los datos para análisis.</span></li>
       </ul>
     </div>
   </div>
@@ -688,22 +707,23 @@
 <section class="section access" id="acceso">
   <div class="wrap access-grid">
     <div>
-      <h2>Súmate al piloto</h2>
-      <p class="lead">Estamos abriendo Predium a equipos de extensión, ONG y universidades que acompañan la transición agroecológica. Déjanos tu correo y te escribimos para crear tu cuenta.</p>
+      <h2 data-en="Join the pilot">Súmate al piloto</h2>
+      <p class="lead" data-en="We're opening Predium to extension teams, NGOs and universities supporting the agroecological transition. Leave us your email and we'll get in touch to set up your account.">Estamos abriendo Predium a equipos de extensión, ONG y universidades que acompañan la transición agroecológica. Déjanos tu correo y te escribimos para crear tu cuenta.</p>
     </div>
     <form class="form" action="https://formspree.io/f/mwvrqdya" method="POST">
       <input type="hidden" name="_subject" value="Solicitud de invitación a Predium">
+      <input type="hidden" name="idioma" id="idioma" value="es">
       <div class="field-row">
-        <label for="email">Correo electrónico</label>
+        <label for="email" data-en="Email">Correo electrónico</label>
         <input type="email" id="email" name="email" autocomplete="email" required>
       </div>
       <div class="field-row">
-        <label for="organizacion">Organización <small>(opcional)</small></label>
+        <label for="organizacion"><span data-en="Organization">Organización</span> <small data-en="(optional)">(opcional)</small></label>
         <input type="text" id="organizacion" name="organizacion" autocomplete="organization">
       </div>
       <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-      <button type="submit" class="btn btn-primary">Solicitar invitación</button>
-      <p class="form-note">Sin costo durante el piloto. Usamos tu correo solo para contactarte por Predium.</p>
+      <button type="submit" class="btn btn-primary" data-en="Request an invite">Solicitar invitación</button>
+      <p class="form-note" data-en="Free during the pilot. We only use your email to contact you about Predium.">Sin costo durante el piloto. Usamos tu correo solo para contactarte por Predium.</p>
     </form>
   </div>
 </section>
@@ -713,24 +733,109 @@
 <footer>
   <div class="wrap">
     <span class="brand">Predium</span>
-    <span>Diagnóstico agroecológico para la agricultura familiar campesina.</span>
+    <span data-en="Agroecological diagnosis for smallholder family farming.">Diagnóstico agroecológico para la agricultura familiar campesina.</span>
     <ul class="foot-links">
       <li><a href="https://github.com/aliciapaz/predium" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-      <li><a href="#acceso">Contacto</a></li>
+      <li><a href="#acceso" data-en="Contact">Contacto</a></li>
     </ul>
   </div>
 </footer>
 
 <script>
   (function () {
-    var principles = [
-      { short: 'Biodiversidad', name: 'Biodiversidad' },
-      { short: 'Reciclaje', name: 'Reciclaje' },
-      { short: 'Interacciones', name: 'Interacción entre los componentes del sistema: animal, agrícola, forestal y otros' },
-      { short: 'Suelo', name: 'Manejo ecológico del suelo' },
-      { short: 'Plagas', name: 'Manejo ecológico de plagas y enfermedades' },
-      { short: 'Saber tradicional', name: 'Bases culturales y conocimiento tradicional en el manejo del sistema' }
-    ];
+    var KEY = 'predium-lang';
+    var LANGS = ['es', 'en'];
+    var ATTRS = ['aria-label', 'content'];
+    var root = document.documentElement;
+    var nodes = document.querySelectorAll('[data-en], [data-en-aria-label], [data-en-content]');
+    var toggles = document.querySelectorAll('.lang button');
+
+    // The Spanish copy is the markup itself, so stash it before the first swap.
+    Array.prototype.forEach.call(nodes, function (node) {
+      if (node.hasAttribute('data-en')) node.setAttribute('data-es', node.textContent);
+      ATTRS.forEach(function (attr) {
+        if (node.hasAttribute('data-en-' + attr)) node.setAttribute('data-es-' + attr, node.getAttribute(attr));
+      });
+    });
+
+    function stored() {
+      try { return localStorage.getItem(KEY); } catch (e) { return null; }
+    }
+
+    // Spanish and English speakers get their language; anyone else reads English more often than Spanish.
+    function detect() {
+      var param = new URLSearchParams(location.search).get('lang');
+      if (LANGS.indexOf(param) !== -1) return param;
+      var saved = stored();
+      if (LANGS.indexOf(saved) !== -1) return saved;
+      var prefs = navigator.languages || [navigator.language || ''];
+      for (var i = 0; i < prefs.length; i++) {
+        var code = prefs[i].slice(0, 2).toLowerCase();
+        if (LANGS.indexOf(code) !== -1) return code;
+      }
+      return 'en';
+    }
+
+    function apply(lang) {
+      root.lang = lang;
+      Array.prototype.forEach.call(nodes, function (node) {
+        if (node.hasAttribute('data-en')) node.textContent = node.getAttribute('data-' + lang);
+        ATTRS.forEach(function (attr) {
+          if (node.hasAttribute('data-en-' + attr)) node.setAttribute(attr, node.getAttribute('data-' + lang + '-' + attr));
+        });
+      });
+      Array.prototype.forEach.call(toggles, function (b) {
+        b.setAttribute('aria-pressed', b.dataset.lang === lang ? 'true' : 'false');
+      });
+      document.getElementById('idioma').value = lang;
+      document.dispatchEvent(new CustomEvent('predium:lang', { detail: lang }));
+    }
+
+    Array.prototype.forEach.call(toggles, function (b) {
+      b.addEventListener('click', function () {
+        var lang = b.dataset.lang;
+        try { localStorage.setItem(KEY, lang); } catch (e) {}
+        var url = new URL(location.href);
+        if (url.searchParams.has('lang')) {
+          url.searchParams.set('lang', lang);
+          history.replaceState(null, '', url);
+        }
+        apply(lang);
+      });
+    });
+
+    apply(detect());
+  })();
+</script>
+
+<script>
+  (function () {
+    var copy = {
+      es: {
+        meta: function (n, total) { return 'Principio ' + n + ' de ' + total; },
+        principles: [
+          { short: 'Biodiversidad', name: 'Biodiversidad' },
+          { short: 'Reciclaje', name: 'Reciclaje' },
+          { short: 'Interacciones', name: 'Interacción entre los componentes del sistema: animal, agrícola, forestal y otros' },
+          { short: 'Suelo', name: 'Manejo ecológico del suelo' },
+          { short: 'Plagas', name: 'Manejo ecológico de plagas y enfermedades' },
+          { short: 'Saber tradicional', name: 'Bases culturales y conocimiento tradicional en el manejo del sistema' }
+        ]
+      },
+      en: {
+        meta: function (n, total) { return 'Principle ' + n + ' of ' + total; },
+        principles: [
+          { short: 'Biodiversity', name: 'Biodiversity' },
+          { short: 'Recycling', name: 'Recycling' },
+          { short: 'Interactions', name: 'Interaction between system components: animal, agricultural, forestry and others' },
+          { short: 'Soil', name: 'Ecological soil management' },
+          { short: 'Pests', name: 'Ecological pest and disease management' },
+          { short: 'Local knowledge', name: 'Cultural foundations and traditional knowledge in managing the system' }
+        ]
+      }
+    };
+    var lang = document.documentElement.lang;
+    var principles = copy[lang].principles;
     var scores = [8, 5, 6, 4, 3, 7];
     var current = 0;
 
@@ -845,7 +950,7 @@
       draw(drawn);
     }
     function render() {
-      document.getElementById('q-meta').textContent = 'Principio ' + (current + 1) + ' de ' + principles.length;
+      document.getElementById('q-meta').textContent = copy[lang].meta(current + 1, principles.length);
       document.getElementById('q-name').textContent = principles[current].name;
       buttons.forEach(function (b, idx) {
         var on = idx + 1 === scores[current];
@@ -857,6 +962,13 @@
       prev.disabled = current === 0;
       next.disabled = current === principles.length - 1;
     }
+
+    document.addEventListener('predium:lang', function (e) {
+      lang = e.detail;
+      principles = copy[lang].principles;
+      labels.forEach(function (t, idx) { t.textContent = principles[idx].short; });
+      render();
+    });
 
     render();
     draw(drawn);
