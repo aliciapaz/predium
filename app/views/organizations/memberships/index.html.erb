@@ -4,14 +4,15 @@
 <% is_admin = current_membership&.admin? %>
 
 <div>
-  <%= page_header("#{t('navigation.members')}: #{@organization.name}") do %>
-    <div class="flex items-center gap-3">
-      <%= badge(@memberships.size, tone: :neutral) %>
-      <% if is_admin %>
-        <%= link_to t("labels.invite_member"), new_organization_invitation_path(@organization), class: "btn-primary" %>
+  <%= page_header(@organization.name) do %>
+    <% if is_admin %>
+      <%= link_to new_organization_invitation_path(@organization), class: "btn-primary" do %>
+        <%= icon(:plus) %>
+        <%= t("labels.invite_member") %>
       <% end %>
-    </div>
+    <% end %>
   <% end %>
+  <%= render "organizations/tabs", organization: @organization %>
 
   <div class="card-flush overflow-x-auto">
     <table class="data-table">
@@ -32,14 +33,16 @@
             <td><%= membership.user.first_name %> <%= membership.user.last_name %></td>
             <td><%= membership.user.email %></td>
             <td><%= badge(t("roles.#{membership.role}"), tone: membership.admin? ? :success : :neutral) %></td>
-            <td><%= membership.created_at.strftime("%b %d, %Y") %></td>
+            <td><%= l(membership.created_at, format: :short) %></td>
             <% if is_admin %>
               <td class="text-right">
                 <% unless membership.user == current_user %>
+                  <% member_name = [membership.user.first_name, membership.user.last_name].compact_blank.join(" ").presence || membership.user.email %>
                   <%= button_to t("labels.remove"),
                       organization_membership_path(@organization, membership),
                       method: :delete,
-                      data: { turbo_confirm: t("common.confirm_delete") },
+                      "aria-label": t("labels.remove_member", name: member_name),
+                      data: { turbo_confirm: t("labels.confirm_remove_member", name: member_name, org: @organization.name) },
                       class: "btn-danger btn-compact" %>
                 <% end %>
               </td>

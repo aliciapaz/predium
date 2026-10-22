@@ -18,7 +18,6 @@ es:
     edit: "Editar"
     create: "Crear"
     back: "Volver"
-    generate_pdf: "Generar PDF"
     sync_now: "Sincronizar ahora"
     complete_form: "Completar formulario"
     submit: "Enviar"
@@ -42,7 +41,7 @@ es:
     organization_created: "Organización creada exitosamente."
     organization_updated: "Organización actualizada exitosamente."
     member_invited: "Miembro invitado exitosamente."
-    member_removed: "Miembro removido."
+    member_removed: "Miembro quitado de la organización."
     profile_updated: "Perfil actualizado exitosamente."
     form_locked: "Los formularios completados no se pueden editar."
     missing_indicators: "Por favor completa todos los indicadores. Faltan: %{dimensions}"
@@ -90,7 +89,6 @@ es:
     admin_users: "Gestionar usuarios"
     admin_organizations: "Gestionar organizaciones"
     profile_show: "Mi perfil"
-    org_forms: "Cuestionarios"
 
   # ── Etiquetas de Formulario ─────────────────────────────
   labels:
@@ -118,7 +116,10 @@ es:
     search: "Buscar"
     search_farm: "Buscar por nombre del predio..."
     joined: "Ingreso"
-    remove: "Remover"
+    remove: "Quitar"
+    remove_member: "Quitar a %{name}"
+    confirm_remove_member: "¿Quitar a %{name} de %{org}?"
+    email_placeholder: "nombre@ejemplo.com"
     invite_member: "Invitar miembro"
     invite_to_org: "Invitar miembro a %{org}"
     send_invitation: "Enviar invitación"
@@ -144,7 +145,6 @@ es:
     offline: "Sin conexión"
     online: "En línea"
     no_results: "No se encontraron resultados."
-    confirm_delete: "¿Estás seguro de que quieres eliminar esto?"
     total: "Total"
     average: "Promedio"
     low: "Bajo"
@@ -160,6 +160,7 @@ es:
     main: "Navegación principal"
     menu: "Menú"
     language: "Idioma"
+    organization: "Organización"
 
   # ── Flujo del Cuestionario ─────────────────────────────
   questionnaire:
@@ -178,7 +179,8 @@ es:
     previous: "Anterior"
     overall_progress: "Progreso general"
     indicators_count: "%{answered}/%{total} indicadores"
-    dimension_of: "Dimensión %{current} de %{total}"
+    section_of: "Sección %{current} de %{total}"
+    go_to_missing: "Ir a lo que falta"
     answered_count: "%{answered}/%{total} respondidos"
     back_to_farm_info: "Info del Predio"
     principles_title: "Principios agroecológicos"
@@ -194,6 +196,11 @@ es:
     view_results: "Ver resultados"
     back_to_forms: "Volver a mis formularios"
     create_and_start: "Crear e iniciar cuestionario"
+    updated_on: "Actualizado %{date}"
+    completed_on: "Completado %{date}"
+    untitled: "un predio sin nombre"
+    delete_named: "Eliminar el diagnóstico de %{name}"
+    confirm_delete: "¿Eliminar el diagnóstico de %{name}?"
 
   # ── Formulario de Info del Predio ──────────────────────
   farm_info:
@@ -258,7 +265,6 @@ es:
     draft_forms: "Formularios en borrador"
     countries_active: "Países activos"
     recent_activity: "Actividad reciente"
-    export_csv: "Exportar CSV"
     filter_country: "País"
     filter_all_countries: "Todos los países"
     filter_from: "Desde"

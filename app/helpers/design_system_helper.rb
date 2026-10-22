@@ -78,6 +78,10 @@ module DesignSystemHelper
   end
 
   def badge(text, tone:)
+    if text.is_a?(Hash) || text.is_a?(Array) || text.is_a?(ActiveRecord::Relation)
+      raise ArgumentError, "badge needs a string or a number, got #{text.class}. Pass a count such as records.length."
+    end
+
     css = BADGE_CLASSES.fetch(tone) do
       raise ArgumentError, "badge tone :#{tone} is not one of #{BADGE_CLASSES.keys.join(", ")}."
     end

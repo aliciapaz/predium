@@ -7,6 +7,7 @@
 
     <div class="hidden md:flex items-center gap-1 ml-4">
       <%= nav_link t("nav.my_forms"), root_path %>
+      <%= render "shared/organization_nav_link" %>
       <%= nav_link t("nav.profile"), profile_path %>
       <% if current_user.super_admin? %>
         <%= nav_link t("nav.admin"), admin_root_path %>
@@ -31,6 +32,7 @@
   <div id="app-menu" class="md:hidden hidden border-t border-line bg-surface" data-navbar-target="menu">
     <div class="px-4 py-3 flex flex-col gap-1">
       <%= nav_link t("nav.my_forms"), root_path, css: "app-nav-link-row" %>
+      <%= render "shared/organization_nav_link", css: "app-nav-link-row" %>
       <%= nav_link t("nav.profile"), profile_path, css: "app-nav-link-row" %>
       <% if current_user.super_admin? %>
         <%= nav_link t("nav.admin"), admin_root_path, css: "app-nav-link-row" %>

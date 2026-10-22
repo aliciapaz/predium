@@ -1,15 +1,17 @@
 <% content_for(:title, "#{@organization.name} | #{t('navigation.forms')}") %>
 
 <div>
-  <%= page_header("#{@organization.name}: #{t('titles.org_forms')}") do %>
-    <%= badge("#{t('common.total')}: #{@forms.size}", tone: :neutral) %>
-  <% end %>
+  <%= page_header(@organization.name) %>
+  <%= render "organizations/tabs", organization: @organization %>
 
   <div class="flex flex-col gap-6">
-    <div class="segmented self-start" role="group" aria-label="<%= t("labels.status") %>">
-      <%= link_to t("labels.all"), organization_forms_path(@organization), "aria-current": ("true" if params[:state].blank?) %>
-      <%= link_to t("states.draft"), organization_forms_path(@organization, state: "draft"), "aria-current": ("true" if params[:state] == "draft") %>
-      <%= link_to t("states.completed"), organization_forms_path(@organization, state: "completed"), "aria-current": ("true" if params[:state] == "completed") %>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="segmented" role="group" aria-label="<%= t("labels.status") %>">
+        <%= link_to t("labels.all"), organization_forms_path(@organization), "aria-current": ("true" if params[:state].blank?) %>
+        <%= link_to t("states.draft"), organization_forms_path(@organization, state: "draft"), "aria-current": ("true" if params[:state] == "draft") %>
+        <%= link_to t("states.completed"), organization_forms_path(@organization, state: "completed"), "aria-current": ("true" if params[:state] == "completed") %>
+      </div>
+      <%= badge("#{t('common.total')}: #{@forms.size}", tone: :neutral) %>
     </div>
 
     <turbo-frame id="org_forms_search">
@@ -46,7 +48,7 @@
                     <%= badge(t("states.#{form.state}"), tone: form.state == "completed" ? :success : :warning) %>
                   </td>
                   <td><%= [form.locality, form.region].compact_blank.join(", ").presence || "-" %></td>
-                  <td class="text-muted"><%= l(form.updated_at, format: :short, default: form.updated_at.strftime("%b %d, %Y")) %></td>
+                  <td class="text-muted"><%= form_date(form) %></td>
                 </tr>
               <% end %>
             </tbody>

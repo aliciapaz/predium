@@ -1,9 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
-import { newClientId, getForm, saveForm, getResponses, saveResponse, enqueue, pruneDisallowedResponses } from "lib/db"
+import { newClientId, getForm, saveForm, getResponses, saveResponse, enqueue, pruneDisallowedResponses, queueEntries } from "lib/db"
 import { cachedConfig, principles, territoryIndicators, dimensionIndicators, visibleDimensions } from "lib/config_cache"
 import { load as loadTranslations, t, has } from "lib/i18n"
 import { syncNow, hydrateForm, csrfToken } from "lib/sync"
 import { badge, band, escape, icon, iconButton } from "lib/ui"
+
+const HYDRATE_TIMEOUT_MS = 4000
 
 const FARM_FIELDS = [
   "name", "national_id", "date_of_birth", "phone", "gender", "work_force",
@@ -18,7 +20,7 @@ export default class extends Controller {
   static targets = [
     "title", "saveState", "progressText", "progressBar", "dimensionNav", "dimensionProgress",
     "indicators", "prevButton", "nextButton", "nextCaption", "completeForm", "completeButton", "completeHint",
-    "farmInfo", "farmInfoCount"
+    "completeSlot", "missingButton", "farmInfo", "farmInfoCount"
   ]
   static values = { clientId: String, formsUrl: String }
 
@@ -30,12 +32,14 @@ export default class extends Controller {
 
     this.config = await cachedConfig()
     await loadTranslations()
+    const stored = await this.storedForm()
+    this.titleTarget.textContent = stored?.name || t(stored ? "titles.form_edit" : "questionnaire.new_questionnaire")
     if (!this.config) {
       this.indicatorsTarget.innerHTML = `<div class="alert-warning" role="status">${icon("info")}<p>${escape(t("offline.config_unavailable"))}</p></div>`
       return
     }
 
-    this.form = (await getForm(this.clientId)) || { client_id: this.clientId, state: "draft", system_types: [] }
+    this.form = stored || { client_id: this.clientId, state: "draft", system_types: [] }
     if (this.form.state === "completed") {
       window.Turbo.visit(this.formPath())
       return
@@ -46,10 +50,9 @@ export default class extends Controller {
       await enqueue(this.clientId)
       syncNow()
     }
-    this.currentIndex = 0
+    this.currentIndex = this.resumeIndex()
 
     this.hydrateFarmFields()
-    if (this.form.name) this.titleTarget.textContent = this.form.name
     // Returning to a named form is usually about scoring, so the farm details
     // start collapsed; a new form opens on them.
     if (this.hasFarmInfoTarget && this.form.name) this.farmInfoTarget.open = false
@@ -59,6 +62,22 @@ export default class extends Controller {
     this.completeFormTarget.addEventListener("submit", (event) => this.handleComplete(event))
 
     this.render()
+  }
+
+  // Same self-heal as the results view: the window-load seed may not have run
+  // (Turbo navigation) or may still be racing this read, so an existing id with
+  // no local copy, or a copy with no answers, is pulled from the server before
+  // the editor treats it as a new form. Local unsynced work is never waited on,
+// and a slow network cannot hold the editor hostage for more than a moment.
+  async storedForm() {
+    if (!this.clientIdValue) return null
+    const form = await getForm(this.clientId)
+    const answered = form && Object.keys(await getResponses(this.clientId)).length > 0
+    if (answered || !navigator.onLine || form?.dirty) return form
+    if ((await queueEntries()).some((entry) => entry.form_client_id === this.clientId)) return form
+
+    await hydrateForm(this.clientId, { signal: AbortSignal.timeout?.(HYDRATE_TIMEOUT_MS) })
+    return getForm(this.clientId)
   }
 
   // formsUrl may carry a query string (e.g. ?locale=es), so path segments must
@@ -98,8 +117,29 @@ export default class extends Controller {
 
   showDimension(index) {
     this.currentIndex = index
+    if (this.hasFarmInfoTarget && this.form.name) this.farmInfoTarget.open = false
     this.render()
-    this.element.scrollIntoView({ behavior: "smooth", block: "start" })
+    this.indicatorsTarget.querySelector("h2").scrollIntoView({ behavior: "smooth", block: "start" })
+  }
+
+  jumpToMissing() {
+    const index = this.firstIncompleteIndex()
+    if (index >= 0) this.showDimension(index)
+  }
+
+  isDone(dimension) {
+    return this.indicatorsFor(dimension).every((indicator) => this.responses[indicator.key] !== undefined)
+  }
+
+  firstIncompleteIndex() {
+    return this.dimensions().findIndex((dimension) => !this.isDone(dimension))
+  }
+
+  // A resumed draft opens where work remains; a fully scored one opens on the
+  // last section, where it completes.
+  resumeIndex() {
+    const index = this.firstIncompleteIndex()
+    return index === -1 ? this.dimensions().length - 1 : index
   }
 
   // ── Persistence ────────────────────────────────────────
@@ -204,7 +244,14 @@ export default class extends Controller {
     this.showHint(t("offline.complete_requires_sync"))
   }
 
+  refreshMissingButton() {
+    if (!this.hasMissingButtonTarget) return
+    const last = this.currentIndex === this.dimensions().length - 1
+    this.missingButtonTarget.classList.toggle("hidden", !last || this.firstIncompleteIndex() === -1)
+  }
+
   refreshCompleteState() {
+    this.refreshMissingButton()
     const missing = this.requiredItems().filter((item) => this.responses[item.key] === undefined).length
     const online = navigator.onLine
     this.completeButtonTarget.disabled = !(missing === 0 && online)
@@ -234,6 +281,8 @@ export default class extends Controller {
     this.prevButtonTarget.disabled = this.currentIndex === 0
     this.nextButtonTarget.classList.toggle("hidden", last)
     this.completeButtonTarget.classList.toggle("hidden", !last)
+    if (this.hasCompleteSlotTarget) this.completeSlotTarget.classList.toggle("hidden", !last)
+    this.refreshMissingButton()
     if (this.hasNextCaptionTarget) {
       this.nextCaptionTarget.textContent = last ? "" : t("questionnaire.next_up", { section: t(dimensions[this.currentIndex + 1].i18n_key) })
     }
@@ -274,9 +323,9 @@ export default class extends Controller {
 
     const header = `
       <div>
-        <h2 class="page-title text-2xl">${escape(t(dimension.i18n_key))}</h2>
+        <h2 class="page-title scroll-anchor text-2xl">${escape(t(dimension.i18n_key))}</h2>
         <p class="mt-1 text-sm text-muted">
-          ${escape(t("questionnaire.dimension_of", { current: this.currentIndex + 1, total: this.dimensions().length }))},
+          ${escape(t("questionnaire.section_of", { current: this.currentIndex + 1, total: this.dimensions().length }))},
           <span data-form-editor-target="dimensionProgress"></span>
         </p>${hint}
       </div>`
@@ -295,7 +344,7 @@ export default class extends Controller {
         <input type="radio" name="${name}" value="${n}" data-band="${band(n)}"${value === n ? " checked" : ""}>${n}
       </label>`).join("")
 
-    const extension = indicator.extension
+    const extension = indicator.extension && indicator.extension !== this.form.territory_key
       ? badge(t(this.config.extensions[indicator.extension].i18n_key), "neutral")
       : ""
 

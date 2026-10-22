@@ -153,6 +153,12 @@
   }
 }
 
+/* A heading the screen scrolls to (the editor's section heading). Lands just
+   below the top edge with room to breathe instead of flush against it. */
+@utility scroll-anchor {
+  scroll-margin-top: calc(env(safe-area-inset-top) + 1rem);
+}
+
 /* Collapsible group built on <details>. The summary is a full-width,
    48px row with a rotating chevron. */
 @utility disclosure {
@@ -313,6 +319,42 @@
     color: var(--color-ink);
     background-color: var(--color-surface);
     box-shadow: var(--shadow-raised);
+  }
+}
+
+/* Sibling pages of one area (an organization's forms and members). A <nav>
+   of links; the current page carries aria-current="page". Filters within a
+   page use `segmented` instead, so the two never look alike. */
+@utility page-tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--color-line);
+  scrollbar-width: none;
+
+  & > a {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 0.875rem;
+    margin-bottom: -1px;
+    font-weight: 600;
+    color: var(--color-muted);
+    text-decoration: none;
+    border-bottom: 3px solid transparent;
+  }
+
+  @media (hover: hover) {
+    & > a:hover {
+      color: var(--color-ink);
+    }
+  }
+
+  & > a[aria-current="page"] {
+    color: var(--color-primary-ink);
+    border-bottom-color: var(--color-primary);
   }
 }
 

@@ -8,8 +8,7 @@
       </div>
 
       <p class="mt-1 text-sm text-muted">
-        <%= [[form.region, form.country].compact_blank.join(", ").presence,
-              (l(form.updated_at, format: :short) rescue form.updated_at.strftime("%b %d, %Y"))].compact.join(", ") %>
+        <%= [[form.region, form.country].compact_blank.join(", ").presence, form_date(form)].compact.join(", ") %>
       </p>
 
       <% if form.draft? %>
@@ -29,8 +28,9 @@
         <%= icon(:chevron_right) %>
       <% end %>
 
-      <%= form_with url: form_path(form), method: :delete, data: { turbo_confirm: t("common.confirm_delete") } do %>
-        <%= icon_button :trash, label: t("buttons.delete"), type: "submit", class: "hover:text-danger" %>
+      <% name = form.name.presence || t("forms.untitled") %>
+      <%= form_with url: form_path(form), method: :delete, data: { turbo_confirm: t("forms.confirm_delete", name: name) } do %>
+        <%= icon_button :trash, label: t("forms.delete_named", name: name), type: "submit", class: "hover:text-danger" %>
       <% end %>
     </div>
   </article>

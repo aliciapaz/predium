@@ -22,4 +22,13 @@ class ApplicationController < ActionController::Base
     @current_organization ||= current_user&.organizations&.first
   end
   helper_method :current_organization
+
+  # The organization this user runs as an admin member, so the app bar can
+  # lead to its forms and members. Nil for everyone else.
+  def administered_organization
+    return @administered_organization if defined?(@administered_organization)
+
+    @administered_organization = (current_user.administered_organization if user_signed_in?)
+  end
+  helper_method :administered_organization
 end

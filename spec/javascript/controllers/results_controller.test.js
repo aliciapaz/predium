@@ -183,10 +183,19 @@ describe("results controller", () => {
       expect(row.lastElementChild.dataset.band).toBeUndefined()
     })
 
-    it("names each indicator's source territory", async () => {
+    it("names the source territory only for indicators inherited from another one", async () => {
+      await applyServerForm(serverForm({ territory_key: "coast" }))
+
       await mount(fixture, { results: ResultsController })
 
       expect(indicatorRow("Compaction").querySelector("span span").textContent).toBe("Andes extension")
+      expect(indicatorRow("Salinity").querySelector("span span")).toBeNull()
+    })
+
+    it("leaves indicators of the form's own territory unbadged", async () => {
+      await mount(fixture, { results: ResultsController })
+
+      expect(indicatorRow("Compaction").querySelector("span span")).toBeNull()
     })
 
     it("renders only the dimensions the form's territory has indicators for", async () => {

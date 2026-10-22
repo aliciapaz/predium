@@ -16,7 +16,7 @@
   --color-surface: #ffffff;
   --color-line-soft: #eef2e9;
   --color-line: #d5dfcc;
-  --color-line-strong: #b3c2a6;
+  --color-line-strong: #7f9173;
   --color-muted: #56675a;
   --color-ink-soft: #3a4e40;
   --color-ink: #1a2e22;
@@ -27,7 +27,7 @@
   --color-primary-soft: #ecf3e8;
   --color-primary-line: #cfe1c7;
   --color-accent: #f2c14e;
-  --color-focus: #d9960e;
+  --color-focus: #a86f08;
 
   /* Deep forest surfaces (admin sidebar) */
   --color-deep: #1f4a33;

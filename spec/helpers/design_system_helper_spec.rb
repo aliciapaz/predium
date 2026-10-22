@@ -55,6 +55,16 @@ RSpec.describe(DesignSystemHelper, type: :helper) do
     it "refuses unknown tones" do
       expect { helper.badge("x", tone: :info) }.to(raise_error(ArgumentError, /not one of neutral, success, warning, danger/))
     end
+
+    it "accepts a count" do
+      expect(helper.badge(3, tone: :neutral)).to(include(">3</span>"))
+    end
+
+    it "refuses collections, which would print as Ruby" do
+      expect { helper.badge({ 2 => 1 }, tone: :neutral) }.to(raise_error(ArgumentError, /got Hash/))
+      expect { helper.badge([1], tone: :neutral) }.to(raise_error(ArgumentError, /got Array/))
+      expect { helper.badge(Organization.all, tone: :neutral) }.to(raise_error(ArgumentError, /got .*Relation/))
+    end
   end
 
   describe "#alert_box" do

@@ -7,7 +7,7 @@ module Admin
     def format_admin_date(date)
       return "-" if date.blank?
 
-      date.strftime("%b %d, %Y")
+      l(date, format: :short)
     end
 
     def role_badge(role)

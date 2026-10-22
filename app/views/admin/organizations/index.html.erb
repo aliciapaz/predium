@@ -3,7 +3,7 @@
 <div>
   <%= page_header(t("admin.organizations")) do %>
     <div class="flex items-center gap-3">
-      <%= badge(@organizations.size, tone: :neutral) %>
+      <%= badge(@organizations.length, tone: :neutral) %>
       <%= link_to t("admin.new_organization"), new_admin_organization_path, class: "btn-primary" %>
     </div>
   <% end %>

@@ -18,7 +18,6 @@ en:
     edit: "Edit"
     create: "Create"
     back: "Back"
-    generate_pdf: "Generate PDF"
     sync_now: "Sync now"
     complete_form: "Complete form"
     submit: "Submit"
@@ -42,7 +41,7 @@ en:
     organization_created: "Organization created successfully."
     organization_updated: "Organization updated successfully."
     member_invited: "Member invited successfully."
-    member_removed: "Member removed."
+    member_removed: "Member removed from the organization."
     profile_updated: "Profile updated successfully."
     form_locked: "Completed forms cannot be edited."
     missing_indicators: "Please complete all indicators. Missing: %{dimensions}"
@@ -90,7 +89,6 @@ en:
     admin_users: "Manage users"
     admin_organizations: "Manage organizations"
     profile_show: "My profile"
-    org_forms: "Questionnaires"
 
   # ── Form Labels ─────────────────────────────────────────
   labels:
@@ -119,6 +117,9 @@ en:
     search_farm: "Search by farm name..."
     joined: "Joined"
     remove: "Remove"
+    remove_member: "Remove %{name}"
+    confirm_remove_member: "Remove %{name} from %{org}?"
+    email_placeholder: "name@example.com"
     invite_member: "Invite member"
     invite_to_org: "Invite member to %{org}"
     send_invitation: "Send invitation"
@@ -144,7 +145,6 @@ en:
     offline: "Offline"
     online: "Online"
     no_results: "No results found."
-    confirm_delete: "Are you sure you want to delete this?"
     total: "Total"
     average: "Average"
     low: "Low"
@@ -160,6 +160,7 @@ en:
     main: "Main navigation"
     menu: "Menu"
     language: "Language"
+    organization: "Organization"
 
   # ── Questionnaire Flow ────────────────────────────────
   questionnaire:
@@ -178,7 +179,8 @@ en:
     previous: "Previous"
     overall_progress: "Overall progress"
     indicators_count: "%{answered}/%{total} indicators"
-    dimension_of: "Dimension %{current} of %{total}"
+    section_of: "Section %{current} of %{total}"
+    go_to_missing: "Go to what is missing"
     answered_count: "%{answered}/%{total} answered"
     back_to_farm_info: "Farm Info"
     principles_title: "Agroecology principles"
@@ -194,6 +196,11 @@ en:
     view_results: "View results"
     back_to_forms: "Back to my forms"
     create_and_start: "Create & start questionnaire"
+    updated_on: "Updated %{date}"
+    completed_on: "Completed %{date}"
+    untitled: "an unnamed farm"
+    delete_named: "Delete the diagnosis of %{name}"
+    confirm_delete: "Delete the diagnosis of %{name}?"
 
   # ── Farm Info Form ─────────────────────────────────────
   farm_info:
@@ -258,7 +265,6 @@ en:
     draft_forms: "Draft forms"
     countries_active: "Countries active"
     recent_activity: "Recent activity"
-    export_csv: "Export CSV"
     filter_country: "Country"
     filter_all_countries: "All countries"
     filter_from: "From"
@@ -376,3 +382,11 @@ en:
         name: "Name"
       membership:
         role: "Role"
+
+  date:
+    formats:
+      short: "%b %-d, %Y"
+
+  time:
+    formats:
+      short: "%b %-d, %Y"

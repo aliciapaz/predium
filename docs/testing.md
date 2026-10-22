@@ -68,4 +68,4 @@ These are checked by hand in a browser:
 - Repeat the upgrade offline and with a failed config request. The editor reports unavailable config and preserves the draft until it can fetch the compatible schema.
 - Fail one locale request during refresh, then reload online. Its labels recover even when the questionnaire fingerprint already matches. Reload again and use the editor offline to check both cache layers.
 - Change a draft's territory while config pruning runs. Answers valid for the resulting territory survive; completed forms stay untouched.
-- With a child extension, editor and results badges name each indicator's source territory, including inherited parent questions.
+- With a child extension, editor and results badge only the indicators inherited from a parent territory, naming that territory; the child's own indicators carry no badge.

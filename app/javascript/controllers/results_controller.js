@@ -121,7 +121,7 @@ export default class extends Controller {
         const chip = value != null
           ? `<span class="score-chip" data-band="${band(value)}">${value}</span>`
           : '<span class="score-chip">-</span>'
-        const source = indicator.extension
+        const source = indicator.extension && indicator.extension !== this.form.territory_key
           ? badge(t(this.config.extensions[indicator.extension].i18n_key), "neutral")
           : ""
         return `<div class="flex items-center gap-4 px-5 py-3">

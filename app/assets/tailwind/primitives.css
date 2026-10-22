@@ -88,7 +88,9 @@
   cursor: pointer;
 }
 
-/* A checkbox or radio dressed as a pill. Wrap the input in the label. */
+/* A checkbox or radio dressed as a pill. Wrap the input in the label. The
+   mark is round for a radio and a rounded square for a checkbox, so a
+   multi-select never reads as a single choice. */
 @utility chip {
   position: relative;
   display: inline-flex;
@@ -120,6 +122,10 @@
     border: 1.5px solid currentColor;
     border-radius: 9999px;
     opacity: 0.55;
+  }
+
+  &:has(input[type="checkbox"])::before {
+    border-radius: 0.25rem;
   }
 
   &:has(input:checked) {
@@ -449,13 +455,15 @@
     background-color: var(--color-warning-mark);
   }
 
+  /* Offline is the field agent's normal state, not an error: warning, never
+     danger. */
   &[data-state="offline"] {
-    color: var(--color-danger);
-    background-color: var(--color-danger-soft);
+    color: var(--color-warning);
+    background-color: var(--color-warning-soft);
   }
 
   &[data-state="offline"]::before {
-    background-color: var(--color-danger-mark);
+    background-color: var(--color-warning-mark);
   }
 }
 
@@ -476,7 +484,9 @@
 
 /* One 1-10 option: a native radio inside a label, so arrow keys, screen
    readers and form state work for free. `data-band` is low (1-3), mid (4-7)
-   or high (8-10). */
+   or high (8-10). The checked option is a solid band fill with white digits,
+   so selection never depends on hue alone and a low score cannot pass for an
+   invalid field (tinted fill, colored border). */
 @utility score-scale {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -534,23 +544,23 @@
   }
 
   &[data-band="low"]:has(input:checked) {
-    color: var(--color-score-low);
-    background-color: var(--color-score-low-tint);
-    border-color: var(--color-score-low-mark);
+    color: var(--color-white);
+    background-color: var(--color-score-low);
+    border-color: var(--color-score-low);
     box-shadow: 0 0 0 2px var(--color-score-low-ring);
   }
 
   &[data-band="mid"]:has(input:checked) {
-    color: var(--color-score-mid);
-    background-color: var(--color-score-mid-tint);
-    border-color: var(--color-score-mid-mark);
+    color: var(--color-white);
+    background-color: var(--color-score-mid);
+    border-color: var(--color-score-mid);
     box-shadow: 0 0 0 2px var(--color-score-mid-ring);
   }
 
   &[data-band="high"]:has(input:checked) {
-    color: var(--color-score-high);
-    background-color: var(--color-score-high-tint);
-    border-color: var(--color-score-high-mark);
+    color: var(--color-white);
+    background-color: var(--color-score-high);
+    border-color: var(--color-score-high);
     box-shadow: 0 0 0 2px var(--color-score-high-ring);
   }
 }
