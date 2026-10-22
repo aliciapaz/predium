@@ -27,6 +27,8 @@ ENV RAILS_ENV="production" \
 # Stage 2: Build
 FROM base AS build
 
+ARG NODE_VERSION
+
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
     build-essential \
