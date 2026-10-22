@@ -1,0 +1,47 @@
+name: Offline sync regression
+
+on:
+  pull_request:
+    paths:
+      - app/javascript/lib/db.js
+      - app/javascript/lib/sync.js
+      - vendor/javascript/dexie.js
+      - spec/javascript/sync*
+      - .github/workflows/sync-regression.yml
+  push:
+    branches: [main, develop]
+    paths:
+      - app/javascript/lib/db.js
+      - app/javascript/lib/sync.js
+      - vendor/javascript/dexie.js
+      - spec/javascript/sync*
+      - .github/workflows/sync-regression.yml
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install browser runner
+        run: |
+          npm install --global agent-browser@0.31.1
+          agent-browser install --with-deps
+      - name: Run IndexedDB regressions in Chrome
+        run: |
+          python3 -m http.server 8111 --bind 127.0.0.1 > /tmp/sync-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"; agent-browser --session sync-regression close' EXIT
+          for attempt in {1..50}; do
+            if curl --silent --fail http://127.0.0.1:8111/spec/javascript/sync.html > /dev/null; then break; fi
+            sleep 0.1
+          done
+          agent-browser --session sync-regression open http://127.0.0.1:8111/spec/javascript/sync.html
+          agent-browser --session sync-regression wait '[data-complete="true"]'
+          agent-browser --session sync-regression get text '#results'
+          test "$(agent-browser --session sync-regression get attr body data-failed)" = "0"

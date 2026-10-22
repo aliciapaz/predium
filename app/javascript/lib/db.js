@@ -28,19 +28,27 @@ export async function listForms() {
 export async function saveForm(record) {
   // Callers hold long-lived in-memory copies; a raw put would wipe the sync
   // metadata a concurrent push just recorded. Keep the newest of each side.
-  const existing = await db.forms.get(record.client_id)
-  if (existing) {
-    record.base_updated_at = newest(record.base_updated_at, existing.base_updated_at)
-    record.synchronized_at = newest(record.synchronized_at, existing.synchronized_at)
-  }
-  record.updated_at = new Date().toISOString()
-  record.dirty = 1
-  await db.forms.put(record)
+  await db.transaction("rw", db.forms, async () => {
+    const existing = await db.forms.get(record.client_id)
+    if (existing) {
+      record.base_updated_at = newest(record.base_updated_at, existing.base_updated_at)
+      record.synchronized_at = newest(record.synchronized_at, existing.synchronized_at)
+    }
+    record.local_generation = existing?.local_generation ?? 0
+    touchLocal(record)
+    await db.forms.put(record)
+  })
   return record
 }
 
 function newest(a, b) {
   return [a, b].filter(Boolean).sort().pop() ?? null
+}
+
+function touchLocal(form) {
+  form.updated_at = new Date().toISOString()
+  form.dirty = 1
+  form.local_generation = (form.local_generation || 0) + 1
 }
 
 export async function getResponses(formClientId) {
@@ -51,24 +59,90 @@ export async function getResponses(formClientId) {
 }
 
 export async function saveResponse(formClientId, indicatorKey, value, isExtension = false) {
-  await db.form_responses.put({
-    form_client_id: formClientId,
-    indicator_key: indicatorKey,
-    value: Number(value),
-    is_extension: isExtension
+  await db.transaction("rw", db.forms, db.form_responses, async () => {
+    await db.form_responses.put({
+      form_client_id: formClientId,
+      indicator_key: indicatorKey,
+      value: Number(value),
+      is_extension: isExtension
+    })
+    await db.forms.update(formClientId, touchLocal)
   })
-  await db.forms.update(formClientId, { updated_at: new Date().toISOString(), dirty: 1 })
 }
 
-// Drops extension responses no longer allowed by the form's territory so a
-// territory change cannot leave keys the server will reject with 422 forever.
-export async function pruneStaleExtensions(formClientId, allowedKeys) {
+// The generation must describe the exact response set sent to the server.
+export async function snapshotForm(formClientId) {
+  return db.transaction("r", db.forms, db.form_responses, async () => {
+    const form = await db.forms.get(formClientId)
+    if (!form) return null
+    return { form, responses: await getResponses(formClientId) }
+  })
+}
+
+// Drops every response the form's current questionnaire does not allow: answers
+// orphaned by a territory change, or legacy rows hydrated from the server that
+// no questionnaire knows (their is_extension flag is unreliable, so the key set
+// alone decides). Otherwise every sync ships a key the server rejects with 422
+// forever. Marks the form dirty only when something was removed; returns the count.
+export async function pruneDisallowedResponses(formClientId, allowedKeys) {
   const allowed = new Set(allowedKeys)
-  await db.form_responses
-    .where({ form_client_id: formClientId })
-    .and((row) => row.is_extension && !allowed.has(row.indicator_key))
-    .delete()
-  await db.forms.update(formClientId, { updated_at: new Date().toISOString(), dirty: 1 })
+  return db.transaction("rw", db.forms, db.form_responses, async () => {
+    const removed = await db.form_responses
+      .where({ form_client_id: formClientId })
+      .and((row) => !allowed.has(row.indicator_key))
+      .delete()
+    if (removed > 0) await db.forms.update(formClientId, touchLocal)
+    return removed
+  })
+}
+
+// Config-change migration heal. A refreshed config can (a) remove a key
+// entirely (this refactor's placeholder indicators) or (b) move a key into a
+// territory a given form does not belong to. Either way, drop every local
+// response the form's OWN territory chain no longer allows (regardless of
+// is_extension) and re-enqueue the affected forms so they stop failing every
+// sync with a 422. Allowed keys are resolved per form from its territory, not
+// the global union of all territories: a key valid only for another territory
+// is pruned here instead of surviving to 422-loop against a form that cannot
+// hold it.
+export async function pruneUnknownResponses(config) {
+  // One transaction so an interruption can't delete rows without also marking
+  // the form dirty and queued, or prune against a territory changed by a save.
+  await db.transaction("rw", db.forms, db.form_responses, db.sync_queue, async () => {
+    const principleKeys = new Set((config.principles || []).map((p) => p.key))
+    const chainByTerritory = territoryChainKeys(config)
+    const forms = await db.forms.toArray()
+    const territoryOf = new Map(forms.map((form) => [form.client_id, form.territory_key]))
+    // Completed forms are locked and server-authoritative; never touch or re-push
+    // them. An orphaned key left on a completed form is inert.
+    const completed = new Set(forms.filter((form) => form.state === "completed").map((form) => form.client_id))
+
+    const isStale = (row) => {
+      if (completed.has(row.form_client_id) || principleKeys.has(row.indicator_key)) return false
+      const chain = chainByTerritory.get(territoryOf.get(row.form_client_id)) || EMPTY_SET
+      return !chain.has(row.indicator_key)
+    }
+    const stale = await db.form_responses.filter(isStale).toArray()
+    if (stale.length === 0) return
+
+    const formIds = [...new Set(stale.map((row) => row.form_client_id))]
+    await db.form_responses.bulkDelete(stale.map((row) => [row.form_client_id, row.indicator_key]))
+    for (const formClientId of formIds) {
+      await db.forms.update(formClientId, touchLocal)
+      await enqueue(formClientId)
+    }
+  })
+}
+
+const EMPTY_SET = new Set()
+
+// Map of territory_key -> Set of that territory's resolved indicator keys.
+function territoryChainKeys(config) {
+  const map = new Map()
+  Object.entries(config.extensions || {}).forEach(([territory, ext]) => {
+    map.set(territory, new Set((ext.indicators || []).map((indicator) => indicator.key)))
+  })
+  return map
 }
 
 export async function getConfig() {
@@ -90,18 +164,20 @@ export async function putLocale(locale, translations, fingerprint) {
 // One queue entry per form: repeated edits collapse into a single upsert
 // whose payload is built from the current store state at drain time.
 export async function enqueue(formClientId) {
-  const existing = await db.sync_queue.where({ form_client_id: formClientId }).first()
-  if (existing) {
-    await db.sync_queue.update(existing.id, { queued_at: new Date().toISOString() })
-  } else {
-    await db.sync_queue.add({
-      form_client_id: formClientId,
-      operation: "upsert",
-      queued_at: new Date().toISOString(),
-      attempts: 0,
-      last_error: null
-    })
-  }
+  await db.transaction("rw", db.sync_queue, async () => {
+    const existing = await db.sync_queue.where({ form_client_id: formClientId }).first()
+    if (existing) {
+      await db.sync_queue.update(existing.id, { queued_at: new Date().toISOString() })
+    } else {
+      await db.sync_queue.add({
+        form_client_id: formClientId,
+        operation: "upsert",
+        queued_at: new Date().toISOString(),
+        attempts: 0,
+        last_error: null
+      })
+    }
+  })
   queueChanged()
 }
 
@@ -127,6 +203,7 @@ export async function pendingCount() {
 // Replaces the local copy with the server's authoritative version.
 export async function applyServerForm(serverForm) {
   await db.transaction("rw", db.forms, db.form_responses, async () => {
+    const existing = await db.forms.get(serverForm.client_id)
     await db.forms.put({
       client_id: serverForm.client_id,
       name: serverForm.name,
@@ -149,6 +226,7 @@ export async function applyServerForm(serverForm) {
       synchronized_at: serverForm.synchronized_at,
       base_updated_at: serverForm.updated_at,
       updated_at: serverForm.updated_at,
+      local_generation: existing?.local_generation ?? 0,
       dirty: 0
     })
     await db.form_responses.where({ form_client_id: serverForm.client_id }).delete()
@@ -170,6 +248,31 @@ export async function markSynced(clientId, serverForm) {
     base_updated_at: serverForm.updated_at,
     synchronized_at: serverForm.synchronized_at
   })
+}
+
+export async function rebaseForm(clientId, updatedAt) {
+  await db.forms.update(clientId, { base_updated_at: updatedAt })
+}
+
+// Settles a successful push in one transaction, so no edit can land between
+// the generation check and the write that would otherwise discard it.
+export async function acknowledgePush(sentForm, serverForm, entryId) {
+  const clientId = sentForm.client_id
+  await db.transaction("rw", db.forms, db.form_responses, db.sync_queue, async () => {
+    const current = await db.forms.get(clientId)
+    if (!current) {
+      await db.sync_queue.delete(entryId)
+      return
+    }
+    // Older open tabs do not advance local_generation when they save.
+    if (current.local_generation !== sentForm.local_generation || current.updated_at !== sentForm.updated_at) {
+      await markSynced(clientId, serverForm)
+      return
+    }
+    await applyServerForm(serverForm)
+    await db.sync_queue.delete(entryId)
+  })
+  queueChanged()
 }
 
 export async function deleteLocalForm(clientId) {

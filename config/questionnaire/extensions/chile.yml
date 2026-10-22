@@ -1,54 +1,323 @@
-# Chile Territory Extension
-# Additional indicators specific to Chilean agricultural context.
+# Chile Territory Extension: Level 2 indicators
+# Ported from prediapp Form::LEVEL_TWO_ENTRIES_BY_DIMENSION.
+# The mapping of each indicator to a core dimension is PROVISIONAL, pending
+# review by an agroecology specialist (see plan Appendix A). Keys are permanent
+# response identifiers; four prediapp typos were normalized at port time
+# (compactation->compaction, traiditional_crops_seeds->traditional_crops_seeds,
+# food_convervation->food_conservation, infected_plants_remotion->infected_plants_removal).
+# The seven north-only / south-only water questions are excluded here; they will
+# arrive later as chile-norte / chile-sur extensions.
 
 territory: chile
 i18n_key: questionnaire.extensions.chile
 
 indicators:
-  - key: water_rights_status
-    dimension: water_availability
-    i18n_key: questionnaire.indicators.water_rights_status
-    level: 2
+  # ── soil_health (12) ──────────────────────────────────────
+  - key: soil_coverage
+    dimension: soil_health
+    i18n_key: questionnaire.indicators.soil_coverage
     position: 1
-
-  - key: indigenous_land_recognition
-    dimension: social_wellbeing
-    i18n_key: questionnaire.indicators.indigenous_land_recognition
-    level: 2
+  - key: soil_erosion
+    dimension: soil_health
+    i18n_key: questionnaire.indicators.soil_erosion
     position: 2
-
-  - key: native_forest_protection
-    dimension: ecosystem_diversity
-    i18n_key: questionnaire.indicators.native_forest_protection
-    level: 2
+  - key: compaction
+    dimension: soil_health
+    i18n_key: questionnaire.indicators.compaction
     position: 3
-
-  - key: sag_compliance
-    dimension: input_management
-    i18n_key: questionnaire.indicators.sag_compliance
-    level: 2
+  - key: infiltration
+    dimension: soil_health
+    i18n_key: questionnaire.indicators.infiltration
     position: 4
-
-  - key: indap_program_participation
-    dimension: economic_viability
-    i18n_key: questionnaire.indicators.indap_program_participation
-    level: 2
+  - key: soil_depth
+    dimension: soil_health
+    i18n_key: questionnaire.indicators.soil_depth
     position: 5
-
-  - key: desertification_mitigation
-    dimension: climate_adaptation
-    i18n_key: questionnaire.indicators.desertification_mitigation
-    level: 2
+  - key: soil_structure
+    dimension: soil_health
+    i18n_key: questionnaire.indicators.soil_structure
     position: 6
+  - key: clod_stability
+    dimension: soil_health
+    i18n_key: questionnaire.indicators.clod_stability
+    position: 7
+  - key: color_and_smell
+    dimension: soil_health
+    i18n_key: questionnaire.indicators.color_and_smell
+    position: 8
+  - key: root_development
+    dimension: soil_health
+    i18n_key: questionnaire.indicators.root_development
+    position: 9
+  - key: residue_condition
+    dimension: soil_health
+    i18n_key: questionnaire.indicators.residue_condition
+    position: 10
+  - key: biological_activity
+    dimension: soil_health
+    i18n_key: questionnaire.indicators.biological_activity
+    position: 11
+  - key: organic_matter
+    dimension: soil_health
+    i18n_key: questionnaire.indicators.organic_matter
+    position: 12
 
-  - key: campesino_seed_networks
-    dimension: crop_diversity
-    i18n_key: questionnaire.indicators.campesino_seed_networks
-    level: 2
+  # ── soil_management (7) ───────────────────────────────────
+  - key: crop_rotation
+    dimension: soil_management
+    i18n_key: questionnaire.indicators.crop_rotation
+    position: 1
+  - key: organic_fertilizers
+    dimension: soil_management
+    i18n_key: questionnaire.indicators.organic_fertilizers
+    position: 2
+  - key: leaf_fertilizers
+    dimension: soil_management
+    i18n_key: questionnaire.indicators.leaf_fertilizers
+    position: 3
+  - key: efficient_microorganisms
+    dimension: soil_management
+    i18n_key: questionnaire.indicators.efficient_microorganisms
+    position: 4
+  - key: soil_conservation
+    dimension: soil_management
+    i18n_key: questionnaire.indicators.soil_conservation
+    position: 5
+  - key: stubble_burning
+    dimension: soil_management
+    i18n_key: questionnaire.indicators.stubble_burning
+    position: 6
+  - key: weed_management
+    dimension: soil_management
+    i18n_key: questionnaire.indicators.weed_management
     position: 7
 
-  - key: earthquake_preparedness
-    dimension: system_resilience
-    i18n_key: questionnaire.indicators.earthquake_preparedness
-    level: 2
+  # ── water_availability (3; zone questions excluded) ───────
+  - key: irrigation_system
+    dimension: water_availability
+    i18n_key: questionnaire.indicators.irrigation_system
+    position: 1
+  - key: deep_well_water
+    dimension: water_availability
+    i18n_key: questionnaire.indicators.deep_well_water
+    position: 2
+  - key: water_quantity
+    dimension: water_availability
+    i18n_key: questionnaire.indicators.water_quantity
+    position: 3
+
+  # ── crop_diversity (6; includes prediapp seeds) ───────────
+  - key: crop_diversity
+    dimension: crop_diversity
+    i18n_key: questionnaire.indicators.crop_diversity
+    position: 1
+  - key: crop_variety
+    dimension: crop_diversity
+    i18n_key: questionnaire.indicators.crop_variety
+    position: 2
+  - key: polycultures
+    dimension: crop_diversity
+    i18n_key: questionnaire.indicators.polycultures
+    position: 3
+  - key: seed_origin
+    dimension: crop_diversity
+    i18n_key: questionnaire.indicators.seed_origin
+    position: 4
+  - key: traditional_crops_seeds
+    dimension: crop_diversity
+    i18n_key: questionnaire.indicators.traditional_crops_seeds
+    position: 5
+  - key: local_seed_banks
+    dimension: crop_diversity
+    i18n_key: questionnaire.indicators.local_seed_banks
+    position: 6
+
+  # ── ecosystem_diversity (9) ───────────────────────────────
+  - key: live_barriers
+    dimension: ecosystem_diversity
+    i18n_key: questionnaire.indicators.live_barriers
+    position: 1
+  - key: live_coverage
+    dimension: ecosystem_diversity
+    i18n_key: questionnaire.indicators.live_coverage
+    position: 2
+  - key: live_fences
+    dimension: ecosystem_diversity
+    i18n_key: questionnaire.indicators.live_fences
+    position: 3
+  - key: forest_patches
+    dimension: ecosystem_diversity
+    i18n_key: questionnaire.indicators.forest_patches
+    position: 4
+  - key: spontaneous_vegetation
+    dimension: ecosystem_diversity
+    i18n_key: questionnaire.indicators.spontaneous_vegetation
+    position: 5
+  - key: natural_enemies_diversity
+    dimension: ecosystem_diversity
+    i18n_key: questionnaire.indicators.natural_enemies_diversity
+    position: 6
+  - key: pollinator_diversity
+    dimension: ecosystem_diversity
+    i18n_key: questionnaire.indicators.pollinator_diversity
+    position: 7
+  - key: entomophages_released
+    dimension: ecosystem_diversity
+    i18n_key: questionnaire.indicators.entomophages_released
     position: 8
+  - key: entomopathogen_applications
+    dimension: ecosystem_diversity
+    i18n_key: questionnaire.indicators.entomopathogen_applications
+    position: 9
+
+  # ── farm_planning (3) ─────────────────────────────────────
+  - key: transformation_conviction
+    dimension: farm_planning
+    i18n_key: questionnaire.indicators.transformation_conviction
+    position: 1
+  - key: decision_for_practices
+    dimension: farm_planning
+    i18n_key: questionnaire.indicators.decision_for_practices
+    position: 2
+  - key: experience_transmission
+    dimension: farm_planning
+    i18n_key: questionnaire.indicators.experience_transmission
+    position: 3
+
+  # ── input_management (6) ──────────────────────────────────
+  - key: biocides_use
+    dimension: input_management
+    i18n_key: questionnaire.indicators.biocides_use
+    position: 1
+  - key: preventive_sanitary_measures
+    dimension: input_management
+    i18n_key: questionnaire.indicators.preventive_sanitary_measures
+    position: 2
+  - key: infected_plants_removal
+    dimension: input_management
+    i18n_key: questionnaire.indicators.infected_plants_removal
+    position: 3
+  - key: sanitary_crop_rotation
+    dimension: input_management
+    i18n_key: questionnaire.indicators.sanitary_crop_rotation
+    position: 4
+  - key: inputs_produced
+    dimension: input_management
+    i18n_key: questionnaire.indicators.inputs_produced
+    position: 5
+  - key: input_production_percentage
+    dimension: input_management
+    i18n_key: questionnaire.indicators.input_production_percentage
+    position: 6
+
+  # ── animal_management (3) ─────────────────────────────────
+  - key: animal_feed_conservation
+    dimension: animal_management
+    i18n_key: questionnaire.indicators.animal_feed_conservation
+    position: 1
+  - key: animal_feed_production_percentage
+    dimension: animal_management
+    i18n_key: questionnaire.indicators.animal_feed_production_percentage
+    position: 2
+  - key: animal_feed_production
+    dimension: animal_management
+    i18n_key: questionnaire.indicators.animal_feed_production
+    position: 3
+
+  # ── economic_viability (6) ────────────────────────────────
+  - key: agricultural_commercialized_products
+    dimension: economic_viability
+    i18n_key: questionnaire.indicators.agricultural_commercialized_products
+    position: 1
+  - key: animal_commercialized_products
+    dimension: economic_viability
+    i18n_key: questionnaire.indicators.animal_commercialized_products
+    position: 2
+  - key: territorial_commercialization
+    dimension: economic_viability
+    i18n_key: questionnaire.indicators.territorial_commercialization
+    position: 3
+  - key: production_destination
+    dimension: economic_viability
+    i18n_key: questionnaire.indicators.production_destination
+    position: 4
+  - key: income
+    dimension: economic_viability
+    i18n_key: questionnaire.indicators.income
+    position: 5
+  - key: income_sources_diversity
+    dimension: economic_viability
+    i18n_key: questionnaire.indicators.income_sources_diversity
+    position: 6
+
+  # ── social_wellbeing (10) ─────────────────────────────────
+  - key: agroecological_farmers_knowledge
+    dimension: social_wellbeing
+    i18n_key: questionnaire.indicators.agroecological_farmers_knowledge
+    position: 1
+  - key: soil_practices_number
+    dimension: social_wellbeing
+    i18n_key: questionnaire.indicators.soil_practices_number
+    position: 2
+  - key: disease_practices_number
+    dimension: social_wellbeing
+    i18n_key: questionnaire.indicators.disease_practices_number
+    position: 3
+  - key: recycling_practices_number
+    dimension: social_wellbeing
+    i18n_key: questionnaire.indicators.recycling_practices_number
+    position: 4
+  - key: agroecological_organizations
+    dimension: social_wellbeing
+    i18n_key: questionnaire.indicators.agroecological_organizations
+    position: 5
+  - key: participation_conviction
+    dimension: social_wellbeing
+    i18n_key: questionnaire.indicators.participation_conviction
+    position: 6
+  - key: territorial_participation
+    dimension: social_wellbeing
+    i18n_key: questionnaire.indicators.territorial_participation
+    position: 7
+  - key: family_food_availability
+    dimension: social_wellbeing
+    i18n_key: questionnaire.indicators.family_food_availability
+    position: 8
+  - key: food_conservation
+    dimension: social_wellbeing
+    i18n_key: questionnaire.indicators.food_conservation
+    position: 9
+  - key: family_food_diversity
+    dimension: social_wellbeing
+    i18n_key: questionnaire.indicators.family_food_diversity
+    position: 10
+
+  # ── system_resilience (7; prediapp crop_health) ───────────
+  - key: crop_appearance
+    dimension: system_resilience
+    i18n_key: questionnaire.indicators.crop_appearance
+    position: 1
+  - key: crop_growth
+    dimension: system_resilience
+    i18n_key: questionnaire.indicators.crop_growth
+    position: 2
+  - key: stress_tolerance
+    dimension: system_resilience
+    i18n_key: questionnaire.indicators.stress_tolerance
+    position: 3
+  - key: global_disease_incidence
+    dimension: system_resilience
+    i18n_key: questionnaire.indicators.global_disease_incidence
+    position: 4
+  - key: insects_and_mite_presence
+    dimension: system_resilience
+    i18n_key: questionnaire.indicators.insects_and_mite_presence
+    position: 5
+  - key: fungi_bacteria_viruses_presence
+    dimension: system_resilience
+    i18n_key: questionnaire.indicators.fungi_bacteria_viruses_presence
+    position: 6
+  - key: weed_presence
+    dimension: system_resilience
+    i18n_key: questionnaire.indicators.weed_presence
+    position: 7
