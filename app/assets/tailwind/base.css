@@ -15,9 +15,10 @@
     padding-right: env(safe-area-inset-right);
   }
 
+  /* No color here: headings inherit, so they stay legible on deep and tinted
+     surfaces. The body already sets ink. */
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    color: var(--color-ink);
     font-weight: 700;
     letter-spacing: -0.015em;
     line-height: 1.2;
