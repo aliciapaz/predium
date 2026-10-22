@@ -3,6 +3,7 @@ import { newClientId, getForm, saveForm, getResponses, saveResponse, enqueue, pr
 import { cachedConfig, principles, territoryIndicators, dimensionIndicators, visibleDimensions } from "lib/config_cache"
 import { load as loadTranslations, t, has } from "lib/i18n"
 import { syncNow, hydrateForm, csrfToken } from "lib/sync"
+import { badge, band, escape, icon, iconButton } from "lib/ui"
 
 const FARM_FIELDS = [
   "name", "national_id", "date_of_birth", "phone", "gender", "work_force",
@@ -16,7 +17,8 @@ const FARM_FIELDS = [
 export default class extends Controller {
   static targets = [
     "title", "saveState", "progressText", "progressBar", "dimensionNav", "dimensionProgress",
-    "indicators", "prevButton", "nextButton", "completeForm", "completeButton", "completeHint"
+    "indicators", "prevButton", "nextButton", "nextCaption", "completeForm", "completeButton", "completeHint",
+    "farmInfo", "farmInfoCount"
   ]
   static values = { clientId: String, formsUrl: String }
 
@@ -29,7 +31,7 @@ export default class extends Controller {
     this.config = await cachedConfig()
     await loadTranslations()
     if (!this.config) {
-      this.indicatorsTarget.innerHTML = `<p class="text-sm text-rose-600">${this.escape(t("offline.config_unavailable"))}</p>`
+      this.indicatorsTarget.innerHTML = `<div class="alert-warning" role="status">${icon("info")}<p>${escape(t("offline.config_unavailable"))}</p></div>`
       return
     }
 
@@ -48,6 +50,10 @@ export default class extends Controller {
 
     this.hydrateFarmFields()
     if (this.form.name) this.titleTarget.textContent = this.form.name
+    // Returning to a named form is usually about scoring, so the farm details
+    // start collapsed; a new form opens on them.
+    if (this.hasFarmInfoTarget && this.form.name) this.farmInfoTarget.open = false
+    this.updateFarmInfoCount()
     this.element.addEventListener("change", (event) => this.handleChange(event))
     this.element.addEventListener("input", (event) => this.handleInput(event))
     this.completeFormTarget.addEventListener("submit", (event) => this.handleComplete(event))
@@ -129,6 +135,7 @@ export default class extends Controller {
     ).map((box) => box.value)
 
     await saveForm(this.form)
+    this.updateFarmInfoCount()
     if (this.form.territory_key !== territoryBefore) await this.dropStaleResponses()
     await enqueue(this.clientId)
     this.markSaved()
@@ -198,11 +205,11 @@ export default class extends Controller {
   }
 
   refreshCompleteState() {
-    const allScored = this.requiredItems().every((item) => this.responses[item.key] !== undefined)
+    const missing = this.requiredItems().filter((item) => this.responses[item.key] === undefined).length
     const online = navigator.onLine
-    this.completeButtonTarget.disabled = !(allScored && online)
+    this.completeButtonTarget.disabled = !(missing === 0 && online)
 
-    if (!allScored) this.showHint(t("offline.complete_missing_indicators"))
+    if (missing > 0) this.showHint(t(`questionnaire.missing_count.${missing === 1 ? "one" : "other"}`, { count: missing }))
     else if (!online) this.showHint(t("offline.complete_requires_sync"))
     else this.completeHintTarget.classList.add("hidden")
   }
@@ -222,30 +229,35 @@ export default class extends Controller {
     this.renderIndicators()
     this.updateProgress()
     this.refreshCompleteState()
-    const last = this.currentIndex === this.dimensions().length - 1
+    const dimensions = this.dimensions()
+    const last = this.currentIndex === dimensions.length - 1
     this.prevButtonTarget.disabled = this.currentIndex === 0
     this.nextButtonTarget.classList.toggle("hidden", last)
+    this.completeButtonTarget.classList.toggle("hidden", !last)
+    if (this.hasNextCaptionTarget) {
+      this.nextCaptionTarget.textContent = last ? "" : t("questionnaire.next_up", { section: t(dimensions[this.currentIndex + 1].i18n_key) })
+    }
   }
 
   renderNav() {
+    // One section needs no navigation; the section header already names it.
+    this.dimensionNavTarget.hidden = this.dimensions().length < 2
     this.dimensionNavTarget.innerHTML = this.dimensions().map((dimension, index) => {
       const indicators = this.indicatorsFor(dimension)
       const answered = indicators.filter((indicator) => this.responses[indicator.key] !== undefined).length
-      const current = index === this.currentIndex
       const done = indicators.length > 0 && answered === indicators.length
-      const partial = answered > 0 && !done
+      const state = done ? "done" : answered > 0 ? "partial" : "todo"
+      const progress = indicators.length ? Math.round((answered * 100) / indicators.length) : 0
+      const current = index === this.currentIndex ? ' aria-current="step"' : ""
 
-      let cls = "snap-start flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap transition-colors cursor-pointer "
-      if (current) cls += "bg-forest-600 text-white"
-      else if (done) cls += "bg-forest-50 text-forest-700 hover:bg-forest-100"
-      else if (partial) cls += "bg-mustard-50 text-mustard-700 hover:bg-mustard-100"
-      else cls += "bg-earth-100 text-earth-500 hover:bg-earth-200"
-
-      return `<button type="button" class="${cls}" data-action="form-editor#jump" data-index="${index}">
-                ${done ? this.checkIcon() : partial ? '<span class="w-2 h-2 rounded-full bg-current"></span>' : ""}
-                ${this.escape(t(dimension.i18n_key))}
-              </button>`
+      return `<button type="button" class="section-tab" data-state="${state}"${current} style="--progress: ${progress}%"
+                      data-action="form-editor#jump" data-index="${index}"><span class="section-tab-mark">${done ? icon("check") : ""}</span>${escape(t(dimension.i18n_key))}</button>`
     }).join("")
+    // Center the current tab by scrolling the strip itself; scrollIntoView
+    // would also scroll the page.
+    const nav = this.dimensionNavTarget
+    const current = nav.querySelector('[aria-current="step"]')
+    if (current) nav.scrollLeft = current.offsetLeft - (nav.clientWidth - current.clientWidth) / 2
   }
 
   jump(event) {
@@ -257,16 +269,17 @@ export default class extends Controller {
     const indicators = this.indicatorsFor(dimension)
 
     const hint = dimension.principles && !this.form.territory_key
-      ? `<p class="text-sm text-earth-500 mt-1">${this.escape(t("questionnaire.no_territory_hint"))}</p>`
+      ? `<div class="alert-warning mt-3" role="status">${icon("info")}<p>${escape(t("questionnaire.no_territory_hint"))}</p></div>`
       : ""
 
     const header = `
-      <h2 class="text-xl font-bold text-earth-900">${this.escape(t(dimension.i18n_key))}</h2>
-      <p class="text-sm text-earth-500">
-        ${this.escape(t("questionnaire.dimension_of", { current: this.currentIndex + 1, total: this.dimensions().length }))}
-        &middot;
-        <span data-form-editor-target="dimensionProgress"></span>
-      </p>${hint}`
+      <div>
+        <h2 class="page-title text-2xl">${escape(t(dimension.i18n_key))}</h2>
+        <p class="mt-1 text-sm text-muted">
+          ${escape(t("questionnaire.dimension_of", { current: this.currentIndex + 1, total: this.dimensions().length }))},
+          <span data-form-editor-target="dimensionProgress"></span>
+        </p>${hint}
+      </div>`
 
     this.indicatorsTarget.innerHTML = header + indicators.map((indicator) => this.indicatorCard(indicator)).join("")
   }
@@ -275,68 +288,43 @@ export default class extends Controller {
     const key = indicator.key
     const base = indicator.i18n_key
     const value = this.responses[key]
-    const hasDescription = has(`${base}.description`)
-    const hasScoring = has(`${base}.scoring.low`)
+    const name = `form_responses[${key}]`
 
-    const buttons = Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
-      let cls = "bg-earth-50 border-earth-300 text-earth-600 hover:bg-earth-100"
-      if (value === n) {
-        if (n <= 3) cls = "bg-rose-100 border-rose-500 text-rose-700 ring-2 ring-rose-300"
-        else if (n <= 7) cls = "bg-mustard-100 border-mustard-500 text-mustard-700 ring-2 ring-mustard-300"
-        else cls = "bg-forest-100 border-forest-500 text-forest-700 ring-2 ring-forest-300"
-      }
-      return `<button type="button" data-question-target="optionBtn" data-action="question#select" data-value="${n}"
-                      class="aspect-square min-h-[44px] flex items-center justify-center border-2 rounded-lg text-sm font-semibold transition-all cursor-pointer ${cls}">${n}</button>`
-    }).join("")
+    const options = Array.from({ length: 10 }, (_, i) => i + 1).map((n) => `
+      <label class="score-option" data-band="${band(n)}" data-value="${n}">
+        <input type="radio" name="${name}" value="${n}" data-band="${band(n)}"${value === n ? " checked" : ""}>${n}
+      </label>`).join("")
 
-    const descClass = (matches) => {
-      if (value === undefined) return ""
-      return matches ? "" : "bg-earth-50 border-earth-100 text-earth-400"
-    }
-
-    const badge = indicator.extension
-      ? `<span class="ml-2 inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-earth-100 text-earth-600 align-middle">${this.escape(t(this.config.extensions[indicator.extension].i18n_key))}</span>`
+    const extension = indicator.extension
+      ? badge(t(this.config.extensions[indicator.extension].i18n_key), "neutral")
       : ""
 
-    const info = hasDescription
-      ? `<div class="relative shrink-0 ml-2" data-controller="collapsible">
-            <button type="button" data-action="collapsible#toggle" class="text-earth-400 hover:text-earth-600 p-1">
-              <svg data-collapsible-target="icon" class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-            </button>
-            <div data-collapsible-target="content" class="hidden absolute right-0 mt-2 w-80 bg-white border border-earth-200 rounded-lg shadow-lg p-4 z-10 text-left">
-              <p class="text-sm text-earth-600 mb-3">${this.escape(t(`${base}.description`))}</p>
-            </div>
-          </div>`
+    const help = has(`${base}.description`)
+      ? `<div class="relative shrink-0 -mt-2 -mr-2" data-controller="collapsible">
+          ${iconButton({ icon: "info", label: t("questionnaire.indicator_help"), attrs: 'data-action="collapsible#toggle" aria-expanded="false"' })}
+          <div class="popover hidden" data-collapsible-target="content">${escape(t(`${base}.description`))}</div>
+        </div>`
       : ""
 
-    const rubric = hasScoring
-      ? `<div class="mt-3 space-y-1.5 text-sm">
-          <div data-question-target="descLow" class="p-2.5 rounded-lg border transition-all ${value !== undefined && value <= 3 ? "bg-rose-50 border-rose-300 text-rose-700 ring-2 ring-rose-200" : descClass(false) || "bg-rose-50/50 border-rose-100 text-rose-600/80"}">
-            <span class="font-medium">1-3:</span> ${this.escape(t(`${base}.scoring.low`))}
-          </div>
-          <div data-question-target="descMedium" class="p-2.5 rounded-lg border transition-all ${value !== undefined && value >= 4 && value <= 7 ? "bg-mustard-50 border-mustard-300 text-mustard-700 ring-2 ring-mustard-200" : descClass(false) || "bg-mustard-50/50 border-mustard-100 text-mustard-600/80"}">
-            <span class="font-medium">4-7:</span> ${this.escape(t(`${base}.scoring.medium`))}
-          </div>
-          <div data-question-target="descHigh" class="p-2.5 rounded-lg border transition-all ${value !== undefined && value >= 8 ? "bg-forest-50 border-forest-300 text-forest-700 ring-2 ring-forest-200" : descClass(false) || "bg-forest-50/50 border-forest-100 text-forest-600/80"}">
-            <span class="font-medium">8-10:</span> ${this.escape(t(`${base}.scoring.high`))}
-          </div>
+    const rubric = has(`${base}.scoring.low`)
+      ? `<div class="mt-4 flex flex-col gap-2">
+          ${[["low", "1-3"], ["mid", "4-7"], ["high", "8-10"]].map(([level, range]) => `
+            <p class="rubric-row" data-band="${level}"><b>${range}</b><span>${escape(t(`${base}.scoring.${level === "mid" ? "medium" : level}`))}</span></p>`).join("")}
         </div>`
       : ""
 
     return `
-      <div class="bg-white border border-earth-200 rounded-lg p-5" data-controller="question">
-        <div class="flex items-start justify-between mb-4">
-          <h3 class="text-base font-semibold text-earth-900">${this.escape(t(`${base}.name`))}${badge}</h3>
-          ${info}
+      <section class="card" data-controller="question" data-question data-action="pointerdown->question#pointed change->question#answered">
+        <div class="flex items-start justify-between gap-3 mb-4">
+          <h3 id="${escape(key)}-name" class="flex flex-wrap items-center gap-x-2 gap-y-1 text-lg leading-snug">${escape(t(`${base}.name`))}${extension}</h3>
+          ${help}
         </div>
-
-        <input type="hidden" name="form_responses[${key}]" value="${value ?? ""}" data-question-target="hiddenInput">
-
-        <div class="grid grid-cols-5 sm:gap-2 gap-1.5">${buttons}</div>
+        <fieldset class="score-scale" aria-labelledby="${escape(key)}-name" aria-describedby="${escape(key)}-scale">
+          <legend class="sr-only" id="${escape(key)}-scale">${escape(t("questionnaire.score_legend"))}</legend>
+          ${options}
+        </fieldset>
         ${rubric}
-      </div>`
+      </section>`
   }
 
   updateProgress() {
@@ -351,16 +339,10 @@ export default class extends Controller {
     this.dimensionProgressTarget.textContent = t("questionnaire.answered_count", { answered, total: indicators.length })
   }
 
-  checkIcon() {
-    return `<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-            </svg>`
-  }
-
-  escape(text) {
-    const div = document.createElement("div")
-    div.textContent = text ?? ""
-    return div.innerHTML
+  updateFarmInfoCount() {
+    if (!this.hasFarmInfoCountTarget) return
+    const filled = FARM_FIELDS.filter((field) => this.form[field] != null && this.form[field] !== "").length
+    this.farmInfoCountTarget.textContent = t("farm_info.fields_filled", { filled, total: FARM_FIELDS.length })
   }
 
   hydrateFarmFields() {

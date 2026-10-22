@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Usage:
+#   bin/design-check                 scan every view, Stimulus file and helper
+#   bin/design-check path [path...]  scan specific files
+#   bin/design-check --hook          editor gate; reads a Claude Code hook payload on stdin
+require_relative "../lib/design_check"
+
+exit DesignCheck.run(ARGV)

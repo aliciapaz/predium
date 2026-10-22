@@ -147,15 +147,16 @@ describe("results controller", () => {
 
       const [structure, fertility, supply] = Array.from(rows).map((row) => ({
         label: row.querySelector("span").textContent,
-        bar: row.querySelector("[style]"),
-        score: row.lastElementChild.textContent
+        bar: row.querySelector(".score-bar"),
+        score: row.querySelector("[data-score]").textContent
       }))
       expect(structure).toMatchObject({ label: "Structure", score: "3.0" })
-      expect(structure.bar.className).toContain("bg-rose-500")
+      expect(structure.bar.dataset.band).toBe("low")
       expect(structure.bar.style.width).toBe("30%")
       expect(fertility.score).toBe("9.0")
-      expect(fertility.bar.className).toContain("bg-forest-500")
+      expect(fertility.bar.dataset.band).toBe("high")
       expect(supply.score).toBe("-")
+      expect(supply.bar.dataset.band).toBeUndefined()
       expect(supply.bar.style.width).toBe("0%")
     })
 
@@ -166,9 +167,9 @@ describe("results controller", () => {
 
       const badgeFor = (name) => indicatorRow(name).lastElementChild
       expect(badgeFor("Compaction").textContent).toBe("2")
-      expect(badgeFor("Compaction").className).toContain("bg-rose-100")
-      expect(badgeFor("Erosion").className).toContain("bg-mustard-100")
-      expect(badgeFor("Organic matter").className).toContain("bg-forest-100")
+      expect(badgeFor("Compaction").dataset.band).toBe("low")
+      expect(badgeFor("Erosion").dataset.band).toBe("mid")
+      expect(badgeFor("Organic matter").dataset.band).toBe("high")
       expect(badgeFor("Irrigation").textContent).toBe("6")
     })
 
@@ -179,7 +180,7 @@ describe("results controller", () => {
 
       const row = indicatorRow("Compaction")
       expect(row.lastElementChild.textContent).toBe("-")
-      expect(row.lastElementChild.className).toContain("text-earth-300")
+      expect(row.lastElementChild.dataset.band).toBeUndefined()
     })
 
     it("names each indicator's source territory", async () => {

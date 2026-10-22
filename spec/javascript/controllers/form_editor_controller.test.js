@@ -196,8 +196,9 @@ describe("form editor controller", () => {
 
       expect(navLabels()).toEqual(["Principles", "Structure", "Fertility", "Supply"])
       expect(cardTitles()).toEqual(["Diversity", "Recycling"])
-      expect(card("Diversity").querySelector('[name="form_responses[diversity]"]').value).toBe("2")
-      expect(card("Diversity").querySelector('[data-value="2"]').className).toContain("bg-rose-100")
+      const saved = card("Diversity").querySelector('[name="form_responses[diversity]"]:checked')
+      expect(saved.value).toBe("2")
+      expect(saved.closest(".score-option").dataset.band).toBe("low")
       expect(target("progressText").textContent).toBe("1 of 6 indicators")
       expect(target("progressBar").style.width).toBe("17%")
     })
@@ -359,7 +360,7 @@ describe("form editor controller", () => {
       await mount(editor(), controllers)
 
       expect(target("completeButton").disabled).toBe(true)
-      expect(target("completeHint").textContent).toBe("Score every indicator to complete")
+      expect(target("completeHint").textContent).toBe("1 indicator left")
       expect(target("completeHint").classList).not.toContain("hidden")
 
       score("Diversity", 3)

@@ -9,23 +9,22 @@ import { mount, unmount } from "../support/stimulus"
 vi.mock("lib/sync", () => ({ syncNow: vi.fn(), resumeAfterLogin: vi.fn() }))
 
 const fixture = `
-  <div data-controller="connectivity"
-       data-action="online@window->connectivity#refresh offline@window->connectivity#refresh predium:queue-changed@document->connectivity#refresh predium:sync-status@document->connectivity#syncStatusChanged">
-    <span data-connectivity-target="badge">
-      <span data-connectivity-target="dot"></span>
-      <span data-connectivity-target="label">Online</span>
-      <span data-connectivity-target="pending" class="hidden"></span>
-    </span>
-    <button type="button" data-action="connectivity#syncNow" data-connectivity-target="syncButton" title="Last sync">Sync now</button>
-  </div>`
+  <button type="button" class="status-pill"
+          data-controller="connectivity"
+          data-connectivity-target="badge syncButton"
+          data-action="connectivity#syncNow online@window->connectivity#refresh offline@window->connectivity#refresh predium:queue-changed@document->connectivity#refresh predium:sync-status@document->connectivity#syncStatusChanged"
+          title="Sync now">
+    <span data-connectivity-target="label">Online</span>
+    <span data-connectivity-target="pending" class="hidden"></span>
+  </button>`
 
-const target = (name) => document.querySelector(`[data-connectivity-target="${name}"]`)
+const target = (name) => document.querySelector(`[data-connectivity-target~="${name}"]`)
 
 // connect() fires refresh() without awaiting it, so mount() resolves before
-// the badge is painted; the dot has no class until the first paint.
+// the badge is painted; the badge has no state until the first paint.
 async function mountBadge() {
   await mount(fixture, { connectivity: ConnectivityController })
-  await vi.waitFor(() => expect(target("dot").className).not.toBe(""))
+  await vi.waitFor(() => expect(target("badge").dataset.state).toBeDefined())
 }
 
 function setOnline(online) {
@@ -47,8 +46,7 @@ describe("connectivity controller", () => {
     await mountBadge()
 
     expect(target("label").textContent).toBe("Online")
-    expect(target("dot").className).toContain("bg-forest-500")
-    expect(target("badge").className).toContain("bg-forest-50")
+    expect(target("badge").dataset.state).toBe("online")
     expect(target("pending").classList).toContain("hidden")
   })
 
@@ -58,7 +56,7 @@ describe("connectivity controller", () => {
 
     await mountBadge()
 
-    expect(target("dot").className).toContain("bg-mustard-500")
+    expect(target("badge").dataset.state).toBe("pending")
     expect(target("pending").textContent).toBe("2 pending")
     expect(target("pending").classList).not.toContain("hidden")
   })
@@ -69,8 +67,7 @@ describe("connectivity controller", () => {
     await mountBadge()
 
     expect(target("label").textContent).toBe("Offline")
-    expect(target("dot").className).toContain("bg-rose-500")
-    expect(target("badge").className).toContain("bg-rose-50")
+    expect(target("badge").dataset.state).toBe("offline")
   })
 
   it("repaints when the browser goes offline", async () => {
@@ -130,5 +127,16 @@ describe("connectivity controller", () => {
     document.dispatchEvent(new CustomEvent("predium:queue-changed"))
 
     await vi.waitFor(() => expect(target("label").textContent).toBe("Online"))
+  })
+
+  // On phones the pending state hides the label; an expired session must not.
+  it("flags an expired session ahead of pending changes", async () => {
+    await enqueue("form-1")
+    await mountBadge()
+
+    document.dispatchEvent(new CustomEvent("predium:sync-status", { detail: { status: "needs_login" } }))
+
+    await vi.waitFor(() => expect(target("badge").dataset.state).toBe("expired"))
+    expect(target("pending").textContent).toBe("1 pending")
   })
 })

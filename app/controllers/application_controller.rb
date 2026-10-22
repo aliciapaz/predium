@@ -5,6 +5,7 @@ class ApplicationController < ActionController::Base
 
   allow_browser versions: :modern
   stale_when_importmap_changes
+  default_form_builder PrediumFormBuilder
 
   before_action :configure_permitted_parameters, if: :devise_controller?
 

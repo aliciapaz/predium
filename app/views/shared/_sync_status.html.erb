@@ -1,15 +1,11 @@
-<div class="flex items-center gap-2"
-     data-controller="connectivity"
-     data-action="online@window->connectivity#refresh offline@window->connectivity#refresh predium:queue-changed@document->connectivity#refresh predium:sync-status@document->connectivity#syncStatusChanged">
-  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium rounded-full bg-earth-100 text-earth-500"
-        data-connectivity-target="badge">
-    <span class="w-2 h-2 rounded-full bg-earth-400" data-connectivity-target="dot"></span>
-    <span data-connectivity-target="label"><%= t("offline.online") %></span>
-    <span data-connectivity-target="pending" class="hidden"></span>
-  </span>
-  <button type="button" data-action="connectivity#syncNow" data-connectivity-target="syncButton"
-          title="<%= t("offline.last_sync") %>"
-          class="text-xs text-earth-500 hover:text-forest-600 transition-colors cursor-pointer">
-    <%= t("offline.sync_now") %>
-  </button>
-</div>
+<button type="button"
+        class="status-pill"
+        data-controller="connectivity"
+        data-connectivity-target="badge syncButton"
+        data-action="connectivity#syncNow online@window->connectivity#refresh offline@window->connectivity#refresh predium:queue-changed@document->connectivity#refresh predium:sync-status@document->connectivity#syncStatusChanged"
+        title="<%= t("offline.sync_now") %>">
+  <span class="status-pill-label" data-connectivity-target="label"><%= t("offline.online") %></span>
+  <span data-connectivity-target="pending" class="hidden"></span>
+  <span class="sr-only"><%= t("offline.sync_now") %></span>
+  <%= icon(:sync) %>
+</button>

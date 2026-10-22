@@ -2,47 +2,37 @@
 
 <%# Results shell (KTD-4): farm info, scores, and charts hydrate client-side
     from IndexedDB via lib/scoring.js, so results render offline too. %>
-<div data-controller="results" data-results-client-id-value="<%= params[:id] %>">
-  <div class="mb-6">
-    <%= link_to forms_path, class: "text-sm text-earth-500 hover:text-earth-700 inline-flex items-center gap-1" do %>
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-      </svg>
+<div class="max-w-2xl mx-auto flex flex-col gap-8" data-controller="results" data-results-client-id-value="<%= params[:id] %>">
+  <div class="flex flex-col gap-4">
+    <%= link_to forms_path, class: "back-link" do %>
+      <%= icon(:chevron_left) %>
       <%= t("forms.back_to_forms") %>
     <% end %>
+
+    <%= alert_box t("offline.results_unavailable"), tone: :warning, class: "hidden", data: { results_target: "missing" } %>
+
+    <div data-results-target="farmInfo">
+      <p class="text-muted"><%= t("offline.loading") %></p>
+    </div>
   </div>
 
-  <div data-results-target="missing" class="hidden bg-mustard-50 border border-mustard-200 rounded-lg p-4 text-sm text-mustard-800 mb-8">
-    <%= t("offline.results_unavailable") %>
-  </div>
-
-  <%# Farm Info Summary %>
-  <div class="bg-white border border-earth-200 rounded-lg p-6 mb-8" data-results-target="farmInfo">
-    <p class="text-sm text-earth-400"><%= t("offline.loading") %></p>
-  </div>
-
-  <%# L1 principles: radar chart %>
-  <section class="mb-8">
-    <h2 class="text-lg font-semibold text-earth-800 mb-4"><%= t("results.category_overview") %></h2>
-    <div class="bg-white border border-earth-200 rounded-lg p-6" data-results-target="radar"></div>
+  <section>
+    <h2 class="section-title mb-3"><%= t("results.category_overview") %></h2>
+    <div class="card" data-results-target="radar"></div>
   </section>
 
-  <%# Dimension scores %>
-  <section class="mb-8">
-    <h2 class="text-lg font-semibold text-earth-800 mb-4"><%= t("results.dimension_scores") %></h2>
-    <div class="bg-white border border-earth-200 rounded-lg divide-y divide-earth-100" data-results-target="dimensions"></div>
+  <section>
+    <h2 class="section-title mb-3"><%= t("results.dimension_scores") %></h2>
+    <div class="card-flush divide-y divide-line-soft" data-results-target="dimensions"></div>
   </section>
 
-  <%# All indicators by dimension %>
-  <section class="mb-8">
-    <h2 class="text-lg font-semibold text-earth-800 mb-4"><%= t("results.all_indicators") %></h2>
-    <div class="space-y-4" data-results-target="indicators"></div>
+  <section>
+    <h2 class="section-title mb-3"><%= t("results.all_indicators") %></h2>
+    <div class="flex flex-col gap-3" data-results-target="indicators"></div>
   </section>
 
-  <div class="flex items-center gap-4 py-4 border-t border-earth-200">
-    <button type="button" disabled class="px-5 py-2.5 bg-earth-300 text-white font-medium rounded-lg cursor-not-allowed opacity-60">
-      <%= t("buttons.generate_pdf") %>
-    </button>
-    <%= link_to t("forms.back_to_forms"), forms_path, class: "text-sm text-earth-500 hover:text-earth-700" %>
+  <div class="flex flex-col-reverse sm:flex-row sm:items-center gap-3 pt-6 border-t border-line">
+    <%= link_to t("forms.back_to_forms"), forms_path, class: "btn-quiet" %>
+    <button type="button" class="btn-secondary sm:ml-auto" disabled><%= t("buttons.generate_pdf") %></button>
   </div>
 </div>

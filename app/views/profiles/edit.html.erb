@@ -1,9 +1,9 @@
 <% content_for(:title, t("titles.profile_edit")) %>
 
 <div class="max-w-lg mx-auto">
-  <h1 class="text-xl font-bold text-earth-900 mb-6"><%= t("titles.profile_edit") %></h1>
+  <%= page_header(t("titles.profile_edit")) %>
 
-  <div class="bg-white rounded-lg shadow-sm border border-earth-200 p-6">
+  <div class="card">
     <%= render "form", profile: @profile %>
   </div>
 </div>

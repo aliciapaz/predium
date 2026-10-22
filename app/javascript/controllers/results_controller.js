@@ -4,6 +4,7 @@ import { cachedConfig, principles, dimensionIndicators, visibleDimensions } from
 import { load as loadTranslations, t } from "lib/i18n"
 import { calculateScores } from "lib/scoring"
 import { hydrateForm } from "lib/sync"
+import { averageBand, badge, band, escape, icon } from "lib/ui"
 
 // Hydrates the results shell from IndexedDB (KTD-4 amended): scores and
 // charts always compute client-side via lib/scoring.js, online and offline.
@@ -46,8 +47,7 @@ export default class extends Controller {
     const completedOn = form.completed_at
       ? t("results.completed_on", { date: new Date(form.completed_at).toLocaleDateString(document.documentElement.lang) })
       : ""
-    const stateLabel = form.state === "completed" ? t("states.completed") : t("states.draft")
-    const stateClass = form.state === "completed" ? "bg-forest-100 text-forest-700" : "bg-mustard-100 text-mustard-700"
+    const completed = form.state === "completed"
 
     const facts = []
     if (form.land_area) facts.push(this.fact(t("results.land_area"), `${form.land_area} ha`))
@@ -57,20 +57,18 @@ export default class extends Controller {
     }
 
     this.farmInfoTarget.innerHTML = `
-      <div class="flex items-start justify-between mb-4">
-        <div>
-          <h1 class="text-2xl font-bold text-earth-900">${this.escape(form.name)}</h1>
-          <p class="text-sm text-earth-500 mt-1">${this.escape(location)}${location && completedOn ? " &middot; " : ""}${this.escape(completedOn)}</p>
-        </div>
-        <span class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full ${stateClass}">${this.escape(stateLabel)}</span>
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <h1 class="page-title min-w-0 break-words">${escape(form.name)}</h1>
+        ${badge(t(completed ? "states.completed" : "states.draft"), completed ? "success" : "warning")}
       </div>
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">${facts.join("")}</div>`
+      <p class="mt-1 text-muted">${escape([location, completedOn].filter(Boolean).join(", "))}</p>
+      ${facts.length ? `<dl class="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-4">${facts.join("")}</dl>` : ""}`
   }
 
   fact(label, value, wide = false) {
-    return `<div${wide ? ' class="col-span-2"' : ""}>
-              <span class="text-earth-500">${this.escape(label)}</span>
-              <p class="font-medium text-earth-800">${this.escape(value)}</p>
+    return `<div class="${wide ? "col-span-2 " : ""}rounded-lg bg-canvas px-4 py-3">
+              <dt class="text-sm text-muted">${escape(label)}</dt>
+              <dd class="mt-0.5 font-display text-lg font-bold text-ink">${escape(value)}</dd>
             </div>`
   }
 
@@ -89,19 +87,29 @@ export default class extends Controller {
     const canvas = document.createElement("canvas")
     canvas.setAttribute("data-radar-chart-target", "canvas")
     mount.appendChild(canvas)
-    this.radarTarget.replaceChildren(mount)
+
+    const list = document.createElement("ul")
+    list.className = "mt-4 divide-y divide-line-soft border-t border-line-soft"
+    list.innerHTML = items.map((principle, index) => {
+      const score = scores[index]
+      return `<li class="flex items-center justify-between gap-4 py-2.5">
+                <span class="text-ink-soft">${escape(labels[index])}</span>
+                <span class="score-chip"${score ? ` data-band="${band(Math.round(score))}"` : ""}>${score ? Number(score.toFixed(1)) : "-"}</span>
+              </li>`
+    }).join("")
+    this.radarTarget.replaceChildren(mount, list)
   }
 
   renderDimensions() {
     this.dimensionsTarget.innerHTML = visibleDimensions(this.config, this.form.territory_key).map((dimension) => {
       const score = this.scores.l2Scores[dimension.key] || 0
-      const color = score >= 7 ? "bg-forest-500" : score >= 4 ? "bg-mustard-500" : "bg-rose-500"
-      return `<div class="flex items-center gap-4 px-5 py-3">
-                <span class="text-sm text-earth-700 w-48 shrink-0">${this.escape(t(dimension.i18n_key))}</span>
-                <div class="flex-1 bg-earth-100 rounded-full h-3">
-                  <div class="${color} h-3 rounded-full transition-all" style="width: ${score * 10}%"></div>
+      const level = averageBand(score)
+      return `<div class="px-5 py-3.5">
+                <div class="flex items-baseline justify-between gap-3 mb-2">
+                  <span class="text-ink-soft">${escape(t(dimension.i18n_key))}</span>
+                  <span class="font-display font-bold text-ink tabular-nums" data-score>${score > 0 ? score.toFixed(1) : "-"}</span>
                 </div>
-                <span class="text-sm font-semibold text-earth-800 w-10 text-right">${score > 0 ? score.toFixed(1) : "-"}</span>
+                <div class="meter h-2.5"><div class="score-bar"${level ? ` data-band="${level}"` : ""} style="width: ${score * 10}%"></div></div>
               </div>`
     }).join("")
   }
@@ -110,35 +118,25 @@ export default class extends Controller {
     this.indicatorsTarget.innerHTML = visibleDimensions(this.config, this.form.territory_key).map((dimension) => {
       const rows = dimensionIndicators(this.config, dimension.key, this.form.territory_key).map((indicator) => {
         const value = this.scores.indicatorScores[indicator.key]
-        let badge = '<span class="text-earth-300">-</span>'
-        if (value != null) {
-          const cls = value >= 8 ? "bg-forest-100 text-forest-700" : value >= 4 ? "bg-mustard-100 text-mustard-700" : "bg-rose-100 text-rose-700"
-          badge = `<span class="inline-flex items-center justify-center w-8 h-8 rounded-md text-sm font-semibold ${cls}">${value}</span>`
-        }
+        const chip = value != null
+          ? `<span class="score-chip" data-band="${band(value)}">${value}</span>`
+          : '<span class="score-chip">-</span>'
         const source = indicator.extension
-          ? `<span class="ml-2 inline-flex items-center px-1.5 py-0.5 text-xs font-medium rounded-full bg-earth-100 text-earth-500">${this.escape(t(this.config.extensions[indicator.extension].i18n_key))}</span>`
+          ? badge(t(this.config.extensions[indicator.extension].i18n_key), "neutral")
           : ""
-        return `<div class="flex items-center gap-4 px-5 py-2.5 text-sm">
-                  <span class="text-earth-600 flex-1">${this.escape(t(`${indicator.i18n_key}.name`))}${source}</span>
-                  ${badge}
+        return `<div class="flex items-center gap-4 px-5 py-3">
+                  <span class="flex-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-ink-soft">${escape(t(`${indicator.i18n_key}.name`))}${source}</span>
+                  ${chip}
                 </div>`
       }).join("")
 
-      return `<div class="bg-white border border-earth-200 rounded-lg" data-controller="collapsible">
-                <button type="button" data-action="collapsible#toggle" class="flex items-center justify-between w-full px-5 py-3 text-left">
-                  <span class="font-medium text-earth-800">${this.escape(t(dimension.i18n_key))}</span>
-                  <svg data-collapsible-target="icon" class="w-5 h-5 text-earth-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                  </svg>
-                </button>
-                <div data-collapsible-target="content" class="hidden border-t border-earth-100">${rows}</div>
-              </div>`
+      return `<details class="disclosure">
+                <summary>
+                  <span class="font-semibold text-ink">${escape(t(dimension.i18n_key))}</span>
+                  ${icon("chevron_down", "disclosure-chevron")}
+                </summary>
+                <div class="divide-y divide-line-soft">${rows}</div>
+              </details>`
     }).join("")
-  }
-
-  escape(text) {
-    const div = document.createElement("div")
-    div.textContent = text ?? ""
-    return div.innerHTML
   }
 }

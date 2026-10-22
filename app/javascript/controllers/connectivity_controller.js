@@ -5,7 +5,7 @@ import { load as loadTranslations, t } from "lib/i18n"
 
 // Navbar online/offline badge with unsynced-change count (AC 5.5).
 export default class extends Controller {
-  static targets = ["badge", "dot", "label", "pending", "syncButton"]
+  static targets = ["badge", "label", "pending", "syncButton"]
 
   async connect() {
     await loadTranslations()
@@ -20,13 +20,10 @@ export default class extends Controller {
     if (token !== this.refreshToken) return
 
     this.labelTarget.textContent = online ? t(this.sessionExpired ? "offline.session_expired" : "offline.online") : t("offline.offline")
-    this.dotTarget.className = `w-2 h-2 rounded-full ${online ? (pending ? "bg-mustard-500" : "bg-forest-500") : "bg-rose-500"}`
-    this.badgeTarget.className = `inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium rounded-full ${
-      online ? (pending ? "bg-mustard-50 text-mustard-700" : "bg-forest-50 text-forest-700") : "bg-rose-50 text-rose-700"
-    }`
+    this.badgeTarget.dataset.state = !online ? "offline" : this.sessionExpired ? "expired" : pending ? "pending" : "online"
 
     if (pending > 0) {
-      this.pendingTarget.textContent = t("offline.pending_count", { count: pending })
+      this.pendingTarget.textContent = t(`offline.pending_count.${pending === 1 ? "one" : "other"}`, { count: pending })
       this.pendingTarget.classList.remove("hidden")
     } else {
       this.pendingTarget.classList.add("hidden")

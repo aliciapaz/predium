@@ -1,23 +1,34 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { db } from "lib/db"
+import { load as loadTranslations } from "lib/i18n"
 import GeolocationController from "controllers/geolocation_controller"
+import { clearDb } from "../support/db"
+import { seedTranslations } from "../support/questionnaire"
 import { mount, unmount } from "../support/stimulus"
 
 const fixture = `
   <div data-controller="geolocation">
     <input type="number" data-farm-field="latitude" data-geolocation-target="latitude">
     <input type="number" data-farm-field="longitude" data-geolocation-target="longitude">
-    <button type="button" data-action="geolocation#locate" data-geolocation-target="button">Use GPS</button>
+    <button type="button" data-action="geolocation#locate" data-geolocation-target="button">
+      <span data-geolocation-target="label">Use GPS</span>
+    </button>
+    <p class="hidden" data-geolocation-target="error"></p>
   </div>`
 
 const input = (name) => document.querySelector(`[data-geolocation-target="${name}"]`)
 const button = () => document.querySelector("button")
+const label = () => document.querySelector('[data-geolocation-target="label"]')
+const error = () => document.querySelector('[data-geolocation-target="error"]')
 
 function stubGeolocation(getCurrentPosition) {
   Object.defineProperty(navigator, "geolocation", { value: { getCurrentPosition }, configurable: true })
 }
 
-beforeEach(() => {
-  vi.stubGlobal("alert", vi.fn())
+beforeEach(async () => {
+  await clearDb(db)
+  await seedTranslations()
+  await loadTranslations()
 })
 
 afterEach(async () => {
@@ -46,11 +57,11 @@ describe("geolocation controller", () => {
 
     button().click()
     expect(button().disabled).toBe(true)
-    expect(button().textContent).toBe("Locating...")
+    expect(label().textContent).toBe("Locating…")
 
     finish({ coords: { latitude: 1, longitude: 2 } })
     expect(button().disabled).toBe(false)
-    expect(button().textContent).toBe("Use GPS")
+    expect(label().textContent).toBe("Use GPS")
   })
 
   it("asks for high accuracy with a timeout", async () => {
@@ -63,23 +74,24 @@ describe("geolocation controller", () => {
     expect(getCurrentPosition.mock.calls[0][2]).toEqual({ enableHighAccuracy: true, timeout: 10000 })
   })
 
-  it("alerts and restores the button when the position cannot be read", async () => {
+  it("explains the failure inline and restores the button when the position cannot be read", async () => {
     stubGeolocation((_success, failure) => failure({ code: 1 }))
     await mount(fixture, { geolocation: GeolocationController })
 
     button().click()
 
-    expect(alert).toHaveBeenCalledWith("Unable to retrieve your location. Please enter coordinates manually.")
+    expect(error().textContent).toBe("We could not read your location.")
+    expect(error().classList).not.toContain("hidden")
     expect(input("latitude").value).toBe("")
     expect(button().disabled).toBe(false)
   })
 
-  it("alerts when the browser has no geolocation support", async () => {
+  it("explains inline when the device has no geolocation support", async () => {
     await mount(fixture, { geolocation: GeolocationController })
 
     button().click()
 
-    expect(alert).toHaveBeenCalledWith("Geolocation is not supported by your browser.")
+    expect(error().textContent).toBe("This device cannot read its location.")
     expect(button().disabled).toBe(false)
   })
 })
