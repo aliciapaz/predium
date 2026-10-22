@@ -3,7 +3,10 @@
 class ApplicationController < ActionController::Base
   include LocaleSetting
 
-  allow_browser versions: :modern
+  # The app's real floor, not Rails' :modern default: import maps (no JS
+  # without them) and the Tailwind v4 CSS (@property, color-mix, :has). It lets
+  # in iPhone 8/X on iOS 16.4+ and Android 7 phones stuck on Chrome 119.
+  allow_browser versions: { safari: 16.4, chrome: 111, firefox: 128, ie: false }
   stale_when_importmap_changes
   default_form_builder PrediumFormBuilder
 
