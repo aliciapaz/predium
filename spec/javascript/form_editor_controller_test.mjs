@@ -8,7 +8,8 @@ const dependencies = {
   "@hotwired/stimulus": { Controller: class {} },
   "lib/db": {
     newClientId: noop, getForm: async () => ({}), saveForm: noop,
-    getResponses: noop, saveResponse: noop, enqueue: noop, pruneDisallowedResponses: noop
+    getResponses: noop, saveResponse: noop, enqueue: noop, pruneDisallowedResponses: noop,
+    queueEntries: async () => []
   },
   "lib/config_cache": {
     cachedConfig: noop, principles: noop, territoryIndicators: noop,
@@ -18,7 +19,11 @@ const dependencies = {
     load: noop, has: () => false,
     t: (key, values) => values ? `${values.answered}/${values.total}` : key
   },
-  "lib/sync": { syncNow: noop, hydrateForm: noop, csrfToken: noop }
+  "lib/sync": { syncNow: noop, hydrateForm: noop, csrfToken: noop },
+  "lib/ui": {
+    escape: (text) => String(text ?? ""), icon: () => "", iconButton: () => "",
+    badge: (text) => String(text), band: () => null
+  }
 }
 
 const source = await readFile(new URL("../../app/javascript/controllers/form_editor_controller.js", import.meta.url), "utf8")
@@ -53,7 +58,8 @@ for (const principles of [true, false]) {
       dimensionProgressTarget: { textContent: "" },
       progressTextTarget: { textContent: "" },
       progressBarTarget: { style: {} },
-      dimensionNavTarget: { innerHTML: "" },
+      dimensionNavTarget: { innerHTML: "", querySelector: () => null },
+      completeButtonTarget: { classList: { toggle: noop } },
       saveStateTarget: { textContent: "" },
       prevButtonTarget: { disabled: false },
       nextButtonTarget: { classList: { toggle: noop } },
