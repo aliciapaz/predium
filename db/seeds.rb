@@ -2,7 +2,10 @@
 
 # Seed data for development and QA testing.
 # Run with: bin/rails db:seed
-# Idempotent — safe to run multiple times.
+# Idempotent: safe to run multiple times.
+
+# db:prepare seeds any freshly created database, including production's on first boot.
+return if Rails.env.production?
 
 puts "Seeding..."
 
