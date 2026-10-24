@@ -10,7 +10,9 @@ function signedIn() {
 // page must wipe the previous user's forms and cached authenticated responses
 // before anyone else signs in.
 async function purgeOfflineData() {
-  try { await db.delete() } catch { /* nothing cached yet */ }
+  // Devise signs in through Turbo, so this same db instance serves the next
+  // session; Dexie 4 otherwise leaves it closed after delete().
+  try { await db.delete({ disableAutoOpen: false }) } catch { /* nothing cached yet */ }
   if (!("caches" in window)) return
   try {
     const keys = await caches.keys()
