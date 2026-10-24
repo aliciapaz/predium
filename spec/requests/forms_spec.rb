@@ -7,6 +7,35 @@ RSpec.describe("Forms", type: :request) do
 
   before { sign_in user }
 
+  def page
+    Nokogiri::HTML(response.body)
+  end
+
+  describe "GET /forms" do
+    it "names the farm in the delete action and its confirmation" do
+      create(:form, user: user, name: "La Esperanza")
+      get forms_path
+
+      form = page.at("form[data-turbo-confirm]")
+      expect(form["data-turbo-confirm"]).to(eq("¿Eliminar el diagnóstico de La Esperanza?"))
+      expect(form.at("button")["aria-label"]).to(eq("Eliminar el diagnóstico de La Esperanza"))
+    end
+
+    it "labels a draft's date as its last update" do
+      create(:form, user: user, updated_at: Time.zone.local(2026, 10, 22, 9))
+      get forms_path
+
+      expect(page.at("article").text).to(include("Actualizado 22 oct 2026"))
+    end
+
+    it "labels a completed form's date as its completion" do
+      create(:form, :completed, user: user, completed_at: Time.zone.local(2026, 10, 20, 9))
+      get forms_path
+
+      expect(page.at("article").text).to(include("Completado 20 oct 2026"))
+    end
+  end
+
   describe "GET /forms/new" do
     it "renders the editor shell with no server-side form data" do
       get new_form_path
@@ -24,6 +53,19 @@ RSpec.describe("Forms", type: :request) do
         get edit_form_path(form)
         expect(response).to(have_http_status(:ok))
         expect(response.body).to(include(form.client_id))
+      end
+
+      it "titles the shell as loading, never as a new questionnaire" do
+        get edit_form_path(form)
+
+        expect(page.at("h1").text.strip).to(eq("Cargando..."))
+      end
+
+      it "leaves coordinates on a keypad that has a minus sign" do
+        get edit_form_path(form)
+
+        expect(page.at("#farm_latitude")["inputmode"]).to(be_nil)
+        expect(page.at("#farm_longitude")["inputmode"]).to(be_nil)
       end
     end
 
@@ -49,6 +91,13 @@ RSpec.describe("Forms", type: :request) do
       form = create(:form, :completed, user: user)
       get form_path(form)
       expect(response).to(have_http_status(:ok))
+    end
+
+    it "offers no PDF action until the feature exists" do
+      form = create(:form, :completed, user: user)
+      get form_path(form)
+
+      expect(response.body).not_to(include("Generar PDF"))
     end
 
     it "redirects a draft to the editor" do

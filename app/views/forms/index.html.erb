@@ -1,61 +1,45 @@
 <% content_for(:title, t("titles.forms_index")) %>
 
-<div data-controller="offline-forms">
-
-<div class="flex items-center justify-between mb-8">
-  <h1 class="text-2xl font-bold text-earth-900"><%= t("titles.forms_index") %></h1>
-  <%= link_to new_form_path,
-      class: "inline-flex items-center gap-2 px-5 py-2.5 bg-forest-600 text-white font-medium rounded-lg hover:bg-forest-700 transition-colors shadow-sm" do %>
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-    </svg>
-    <%= t("questionnaire.new_questionnaire") %>
+<div class="max-w-2xl mx-auto" data-controller="offline-forms">
+  <%= page_header t("titles.forms_index") do %>
+    <%= link_to new_form_path, class: "btn-primary" do %>
+      <%= icon(:plus) %>
+      <%= t("questionnaire.new_questionnaire") %>
+    <% end %>
   <% end %>
-</div>
 
-<div data-offline-forms-target="list">
-<%# Drafts Section %>
-<section class="mb-10">
-  <div class="flex items-center gap-2 mb-4">
-    <h2 class="text-lg font-semibold text-earth-800"><%= t("forms.drafts") %></h2>
-    <span class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium rounded-full bg-mustard-100 text-mustard-700">
-      <%= @drafts.size %>
-    </span>
-  </div>
+  <div class="flex flex-col gap-10" data-offline-forms-target="list">
+    <section>
+      <div class="flex items-center gap-2 mb-4">
+        <h2 class="section-title"><%= t("forms.drafts") %></h2>
+        <%= badge(@drafts.size, tone: :warning) %>
+      </div>
 
-  <% if @drafts.any? %>
-    <div class="space-y-3">
-      <% @drafts.each do |form| %>
-        <%= render "forms/form_card", form: form %>
+      <% if @drafts.any? %>
+        <div class="flex flex-col gap-3">
+          <%= render partial: "forms/form_card", collection: @drafts, as: :form %>
+        </div>
+      <% else %>
+        <%= render "shared/empty_state",
+            message: t("forms.no_drafts"),
+            action_text: t("questionnaire.new_questionnaire"),
+            action_path: new_form_path %>
       <% end %>
-    </div>
-  <% else %>
-    <%= render "shared/empty_state",
-        message: t("forms.no_drafts"),
-        action_text: t("questionnaire.new_questionnaire"),
-        action_path: new_form_path %>
-  <% end %>
-</section>
+    </section>
 
-<%# Completed Section %>
-<section>
-  <div class="flex items-center gap-2 mb-4">
-    <h2 class="text-lg font-semibold text-earth-800"><%= t("forms.completed") %></h2>
-    <span class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium rounded-full bg-forest-100 text-forest-700">
-      <%= @completed.size %>
-    </span>
-  </div>
+    <section>
+      <div class="flex items-center gap-2 mb-4">
+        <h2 class="section-title"><%= t("forms.completed") %></h2>
+        <%= badge(@completed.size, tone: :success) %>
+      </div>
 
-  <% if @completed.any? %>
-    <div class="space-y-3">
-      <% @completed.each do |form| %>
-        <%= render "forms/form_card", form: form %>
+      <% if @completed.any? %>
+        <div class="flex flex-col gap-3">
+          <%= render partial: "forms/form_card", collection: @completed, as: :form %>
+        </div>
+      <% else %>
+        <%= render "shared/empty_state", message: t("forms.no_completed") %>
       <% end %>
-    </div>
-  <% else %>
-    <%= render "shared/empty_state", message: t("forms.no_completed") %>
-  <% end %>
-</section>
-</div>
-
+    </section>
+  </div>
 </div>

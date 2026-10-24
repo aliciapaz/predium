@@ -3,7 +3,7 @@
 Farm diagnosis tool for agroecological transition, based on CET's methodology and developed in
 Chile. Field agents score a farm against six agroecology principles (Level 1) and a set of
 territory-specific indicators (Level 2), working offline on their phone or tablet. Forms sync
-when connectivity returns, and each completed diagnosis produces a PDF report.
+when connectivity returns. PDF reports for completed diagnoses are planned.
 
 - Product site: [prediumapp.org](https://prediumapp.org)
 - App: [app.prediumapp.org](https://app.prediumapp.org) (invite-only)
@@ -57,7 +57,22 @@ twice (server, and client for offline previews), and both are pinned to
 | [`CONCEPTS.md`](CONCEPTS.md) | Domain vocabulary: Principle, Indicator, Territory Extension, sync states |
 | [`docs/architecture.md`](docs/architecture.md) | Architecture decision records |
 | [`docs/acceptance-criteria.md`](docs/acceptance-criteria.md) | User stories by feature area |
-| [`docs/database.md`](docs/database.md) | Original schema spec (`db/schema.rb` is authoritative) |
 | [`docs/testing.md`](docs/testing.md) | Testing conventions for both suites |
 | [`docs/deployment.md`](docs/deployment.md) | Releases, inviting users, console access, backups |
 | [`docs/solutions/`](docs/solutions/) | Write-ups of past bugs and the patterns that fixed them |
+
+## License
+
+The source code is licensed under the [GNU Affero General Public License v3.0](LICENSE). If you
+run a modified version of Predium as a network service, you must make your modified source
+available to its users.
+
+The questionnaire content (principles, indicators, questions, and their translations) is CET's
+methodology and is not covered by the AGPL. All rights to it are reserved by CET. It lives in:
+
+- `config/questionnaire/`
+- `config/locales/es/questionnaire.yml`
+- `config/locales/en/questionnaire.yml`
+
+The app runs on whatever questionnaire is in those files, so to run your own instance either
+replace them with your own content or get CET's permission to use theirs.

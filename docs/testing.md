@@ -11,6 +11,7 @@ How Predium is tested today, and the rules for adding tests. Two suites run in C
 | Services (`Forms::SyncUpsert`, `Scoring::Calculator`, `QuestionnaireConfig`) | RSpec service specs | `spec/services/` |
 | IndexedDB layer, sync queue, conflict handling, config/locale cache, client scoring | Vitest | `spec/javascript/lib/` |
 | Stimulus controllers (rendering, events, self-heal, completion flow) | Vitest | `spec/javascript/controllers/` |
+| Design system primitives that refuse misuse, the form builder, `bin/design-check` rules | RSpec helper, form builder and lib specs; Vitest for `lib/ui.js` | `spec/helpers/`, `spec/form_builders/`, `spec/lib/`, `spec/javascript/lib/ui.test.js` |
 
 If a bug lives in the browser (IndexedDB timing, a controller repainting state, a sync race), it belongs in Vitest. A request spec cannot reproduce it.
 
@@ -20,6 +21,7 @@ If a bug lives in the browser (IndexedDB timing, a controller repainting state, 
 - **The offline invariants in `AGENTS.md` are tested, and new client code that touches them needs tests too:** online reads self-heal on a cache miss, and server-only state changes refresh the local copy.
 - **Scoring changes touch both implementations.** `Scoring::Calculator` and `lib/scoring.js` are both pinned to `spec/fixtures/scoring_parity.json`. Change the fixture, then make both suites pass.
 - **Known bugs are `it.todo` with a one-line reason**, never a skipped or deleted test. The fix PR turns the todo into a real test.
+- **Assert on design-system contracts, not utility classes.** Score and status state lives in attributes (`data-band`, `data-state`, `aria-current`, `:checked`), so tests read those instead of color classes.
 - **Test behavior, not implementation.** Assert on what IndexedDB, the DOM, the request, or the dispatched event ends up holding, not on which private method ran.
 
 ## RSpec conventions
@@ -66,4 +68,4 @@ These are checked by hand in a browser:
 - Repeat the upgrade offline and with a failed config request. The editor reports unavailable config and preserves the draft until it can fetch the compatible schema.
 - Fail one locale request during refresh, then reload online. Its labels recover even when the questionnaire fingerprint already matches. Reload again and use the editor offline to check both cache layers.
 - Change a draft's territory while config pruning runs. Answers valid for the resulting territory survive; completed forms stay untouched.
-- With a child extension, editor and results badges name each indicator's source territory, including inherited parent questions.
+- With a child extension, editor and results badge only the indicators inherited from a parent territory, naming that territory; the child's own indicators carry no badge.

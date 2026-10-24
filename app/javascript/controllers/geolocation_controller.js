@@ -1,28 +1,26 @@
 import { Controller } from "@hotwired/stimulus"
+import { t } from "lib/i18n"
 
 export default class extends Controller {
-  static targets = ["latitude", "longitude", "button"]
+  static targets = ["latitude", "longitude", "button", "label", "error"]
 
   locate() {
+    this.showError(null)
     if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser.")
+      this.showError(t("farm_info.gps_unsupported"))
       return
     }
 
-    if (this.hasButtonTarget) {
-      this.buttonTarget.disabled = true
-      this.buttonTarget.textContent = "Locating..."
-    }
-
+    this.setBusy(true)
     navigator.geolocation.getCurrentPosition(
       (position) => {
         this.setCoordinate(this.latitudeTarget, position.coords.latitude)
         this.setCoordinate(this.longitudeTarget, position.coords.longitude)
-        this.resetButton()
+        this.setBusy(false)
       },
       () => {
-        alert("Unable to retrieve your location. Please enter coordinates manually.")
-        this.resetButton()
+        this.showError(t("farm_info.gps_failed"))
+        this.setBusy(false)
       },
       { enableHighAccuracy: true, timeout: 10000 }
     )
@@ -35,10 +33,16 @@ export default class extends Controller {
     target.dispatchEvent(new Event("input", { bubbles: true }))
   }
 
-  resetButton() {
-    if (this.hasButtonTarget) {
-      this.buttonTarget.disabled = false
-      this.buttonTarget.textContent = "Use GPS"
-    }
+  setBusy(busy) {
+    if (!this.hasButtonTarget) return
+    this.buttonTarget.disabled = busy
+    this.buttonTarget.setAttribute("aria-busy", String(busy))
+    if (this.hasLabelTarget) this.labelTarget.textContent = t(busy ? "farm_info.locating" : "farm_info.use_gps")
+  }
+
+  showError(message) {
+    if (!this.hasErrorTarget) return
+    this.errorTarget.textContent = message || ""
+    this.errorTarget.classList.toggle("hidden", !message)
   }
 }

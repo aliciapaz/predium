@@ -12,6 +12,7 @@ class TranslationsController < ApplicationController
     translations = flatten_translations(I18n.t(".", locale: locale))
 
     expires_in(1.hour, public: true)
+    response.set_header("X-Translations-Version", QuestionnaireConfig.cached_fingerprint)
     render(json: translations)
   end
 

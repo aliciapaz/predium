@@ -1,85 +1,46 @@
-<nav class="bg-white border-b border-earth-200" data-controller="navbar">
-  <div class="max-w-5xl mx-auto px-4">
-    <div class="flex items-center justify-between h-14">
-      <!-- Logo -->
-      <div class="flex items-center space-x-6">
-        <%= link_to "Predium", root_path, class: "text-forest-700 font-bold text-xl tracking-tight" %>
+<nav class="app-bar" data-controller="navbar" aria-label="<%= t("nav.main") %>">
+  <div class="max-w-5xl mx-auto px-4 flex items-center gap-3 h-16">
+    <%= link_to root_path, class: "app-brand" do %>
+      <%= image_tag "/favicon.svg", alt: "", width: 30, height: 30 %>
+      <span>Predium</span>
+    <% end %>
 
-        <div class="hidden md:flex items-center space-x-4">
-          <%= link_to t("nav.my_forms"), root_path,
-              class: "text-sm text-earth-700 hover:text-forest-600 transition-colors #{request.path == root_path ? 'text-forest-700 font-medium' : ''}" %>
-          <%= link_to t("nav.profile"), profile_path,
-              class: "text-sm text-earth-700 hover:text-forest-600 transition-colors #{request.path == profile_path ? 'text-forest-700 font-medium' : ''}" %>
-          <% if current_user.super_admin? %>
-            <%= link_to t("nav.admin"), admin_root_path,
-                class: "text-sm text-earth-700 hover:text-forest-600 transition-colors" %>
-          <% end %>
-        </div>
-      </div>
+    <div class="hidden md:flex items-center gap-1 ml-4">
+      <%= nav_link t("nav.my_forms"), root_path %>
+      <%= render "shared/organization_nav_link" %>
+      <%= nav_link t("nav.profile"), profile_path %>
+      <% if current_user.super_admin? %>
+        <%= nav_link t("nav.admin"), admin_root_path %>
+      <% end %>
+    </div>
 
-      <!-- Right side -->
+    <div class="ml-auto flex items-center gap-2">
       <%= render "shared/sync_status" %>
 
-      <div class="hidden md:flex items-center space-x-4">
-        <!-- Locale switcher -->
-        <div class="flex items-center space-x-1 text-sm text-earth-500">
-          <% I18n.available_locales.each_with_index do |loc, i| %>
-            <% if i > 0 %><span class="text-earth-300">|</span><% end %>
-            <% if loc == I18n.locale %>
-              <span class="font-medium text-forest-700"><%= loc.to_s.upcase %></span>
-            <% else %>
-              <%= link_to loc.to_s.upcase, url_for(locale: loc),
-                  class: "hover:text-forest-600 transition-colors" %>
-            <% end %>
-          <% end %>
-        </div>
-
-        <span class="text-sm text-earth-600"><%= current_user.first_name %></span>
-
-        <%= button_to t("nav.sign_out"), destroy_user_session_path,
-            method: :delete,
-            class: "text-sm text-earth-500 hover:text-forest-600 transition-colors cursor-pointer" %>
+      <div class="hidden md:flex items-center gap-3">
+        <%= render "shared/locale_switch" %>
+        <span class="text-sm font-semibold text-ink-soft"><%= current_user.first_name %></span>
+        <%= button_to t("nav.sign_out"), destroy_user_session_path, method: :delete, class: "btn-quiet" %>
       </div>
 
-      <!-- Mobile hamburger -->
-      <button class="md:hidden text-earth-600 hover:text-forest-700"
-              data-action="navbar#toggle"
-              aria-label="Toggle menu">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-      </button>
+      <%= icon_button :menu, label: t("nav.menu"), class: "md:hidden",
+          "aria-expanded": "false", "aria-controls": "app-menu",
+          data: { action: "navbar#toggle", navbar_target: "button" } %>
     </div>
   </div>
 
-  <!-- Mobile menu -->
-  <div class="md:hidden hidden" data-navbar-target="menu">
-    <div class="px-4 py-3 space-y-2 border-t border-earth-200 bg-white">
-      <%= link_to t("nav.my_forms"), root_path,
-          class: "block text-sm text-earth-700 hover:text-forest-600 py-1" %>
-      <%= link_to t("nav.profile"), profile_path,
-          class: "block text-sm text-earth-700 hover:text-forest-600 py-1" %>
+  <div id="app-menu" class="md:hidden hidden border-t border-line bg-surface" data-navbar-target="menu">
+    <div class="px-4 py-3 flex flex-col gap-1">
+      <%= nav_link t("nav.my_forms"), root_path, css: "app-nav-link-row" %>
+      <%= render "shared/organization_nav_link", css: "app-nav-link-row" %>
+      <%= nav_link t("nav.profile"), profile_path, css: "app-nav-link-row" %>
       <% if current_user.super_admin? %>
-        <%= link_to t("nav.admin"), admin_root_path,
-            class: "block text-sm text-earth-700 hover:text-forest-600 py-1" %>
+        <%= nav_link t("nav.admin"), admin_root_path, css: "app-nav-link-row" %>
       <% end %>
 
-      <div class="pt-2 border-t border-earth-100 flex items-center justify-between">
-        <div class="flex items-center space-x-1 text-sm text-earth-500">
-          <% I18n.available_locales.each_with_index do |loc, i| %>
-            <% if i > 0 %><span class="text-earth-300">|</span><% end %>
-            <% if loc == I18n.locale %>
-              <span class="font-medium text-forest-700"><%= loc.to_s.upcase %></span>
-            <% else %>
-              <%= link_to loc.to_s.upcase, url_for(locale: loc),
-                  class: "hover:text-forest-600 transition-colors" %>
-            <% end %>
-          <% end %>
-        </div>
-
-        <%= button_to t("nav.sign_out"), destroy_user_session_path,
-            method: :delete,
-            class: "text-sm text-earth-500 hover:text-forest-600 cursor-pointer" %>
+      <div class="mt-2 pt-3 border-t border-line-soft flex items-center justify-between gap-3">
+        <%= render "shared/locale_switch" %>
+        <%= button_to t("nav.sign_out"), destroy_user_session_path, method: :delete, class: "btn-secondary" %>
       </div>
     </div>
   </div>
