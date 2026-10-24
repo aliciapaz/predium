@@ -35,6 +35,7 @@ See `CONCEPTS.md` for domain vocabulary (Indicator, Territory Extension, Sync Qu
 ```
 app/
   controllers/    # thin; admin/, api/, organizations/, forms/ namespaces
+  form_builders/  # PrediumFormBuilder: default builder, applies design-system primitives
   models/         # 6 domain models, no concerns
   services/       # forms/sync_upsert, questionnaire_config, scoring/calculator
   policies/       # ActionPolicy: application, admin/base, form, organization
@@ -58,6 +59,17 @@ No third-party HTTP APIs. Authentication is fully local via Devise. The only "ex
 - **JSON API namespace** (`app/controllers/api/`) exists solely to serve/sync the questionnaire config and forms to the PWA, keyed by device-generated `client_id`, not the standard server-rendered flow.
 - **Scoring lives in two places by necessity:** `Scoring::Calculator` (server) and `lib/scoring.js` (client, for offline score preview). Keep them in sync: both are pinned to `spec/fixtures/scoring_parity.json` (RSpec and Vitest).
 
+## Design System
+
+Any change to a view, a Stimulus renderer or a helper that emits markup follows `docs/design-system.md`. The contract:
+
+- Colors, fonts and shadows come from `app/assets/tailwind/tokens.css` only. The default Tailwind palette is reset, so `gray-*`, `rose-*` and the old `earth-*`/`forest-*`/`mustard-*` classes render nothing.
+- Build with primitives, not utility piles: `field`, `btn-*`, `chip`, `card`, `badge`, `alert_box`, `icon`/`icon_button`, `score-option`. Forms get `field` automatically from `PrediumFormBuilder`; Stimulus markup uses `lib/ui.js`.
+- Persistent screen actions go in one `action-bar`; nothing else is pinned to the bottom.
+- Mobile first at 360px, 44px touch targets, 16px text in anything that opens the keyboard.
+- Fix defects in the innermost layer (token, primitive, pattern, rule), not on the one screen where they showed up.
+- `bin/design-check` must stay clean. It runs on every edit through the `.claude/settings.json` hook, in `bin/ci`, and in CI.
+
 ## Architecture Notes
 
 - **Authorization:** ActionPolicy policies for `Form`, `Organization`, and admin area.
@@ -70,6 +82,7 @@ No third-party HTTP APIs. Authentication is fully local via Devise. The only "ex
 - **Tests:** `bundle exec rspec`. Testing rules and conventions for both suites live in `docs/testing.md`.
 - **JS tests:** `npm test` (Vitest + jsdom + fake-indexeddb, specs in `spec/javascript/`). `vitest.config.js` mirrors the importmap aliases; `dexie` resolves to the vendored copy.
 - **Lint:** `bundle exec rubocop` (Shopify style + Telos AI Harness cops under `Harness/*`; run `bundle exec rubocop --only Harness` for architecture checks)
+- **Design check:** `bin/design-check` (tokens, primitives and patterns; see `docs/design-system.md`)
 - **JS lint:** `npm run lint` (ESLint flat config in `eslint.config.js`). Node is dev-only: `package.json` holds lint/test tooling, runtime JS still ships through importmap.
 - **Security scans:** `bin/brakeman`, `bin/bundler-audit`, `bin/importmap audit`
 - **CI:** `.github/workflows/ci.yml` runs RSpec, Brakeman, bundler-audit, importmap audit, RuboCop, and the JS lint + test job; deploys via Kamal.

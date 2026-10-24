@@ -17,6 +17,7 @@ class QuestionnaireConfig
 
   CORE_PATH = Rails.root.join("config/questionnaire/core.yml").freeze
   EXTENSIONS_DIR = Rails.root.join("config/questionnaire/extensions").freeze
+  LOCALES_DIR = Rails.root.join("config/locales").freeze
   MONITOR = Monitor.new
 
   class << self
@@ -90,13 +91,22 @@ class QuestionnaireConfig
       extension_keys.flat_map { |key| extension(key)[:indicators].map { |i| i[:key] } }.uniq
     end
 
+    # Per-process memo for page renders; outside development the files only
+    # change on deploy.
+    def cached_fingerprint
+      return fingerprint if Rails.env.development?
+
+      @cached_fingerprint ||= fingerprint
+    end
+
     def fingerprint
-      files = [CORE_PATH] + EXTENSIONS_DIR.glob("*.yml").sort + questionnaire_locale_files
+      files = [CORE_PATH] + EXTENSIONS_DIR.glob("*.yml").sort + locale_files
       Digest::SHA256.hexdigest(files.map(&:read).join("\x1e"))
     end
 
     def reload!
       MONITOR.synchronize do
+        @cached_fingerprint = nil
         @loaded = false
         @extensions = {}
         @principles = nil
@@ -109,8 +119,10 @@ class QuestionnaireConfig
 
     private
 
-    def questionnaire_locale_files
-      Rails.root.glob("config/locales/*/questionnaire.yml").sort
+    # Clients cache every translation under this fingerprint, not only the
+    # questionnaire's, so any locale file has to invalidate it.
+    def locale_files
+      LOCALES_DIR.glob("**/*.yml").sort
     end
 
     def load_core!

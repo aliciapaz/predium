@@ -1,0 +1,8 @@
+<div class="segmented" role="group" aria-label="<%= t("nav.language") %>">
+  <% I18n.available_locales.each do |loc| %>
+    <%= link_to loc.to_s.upcase, url_for(locale: loc),
+        "aria-current": (loc == I18n.locale ? "true" : nil),
+        lang: loc,
+        title: t("locales.#{loc}", default: loc.to_s.upcase) %>
+  <% end %>
+</div>

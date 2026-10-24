@@ -1,0 +1,8 @@
+<% if allowed_to?(:manage?, organization) %>
+  <nav class="page-tabs" aria-label="<%= organization.name %>">
+    <%= link_to t("navigation.forms"), organization_forms_path(organization),
+        "aria-current": ("page" if controller_name == "forms") %>
+    <%= link_to t("navigation.members"), organization_memberships_path(organization),
+        "aria-current": ("page" if controller_name == "memberships") %>
+  </nav>
+<% end %>

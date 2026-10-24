@@ -7,7 +7,7 @@ RSpec.describe("Locale precedence", type: :request) do
     it "uses Spanish even when the browser prefers English" do
       get new_user_session_path, headers: { "Accept-Language" => "en-US,en;q=0.9" }
 
-      expect(response.body).to(include('<html lang="es">', "Iniciar Sesion"))
+      expect(response.body).to(include('<html lang="es">', "Iniciar sesión"))
     end
 
     it "honors an explicit supported locale" do

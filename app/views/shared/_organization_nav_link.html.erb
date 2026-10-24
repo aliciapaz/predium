@@ -1,0 +1,5 @@
+<% organization = administered_organization %>
+<% if organization && allowed_to?(:manage?, organization) %>
+  <%= nav_link t("nav.organization"), organization_forms_path(organization), css: local_assigns[:css].to_s,
+      active: request.path.start_with?("#{organization_path(organization, locale: nil)}/") %>
+<% end %>

@@ -14,6 +14,9 @@ const fixture = `
 let Chart
 
 beforeEach(() => {
+  for (const name of ["primary", "line", "surface", "muted", "ink-soft"]) {
+    document.documentElement.style.setProperty(`--color-${name}`, "#123456")
+  }
   Chart = vi.fn(function () { this.destroy = vi.fn() })
   vi.stubGlobal("Chart", Chart)
 })
