@@ -75,6 +75,15 @@ function card(name) {
     .find((element) => titleOf(element.querySelector("h3")) === name)
 }
 
+function hintRows(name) {
+  return Array.from(card(name).querySelectorAll(".rubric-row"))
+}
+
+// The CSS lights the rubric row whose band matches the checked score's band.
+function checkedBand(name) {
+  return card(name).querySelector("input:checked")?.dataset.band
+}
+
 function showSection(index) {
   target("dimensionNav").querySelectorAll("button")[index].click()
   return settle()
@@ -321,6 +330,52 @@ describe("form editor controller", () => {
 
       expect(cardTitles()).toEqual(["Irrigation"])
       expect(target("completeButton").classList).not.toContain("hidden")
+    })
+
+    it("shows the low, mid, and high range hints for a question that has them", async () => {
+      await seedForm()
+      await mount(editor(), controllers)
+
+      await showSection(1)
+
+      const rows = hintRows("Compaction").map((row) => [row.dataset.band, row.querySelector("b").textContent, row.querySelector("span").textContent])
+      expect(rows).toEqual([
+        ["low", "1-3", "Hard to push a rod in"],
+        ["mid", "4-7", "A rod goes in with effort"],
+        ["high", "8-10", "Spongy soil"]
+      ])
+    })
+
+    it("renders a label-only question without range hints", async () => {
+      await seedForm()
+      await mount(editor(), controllers)
+
+      await showSection(1)
+
+      expect(hintRows("Erosion")).toHaveLength(0)
+    })
+
+    it.each([
+      [3, "low"], [4, "mid"], [7, "mid"], [8, "high"]
+    ])("opens a saved %i in the band of its range hint", async (value, band) => {
+      await seedForm({}, [response("compaction", value, true)])
+      await mount(editor(), controllers)
+
+      await showSection(1)
+
+      expect(checkedBand("Compaction")).toBe(band)
+      expect(hintRows("Compaction").map((row) => row.dataset.band)).toContain(band)
+    })
+
+    it("moves the chosen score into the band of the matching range hint", async () => {
+      await seedForm()
+      await mount(editor(), controllers)
+      await showSection(1)
+
+      score("Compaction", 5)
+      await settle()
+
+      expect(checkedBand("Compaction")).toBe("mid")
     })
 
     it("moves between dimensions with next, previous, and the nav buttons", async () => {
