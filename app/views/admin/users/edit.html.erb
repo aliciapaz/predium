@@ -1,25 +1,21 @@
 <% content_for(:page_title, t("admin.edit_user_role")) %>
 
-<div class="space-y-6">
-  <h1 class="text-2xl font-bold text-earth-900"><%= t("admin.edit_user_role") %> — <%= @user.first_name %> <%= @user.last_name %></h1>
+<div>
+  <%= page_header("#{t("admin.edit_user_role")}: #{@user.first_name} #{@user.last_name}", back: [t("buttons.back"), admin_user_path(@user)]) %>
 
-  <div class="max-w-lg mx-auto">
-    <div class="bg-white rounded-lg shadow-sm border border-earth-200 p-6">
-      <%= form_with model: [:admin, @user], class: "space-y-4" do |f| %>
+  <div class="max-w-lg">
+    <div class="card">
+      <%= form_with model: [:admin, @user], class: "flex flex-col gap-5" do |f| %>
         <div>
-          <label for="user_platform_role" class="block text-sm font-medium text-earth-700 mb-1"><%= t("admin.platform_role") %></label>
-          <%= f.select :platform_role, User.platform_roles.keys.map { |r| [r.titleize, r] },
-              {}, class: "w-full rounded-lg border-earth-300 text-sm focus:ring-forest-500 focus:border-forest-500" %>
+          <%= f.label :platform_role, t("admin.platform_role") %>
+          <%= f.select :platform_role, User.platform_roles.keys.map { |r| [r.titleize, r] } %>
         </div>
 
-        <p class="text-xs text-mustard-700 bg-mustard-50 border border-mustard-200 rounded-lg p-3">
-          <%= t("admin.role_warning") %>
-        </p>
+        <%= alert_box t("admin.role_warning"), tone: :warning %>
 
-        <div class="flex items-center gap-3">
-          <%= f.submit t("admin.update_role"),
-              class: "bg-forest-500 hover:bg-forest-600 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors cursor-pointer" %>
-          <%= link_to t("buttons.cancel"), admin_user_path(@user), class: "text-sm text-earth-600 hover:text-earth-800" %>
+        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <%= link_to t("buttons.cancel"), admin_user_path(@user), class: "btn-quiet" %>
+          <%= f.submit t("admin.update_role") %>
         </div>
       <% end %>
     </div>

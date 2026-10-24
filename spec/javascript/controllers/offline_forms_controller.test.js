@@ -17,12 +17,12 @@ function sections() {
     title: section.querySelector("h2").textContent,
     count: section.querySelector("h2 + span").textContent,
     names: Array.from(section.querySelectorAll("h3")).map((h3) => h3.textContent),
-    empty: section.querySelector("p.text-earth-400")?.textContent
+    empty: section.querySelector(":scope > p")?.textContent
   }))
 }
 
 function cardFor(name) {
-  return Array.from(list().querySelectorAll("h3")).find((h3) => h3.textContent === name).closest(".bg-white")
+  return Array.from(list().querySelectorAll("h3")).find((h3) => h3.textContent === name).closest("article")
 }
 
 async function seedForm(clientId, overrides = {}) {
@@ -75,9 +75,9 @@ describe("offline forms controller", () => {
       await mount(fixture, { "offline-forms": OfflineFormsController })
 
       expect(cardFor("Draft farm").querySelector("a").getAttribute("href")).toBe("/forms/draft-1/edit")
-      expect(cardFor("Draft farm").querySelector("a").textContent).toBe("Continue")
+      expect(cardFor("Draft farm").querySelector(".btn-quiet").textContent).toBe("Continue")
       expect(cardFor("Done farm").querySelector("a").getAttribute("href")).toBe("/forms/done-1")
-      expect(cardFor("Done farm").querySelector("a").textContent).toBe("View results")
+      expect(cardFor("Done farm").querySelector(".btn-quiet").textContent).toBe("View results")
     })
 
     it("shows draft progress against the principles plus the form's own territory chain", async () => {
@@ -92,7 +92,7 @@ describe("offline forms controller", () => {
 
       const card = cardFor("Draft farm")
       expect(card.textContent).toContain("1 of 6 indicators")
-      expect(card.querySelector(".bg-forest-500").style.width).toBe("17%")
+      expect(card.querySelector(".meter-fill").style.width).toBe("17%")
       expect(cardFor("Puna farm").textContent).toContain("0 of 3 indicators")
     })
 

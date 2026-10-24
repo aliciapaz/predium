@@ -121,3 +121,6 @@ jobs:
 
       - name: Lint code for consistent style
         run: bin/rubocop -f github
+
+      - name: Check views against the design system
+        run: bin/design-check

@@ -7,11 +7,11 @@ es:
       recycling:
         name: "Reciclaje"
       interactions:
-        name: "Nivel de interaccion entre los componentes del sistema: animal, agricola, forestal, otros"
+        name: "Nivel de interacción entre los componentes del sistema: animal, agrícola, forestal, otros"
       soil_management:
-        name: "Manejo ecologico del suelo"
+        name: "Manejo ecológico del suelo"
       pest_management:
-        name: "Manejo ecologico de plagas y enfermedades"
+        name: "Manejo ecológico de plagas y enfermedades"
       traditional_knowledge:
         name: "Bases culturales y conocimiento tradicional en el manejo del sistema"
 
@@ -21,25 +21,25 @@ es:
       water: "Agua"
       biodiversity: "Biodiversidad"
       management: "Manejo"
-      socioeconomic: "Socioeconomico"
+      socioeconomic: "Socioeconómico"
       resilience: "Resiliencia"
 
     # ── Dimensiones ───────────────────────────────────────
     dimensions:
-      soil_health: "Salud del Suelo"
-      soil_management: "Manejo del Suelo"
-      water_availability: "Disponibilidad de Agua"
-      water_quality: "Calidad del Agua"
-      water_management: "Gestion del Agua"
-      crop_diversity: "Diversidad de Cultivos"
-      ecosystem_diversity: "Diversidad del Ecosistema"
-      farm_planning: "Planificacion del Predio"
-      input_management: "Gestion de Insumos"
-      animal_management: "Manejo Animal"
-      economic_viability: "Viabilidad Economica"
-      social_wellbeing: "Bienestar Social"
-      climate_adaptation: "Adaptacion Climatica"
-      system_resilience: "Resiliencia del Sistema"
+      soil_health: "Salud del suelo"
+      soil_management: "Manejo del suelo"
+      water_availability: "Disponibilidad de agua"
+      water_quality: "Calidad del agua"
+      water_management: "Gestión del agua"
+      crop_diversity: "Diversidad de cultivos"
+      ecosystem_diversity: "Diversidad del ecosistema"
+      farm_planning: "Planificación del predio"
+      input_management: "Gestión de insumos"
+      animal_management: "Manejo animal"
+      economic_viability: "Viabilidad económica"
+      social_wellbeing: "Bienestar social"
+      climate_adaptation: "Adaptación climática"
+      system_resilience: "Resiliencia del sistema"
 
     # ── Indicadores L2 (extension Chile; solo nombre por ahora) ──
     indicators:
@@ -47,42 +47,42 @@ es:
       soil_coverage:
         name: "Cobertura de suelo"
       soil_erosion:
-        name: "Erosion de suelo"
+        name: "Erosión de suelo"
       compaction:
-        name: "Compactacion"
+        name: "Compactación"
       infiltration:
-        name: "Infiltracion"
+        name: "Infiltración"
       soil_depth:
         name: "Profundidad efectiva de suelo"
       soil_structure:
         name: "Estructura de suelo"
       clod_stability:
-        name: "Estabilidad del terron"
+        name: "Estabilidad del terrón"
       color_and_smell:
         name: "Color y olor"
       root_development:
-        name: "Desarrollo de raices"
+        name: "Desarrollo de raíces"
       residue_condition:
         name: "Estado de residuos"
       biological_activity:
-        name: "Actividad biologica"
+        name: "Actividad biológica"
       organic_matter:
-        name: "Materia organica"
+        name: "Materia orgánica"
       # soil_management
       crop_rotation:
         name: "Rotaciones"
       organic_fertilizers:
-        name: "Incorporacion de abonos organicos"
+        name: "Incorporación de abonos orgánicos"
       leaf_fertilizers:
-        name: "Abonos organicos foliares y a traves de fertirriego"
+        name: "Abonos orgánicos foliares y a través de fertirriego"
       efficient_microorganisms:
         name: "Microorganismos eficientes"
       soil_conservation:
-        name: "Confeccion de obras de conservacion de suelo"
+        name: "Confección de obras de conservación de suelo"
       stubble_burning:
-        name: "Eliminacion de quemas"
+        name: "Eliminación de quemas"
       weed_management:
-        name: "Practicas de manejo de malezas (mulch, desbrozadora, rana, cultivos de cobertura, etc.)"
+        name: "Prácticas de manejo de malezas (mulch, desbrozadora, rana, cultivos de cobertura, etc.)"
       # water_availability
       irrigation_system:
         name: "Sistema de riego"
@@ -107,31 +107,31 @@ es:
       live_barriers:
         name: "Barreras vivas"
       live_coverage:
-        name: "Asociacion con cobertura viva"
+        name: "Asociación con cobertura viva"
       live_fences:
         name: "Cercos vivos"
       forest_patches:
         name: "Arboleda o parches de bosque"
       spontaneous_vegetation:
-        name: "Sitios prediales de vegetacion espontanea"
+        name: "Sitios prediales de vegetación espontánea"
       natural_enemies_diversity:
         name: "Diversidad de enemigos naturales de plagas"
       pollinator_diversity:
         name: "Diversidad de polinizadores"
       entomophages_released:
-        name: "Entomofagos liberados"
+        name: "Entomófagos liberados"
       entomopathogen_applications:
-        name: "Aplicaciones de entomopatogenos"
+        name: "Aplicaciones de entomopatógenos"
       # farm_planning
       transformation_conviction:
-        name: "Conviccion para iniciar un proceso de transformacion"
+        name: "Convicción para iniciar un proceso de transformación"
       decision_for_practices:
-        name: "Decision para la incorporacion de practicas"
+        name: "Decisión para la incorporación de prácticas"
       experience_transmission:
-        name: "Nivel de acciones de transmision de la experiencia propia"
+        name: "Nivel de acciones de transmisión de la experiencia propia"
       # input_management
       biocides_use:
-        name: "Elaboracion y uso de biocidas para plagas y enfermedades"
+        name: "Elaboración y uso de biocidas para plagas y enfermedades"
       preventive_sanitary_measures:
         name: "Medidas sanitarias preventivas (trampas, plantas repelentes, semillas desinfectadas, etc.)"
       infected_plants_removal:
@@ -144,43 +144,43 @@ es:
         name: "Porcentaje de insumos preparados del total requerido"
       # animal_management
       animal_feed_conservation:
-        name: "Conservacion de alimentos para animales"
+        name: "Conservación de alimentos para animales"
       animal_feed_production_percentage:
-        name: "% de la alimentacion animal proveniente del propio campo"
+        name: "% de la alimentación animal proveniente del propio campo"
       animal_feed_production:
         name: "Produce alimentos para todas las especies animales"
       # economic_viability
       agricultural_commercialized_products:
-        name: "Diversidad de productos agricolas comercializados"
+        name: "Diversidad de productos agrícolas comercializados"
       animal_commercialized_products:
         name: "Diversidad de productos de origen animal comercializados"
       territorial_commercialization:
         name: "Productos comercializados a nivel territorial"
       production_destination:
-        name: "Destino de la produccion"
+        name: "Destino de la producción"
       income:
         name: "Nivel de ingresos"
       income_sources_diversity:
-        name: "Numero de rubros de donde provienen los ingresos"
+        name: "Número de rubros de donde provienen los ingresos"
       # social_wellbeing
       agroecological_farmers_knowledge:
-        name: "Conocimiento de los agricultores de practicas agroecologicas"
+        name: "Conocimiento de los agricultores de prácticas agroecológicas"
       soil_practices_number:
-        name: "Numero de practicas agroecologicas para el manejo ecologico de suelo"
+        name: "Número de prácticas agroecológicas para el manejo ecológico de suelo"
       disease_practices_number:
-        name: "Numero de practicas agroecologicas para el manejo preventivo de plagas y enfermedades"
+        name: "Número de prácticas agroecológicas para el manejo preventivo de plagas y enfermedades"
       recycling_practices_number:
-        name: "Numero de practicas de reciclaje"
+        name: "Número de prácticas de reciclaje"
       agroecological_organizations:
-        name: "Conocimiento y participacion en organizaciones asociadas a la produccion agroecologica"
+        name: "Conocimiento y participación en organizaciones asociadas a la producción agroecológica"
       participation_conviction:
-        name: "Nivel de conviccion para participar en organizaciones vinculadas a la agroecologia"
+        name: "Nivel de convicción para participar en organizaciones vinculadas a la agroecología"
       territorial_participation:
-        name: "Participacion a nivel comunal, regional y nacional"
+        name: "Participación a nivel comunal, regional y nacional"
       family_food_availability:
         name: "Alimentos disponibles para la familia"
       food_conservation:
-        name: "El nivel de produccion permite conservar alimentos"
+        name: "El nivel de producción permite conservar alimentos"
       family_food_diversity:
         name: "Diversidad de alimentos producidos para la familia"
       # system_resilience
@@ -189,11 +189,11 @@ es:
       crop_growth:
         name: "Crecimiento del cultivo"
       stress_tolerance:
-        name: "Resistencia o tolerancia a estres (sequia, lluvias intensas, ataque de plagas, etc.)"
+        name: "Resistencia o tolerancia a estrés (sequía, lluvias intensas, ataque de plagas, etc.)"
       global_disease_incidence:
         name: "Incidencia global de enfermedades"
       insects_and_mite_presence:
-        name: "Presencia de insectos y acaros plaga"
+        name: "Presencia de insectos y ácaros plaga"
       fungi_bacteria_viruses_presence:
         name: "Presencia de hongos, bacterias y virus que causan enfermedades en los cultivos"
       weed_presence:
