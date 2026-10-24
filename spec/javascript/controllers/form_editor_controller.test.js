@@ -245,6 +245,21 @@ describe("form editor controller", () => {
       expect(card("Erosion").querySelectorAll('[data-question-target^="desc"]')).toHaveLength(0)
     })
 
+    it.each([
+      [3, "descLow"], [4, "descMedium"], [7, "descMedium"], [8, "descHigh"]
+    ])("opens with the range hint for a saved %i highlighted", async (value, matching) => {
+      await seedForm({}, [response("compaction", value, true)])
+      await mount(editor(), controllers)
+
+      await showSection(1)
+
+      for (const name of ["descLow", "descMedium", "descHigh"]) {
+        const row = hintRow("Compaction", name)
+        if (name === matching) expect(row.className).toContain("ring-2")
+        else expect(row.className).toContain("text-earth-400")
+      }
+    })
+
     it("highlights the range hint matching the chosen score", async () => {
       await seedForm()
       await mount(editor(), controllers)
