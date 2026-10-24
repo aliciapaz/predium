@@ -48,7 +48,7 @@ app/
 
 ## External Integrations
 
-No third-party HTTP APIs. Authentication is fully local via Devise. The only "external" surface is the browser PWA runtime (service worker, IndexedDB) driven from `app/javascript/lib/`.
+The only third-party service is Cloudflare R2, which holds production Active Storage attachments through the S3-compatible API (`cloudflare` in `config/storage.yml`; dev and test use local disk). Authentication is fully local via Devise. The browser PWA runtime (service worker, IndexedDB) driven from `app/javascript/lib/` is the other "external" surface.
 
 ## Project-Specific Deviations
 
