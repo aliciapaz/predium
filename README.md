@@ -60,3 +60,18 @@ twice (server, and client for offline previews), and both are pinned to
 | [`docs/testing.md`](docs/testing.md) | Testing conventions for both suites |
 | [`docs/deployment.md`](docs/deployment.md) | Releases, inviting users, console access, backups |
 | [`docs/solutions/`](docs/solutions/) | Write-ups of past bugs and the patterns that fixed them |
+
+## License
+
+The source code is licensed under the [GNU Affero General Public License v3.0](LICENSE). If you
+run a modified version of Predium as a network service, you must make your modified source
+available to its users.
+
+The questionnaire content (principles, indicators, questions, and their translations) is CET's
+methodology and is not covered by the AGPL. All rights to it are reserved by CET. It lives in:
+
+- `config/questionnaire/`
+- `config/locales/es/questionnaire.yml`
+- `config/locales/en/questionnaire.yml`
+
+To reuse the questionnaire, contact CET.
