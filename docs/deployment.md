@@ -6,7 +6,8 @@ GitHub Pages from the `gh-pages` branch.
 
 There is no self sign-up (`:registerable` is off) and production sends no email
 (`perform_deliveries = false`), so accounts exist only when an admin creates them and invite
-links are handed out manually; see [Accounts](#accounts).
+links are handed out manually; see [Accounts](#accounts) and
+[Turning on email](#turning-on-email-not-set-up-yet).
 
 ## Releases
 
@@ -31,7 +32,9 @@ docker exec -it $(docker ps -q -f label=service=predium -f label=role=web) bin/r
 ## Accounts
 
 **Invite someone:** add them from an organization's members page in the app (this creates the
-pending account and membership but sends nothing), then generate their link in the console:
+pending account and membership but sends nothing), then generate their link in the console.
+Org admins reach the members page from the **Organización** tab; super admins open the
+organization under **Admin > Organizations** and click **Miembros**, without needing to join it.
 
 ```ruby
 user = User.find_by!(email: "peer@example.com")
@@ -43,6 +46,25 @@ Rails.application.routes.url_helpers.accept_user_invitation_url(
 
 Send the printed URL directly. Running the snippet again issues a new link and invalidates
 the old one. Password resets also need the console, since reset emails are not sent.
+
+### Turning on email (not set up yet)
+
+The console step exists only because there is no mail provider. The planned provider is
+[Resend](https://resend.com): its free tier covers invite and password-reset volume. Do not
+self-host a mail server on the droplet: a new IP has no sending reputation, so mail lands in
+spam, and DigitalOcean blocks outbound port 25 by default. Amazon SES is the cheaper option at
+scale but needs more setup (AWS account, sandbox exit); Postmark is the upgrade if
+deliverability becomes a problem.
+
+To enable it:
+
+1. Verify `prediumapp.org` in Resend and add the SPF, DKIM and DMARC records it lists.
+2. Add `SMTP_USERNAME` and `SMTP_PASSWORD` as GitHub Actions secrets, map them in
+   `.kamal/secrets`, and list them under `env.secret` in `config/deploy.yml`.
+3. In `config/environments/production.rb`, set `perform_deliveries = true` and point
+   `smtp_settings` at Resend's SMTP host using those variables. Set Devise's `mailer_sender`
+   to an address on the verified domain.
+4. Remove the console step above and the "sends no email" note at the top of this file.
 
 ## Operations
 
