@@ -15,6 +15,10 @@ Run **Actions > Deploy > Run workflow** with `deploy`. Migrations run on boot th
 
 Rollback: re-run the Deploy workflow from an earlier tag or branch (**Use workflow from**).
 
+If a deploy fails with `kamal-proxy version ... is too old` (a Kamal gem upgrade raised the
+minimum proxy version), run the workflow with `proxy reboot -y`, then `deploy` again. The
+reboot drops traffic for a few seconds while the proxy restarts.
+
 ## Console
 
 Kamal runs only in CI, so reach the console over SSH:

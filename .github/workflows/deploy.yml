@@ -1,7 +1,8 @@
 name: Deploy
 
 # Manual trigger only. Run "setup" once on a fresh droplet (installs Docker,
-# boots Postgres), then "deploy" for every release.
+# boots Postgres), then "deploy" for every release. Run "proxy reboot -y" when
+# deploy reports kamal-proxy is too old after a Kamal upgrade.
 # Required repo secrets: SSH_PRIVATE_KEY, DEPLOY_HOST, SECRET_KEY_BASE, POSTGRES_PASSWORD.
 on:
   workflow_dispatch:
@@ -9,7 +10,7 @@ on:
       command:
         description: Kamal command
         type: choice
-        options: [deploy, setup]
+        options: [deploy, setup, "proxy reboot -y"]
         default: deploy
 
 permissions:
