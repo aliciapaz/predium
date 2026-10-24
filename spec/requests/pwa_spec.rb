@@ -11,7 +11,7 @@ RSpec.describe("PWA", type: :request) do
       manifest = JSON.parse(response.body)
       expect(manifest["start_url"]).to(eq("/"))
       expect(manifest["icons"]).to(be_present)
-      expect(manifest["theme_color"]).to(eq("#347844"))
+      expect(manifest["theme_color"]).to(eq("#24603a"))
     end
   end
 

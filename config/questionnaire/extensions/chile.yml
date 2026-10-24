@@ -1,10 +1,6 @@
 # Chile Territory Extension: Level 2 indicators
-# Ported from prediapp Form::LEVEL_TWO_ENTRIES_BY_DIMENSION.
 # The mapping of each indicator to a core dimension is PROVISIONAL, pending
-# review by an agroecology specialist (see plan Appendix A). Keys are permanent
-# response identifiers; four prediapp typos were normalized at port time
-# (compactation->compaction, traiditional_crops_seeds->traditional_crops_seeds,
-# food_convervation->food_conservation, infected_plants_remotion->infected_plants_removal).
+# review by an agroecology specialist. Keys are permanent response identifiers.
 # The seven north-only / south-only water questions are excluded here; they will
 # arrive later as chile-norte / chile-sur extensions.
 
@@ -106,7 +102,7 @@ indicators:
     i18n_key: questionnaire.indicators.water_quantity
     position: 3
 
-  # ── crop_diversity (6; includes prediapp seeds) ───────────
+  # ── crop_diversity (6) ────────────────────────────────────
   - key: crop_diversity
     dimension: crop_diversity
     i18n_key: questionnaire.indicators.crop_diversity
@@ -292,7 +288,7 @@ indicators:
     i18n_key: questionnaire.indicators.family_food_diversity
     position: 10
 
-  # ── system_resilience (7; prediapp crop_health) ───────────
+  # ── system_resilience (7) ─────────────────────────────────
   - key: crop_appearance
     dimension: system_resilience
     i18n_key: questionnaire.indicators.crop_appearance

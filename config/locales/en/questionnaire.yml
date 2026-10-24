@@ -50,22 +50,22 @@ en:
 
     # ── Dimensions ────────────────────────────────────────
     dimensions:
-      soil_health: "Soil Health"
-      soil_management: "Soil Management"
-      water_availability: "Water Availability"
-      water_quality: "Water Quality"
-      water_management: "Water Management"
-      crop_diversity: "Crop Diversity"
-      ecosystem_diversity: "Ecosystem Diversity"
-      farm_planning: "Farm Planning"
-      input_management: "Input Management"
-      animal_management: "Animal Management"
-      economic_viability: "Economic Viability"
-      social_wellbeing: "Social Wellbeing"
-      climate_adaptation: "Climate Adaptation"
-      system_resilience: "System Resilience"
+      soil_health: "Soil health"
+      soil_management: "Soil management"
+      water_availability: "Water availability"
+      water_quality: "Water quality"
+      water_management: "Water management"
+      crop_diversity: "Crop diversity"
+      ecosystem_diversity: "Ecosystem diversity"
+      farm_planning: "Farm planning"
+      input_management: "Input management"
+      animal_management: "Animal management"
+      economic_viability: "Economic viability"
+      social_wellbeing: "Social wellbeing"
+      climate_adaptation: "Climate adaptation"
+      system_resilience: "System resilience"
 
-    # ── L2 indicators (Chile extension; range hints are provisional translations of prediapp's Spanish) ──
+    # ── L2 indicators (Chile extension; range hints are provisional translations of the Spanish) ──
     indicators:
       # soil_health
       soil_coverage:

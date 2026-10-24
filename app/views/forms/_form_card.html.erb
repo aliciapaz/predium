@@ -1,61 +1,37 @@
 <%= turbo_frame_tag dom_id(form) do %>
-  <div class="bg-white border border-earth-200 rounded-lg p-5 hover:shadow-md transition-shadow">
-    <div class="flex items-start justify-between">
-      <div class="flex-1 min-w-0">
-        <div class="flex items-center gap-3 mb-1">
-          <h3 class="font-semibold text-earth-900 truncate"><%= form.name %></h3>
-          <% if form.draft? %>
-            <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-mustard-100 text-mustard-700">
-              <%= t("states.draft") %>
-            </span>
-          <% else %>
-            <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-forest-100 text-forest-700">
-              <%= t("states.completed") %>
-            </span>
-          <% end %>
-        </div>
-
-        <p class="text-sm text-earth-500">
-          <% if form.country.present? || form.region.present? %>
-            <%= [form.region, form.country].compact.join(", ") %>
-            &middot;
-          <% end %>
-          <%= l(form.updated_at, format: :short) rescue form.updated_at.strftime("%b %d, %Y") %>
-        </p>
-
-        <% if form.draft? %>
-          <% required = form.required_indicator_keys %>
-          <% total = required.size %>
-          <% scored = (required & form.scored_keys).size %>
-          <% pct = total.positive? ? (scored * 100.0 / total).round : 0 %>
-          <div class="mt-3 flex items-center gap-3">
-            <div class="flex-1 bg-earth-100 rounded-full h-1.5 max-w-xs">
-              <div class="bg-forest-500 h-1.5 rounded-full transition-all" style="width: <%= pct %>%"></div>
-            </div>
-            <span class="text-xs text-earth-500 whitespace-nowrap"><%= t("questionnaire.indicators_count", answered: scored, total: total) %></span>
-          </div>
-        <% end %>
+  <% path = form.draft? ? edit_form_path(form) : form_path(form) %>
+  <article class="card-flush overflow-hidden">
+    <%= link_to path, data: { turbo_frame: "_top" }, class: "block px-5 pt-4 pb-3 hover:bg-canvas transition-colors" do %>
+      <div class="flex items-start justify-between gap-3">
+        <h3 class="text-lg leading-snug min-w-0 break-words"><%= form.name %></h3>
+        <%= badge(t("states.#{form.draft? ? "draft" : "completed"}"), tone: form.draft? ? :warning : :success) %>
       </div>
-    </div>
 
-    <div class="flex items-center gap-4 mt-4 pt-3 border-t border-earth-100">
+      <p class="mt-1 text-sm text-muted">
+        <%= [[form.region, form.country].compact_blank.join(", ").presence, form_date(form)].compact.join(", ") %>
+      </p>
+
       <% if form.draft? %>
-        <%= link_to t("questionnaire.continue"),
-            edit_form_path(form),
-            data: { turbo_frame: "_top" },
-            class: "text-sm font-medium text-forest-600 hover:text-forest-700" %>
-      <% else %>
-        <%= link_to t("forms.view_results"),
-            form_path(form),
-            data: { turbo_frame: "_top" },
-            class: "text-sm font-medium text-forest-600 hover:text-forest-700" %>
+        <% required = form.required_indicator_keys %>
+        <% scored = (required & form.scored_keys).size %>
+        <% pct = required.any? ? (scored * 100.0 / required.size).round : 0 %>
+        <div class="mt-3 flex items-center gap-3">
+          <div class="meter flex-1"><div class="meter-fill" style="width: <%= pct %>%"></div></div>
+          <span class="text-sm font-semibold text-ink-soft tabular-nums whitespace-nowrap"><%= t("questionnaire.indicators_count", answered: scored, total: required.size) %></span>
+        </div>
+      <% end %>
+    <% end %>
+
+    <div class="flex items-center justify-between gap-2 px-2 py-1 border-t border-line-soft">
+      <%= link_to path, data: { turbo_frame: "_top" }, class: "btn-quiet btn-compact" do %>
+        <%= form.draft? ? t("questionnaire.continue") : t("forms.view_results") %>
+        <%= icon(:chevron_right) %>
       <% end %>
 
-      <%= button_to t("buttons.delete"),
-          form_path(form),
-          method: :delete,
-          form: { data: { turbo_confirm: t("common.confirm_delete") } },
-          class: "text-sm text-rose-500 hover:text-rose-700 ml-auto" %>
+      <% name = form.name.presence || t("forms.untitled") %>
+      <%= form_with url: form_path(form), method: :delete, data: { turbo_confirm: t("forms.confirm_delete", name: name) } do %>
+        <%= icon_button :trash, label: t("forms.delete_named", name: name), type: "submit", class: "hover:text-danger" %>
+      <% end %>
     </div>
-  </div>
+  </article>
 <% end %>

@@ -15,19 +15,19 @@ es:
           medium: "Reciclaje parcial en algunos sectores del predio."
           high: "Elevado porcentaje de recursos naturales del predio se reciclan por distintos mecanismos."
       interactions:
-        name: "Nivel de interaccion entre los componentes del sistema: animal, agricola, forestal, otros"
+        name: "Nivel de interacción entre los componentes del sistema: animal, agrícola, forestal, otros"
         scoring:
           low: "No están presentes todos los componentes y no se observan interacciones claras."
           medium: "Existen todos los componentes, pero sin un diseño que los haga interactuar de forma clara. Interacciones parciales."
           high: "Están todos los componentes dentro de un diseño que establece interacciones concretas y beneficiosas."
       soil_management:
-        name: "Manejo ecologico del suelo"
+        name: "Manejo ecológico del suelo"
         scoring:
           low: "No existen prácticas de conservación de suelo ni adiciones sistemáticas de materia orgánica."
           medium: "Existen practicas limitadas de conservación de suelo y aplicaciones esporádicas de materia orgánica."
           high: "Existe estructura definidas de protección y conservación de suelo y aplicaciones permanentes de materia orgánica."
       pest_management:
-        name: "Manejo ecologico de plagas y enfermedades"
+        name: "Manejo ecológico de plagas y enfermedades"
         scoring:
           low: "No existen prácticas ecológicas de manejo y control."
           medium: "Existe un nivel medio de prácticas ecológicas de control y en ocasiones se usan pesticidas de forma combinada."
@@ -45,27 +45,27 @@ es:
       water: "Agua"
       biodiversity: "Biodiversidad"
       management: "Manejo"
-      socioeconomic: "Socioeconomico"
+      socioeconomic: "Socioeconómico"
       resilience: "Resiliencia"
 
     # ── Dimensiones ───────────────────────────────────────
     dimensions:
-      soil_health: "Salud del Suelo"
-      soil_management: "Manejo del Suelo"
-      water_availability: "Disponibilidad de Agua"
-      water_quality: "Calidad del Agua"
-      water_management: "Gestion del Agua"
-      crop_diversity: "Diversidad de Cultivos"
-      ecosystem_diversity: "Diversidad del Ecosistema"
-      farm_planning: "Planificacion del Predio"
-      input_management: "Gestion de Insumos"
-      animal_management: "Manejo Animal"
-      economic_viability: "Viabilidad Economica"
-      social_wellbeing: "Bienestar Social"
-      climate_adaptation: "Adaptacion Climatica"
-      system_resilience: "Resiliencia del Sistema"
+      soil_health: "Salud del suelo"
+      soil_management: "Manejo del suelo"
+      water_availability: "Disponibilidad de agua"
+      water_quality: "Calidad del agua"
+      water_management: "Gestión del agua"
+      crop_diversity: "Diversidad de cultivos"
+      ecosystem_diversity: "Diversidad del ecosistema"
+      farm_planning: "Planificación del predio"
+      input_management: "Gestión de insumos"
+      animal_management: "Manejo animal"
+      economic_viability: "Viabilidad económica"
+      social_wellbeing: "Bienestar social"
+      climate_adaptation: "Adaptación climática"
+      system_resilience: "Resiliencia del sistema"
 
-    # ── Indicadores L2 (extension Chile; nombre y pistas de rango de prediapp) ──
+    # ── Indicadores L2 (extension Chile; nombre y pistas por rango de puntaje) ──
     indicators:
       # soil_health
       soil_coverage:
@@ -75,19 +75,19 @@ es:
           medium: "Suelo cubierto hasta un 60% por residuos, hojarasca o cubierta viva."
           high: "Más del 80% del suelo con cobertura viva o muerta."
       soil_erosion:
-        name: "Erosion de suelo"
+        name: "Erosión de suelo"
         scoring:
           low: "Erosión severa, se nota arrastre de suelo y presencia de cárcavas y canalillos."
           medium: "Erosión evidente pero todavía de baja o media magnitud."
           high: "No hay signos de erosión."
       compaction:
-        name: "Compactacion"
+        name: "Compactación"
         scoring:
           low: "Compacto, es muy difícil penetrar con una barra metálica."
           medium: "Una barra metálica penetra con dificultad y solo hasta una cierta profundidad."
           high: "Suelo esponjoso, no compacto, se puede penetrar con facilidad."
       infiltration:
-        name: "Infiltracion"
+        name: "Infiltración"
         scoring:
           low: "Agua infiltra muy lentamente."
           medium: "Agua infiltra con velocidad media."
@@ -105,7 +105,7 @@ es:
           medium: "Suelo suelto, con pocos gránulos que se rompen al aplicar presión suave."
           high: "Suelo friable y granular, agregados mantienen formas después de aplicar presión suave."
       clod_stability:
-        name: "Estabilidad del terron"
+        name: "Estabilidad del terrón"
         scoring:
           low: "Terrón se deshace rápidamente al exponerlo al agua."
           medium: "Terrón resiste medianamente al exponerlo al agua."
@@ -117,7 +117,7 @@ es:
           medium: "Suelo de color café claro o rojizo, sin mayor olor."
           high: "Suelo de color negro o café oscuro, con olor a tierra fresca."
       root_development:
-        name: "Desarrollo de raices"
+        name: "Desarrollo de raíces"
         scoring:
           low: "Raíces poco desarrolladas, enfermas y cortas."
           medium: "Raíces de crecimiento limitado, se ven raíces finas en mediana cantidad."
@@ -129,13 +129,13 @@ es:
           medium: "Aún persiste residuo del año pasado en vías de descomposición."
           high: "Residuos en varios estados de descomposición, con una gran proporción ya incorporados al suelo."
       biological_activity:
-        name: "Actividad biologica"
+        name: "Actividad biológica"
         scoring:
           low: "Sin signos de actividad biológica ni individuos presentes (lombrices, artrópodos, etc.)."
           medium: "Con signos de actividad biológica, algunas lombrices y artrópodos presentes."
           high: "Mucha actividad biológica, abundantes lombrices y artrópodos presentes."
       organic_matter:
-        name: "Materia organica"
+        name: "Materia orgánica"
         scoring:
           low: "Signos débiles de presencia de materia orgánica, baja reacción al agua oxigenada."
           medium: "Presencia de materia orgánica, mediana reacción al agua oxigenada."
@@ -148,13 +148,13 @@ es:
           medium: "Algunos cultivos en rotación."
           high: "Todos los cultivos están incorporados en un sistema de rotación."
       organic_fertilizers:
-        name: "Incorporacion de abonos organicos"
+        name: "Incorporación de abonos orgánicos"
         scoring:
           low: "No elabora ni usa abonos orgánicos, solo químicos."
           medium: "Superficie de terreno con incorporaciones de abonos orgánicos en el año equivale a un 25 a 65%, con escasas aplicaciones de químicos."
           high: "Alta superficie de terreno con incorporaciones de abonos orgánicos en el año, sin utilización de químicos."
       leaf_fertilizers:
-        name: "Abonos organicos foliares y a traves de fertirriego"
+        name: "Abonos orgánicos foliares y a través de fertirriego"
         scoring:
           low: "No elabora ni usa abonos orgánicos foliares."
           medium: "Cultivos o frutales con incorporaciones de abonos orgánicos foliares en el año equivale a un 25 a 65%."
@@ -166,19 +166,19 @@ es:
           medium: "Utiliza algunas aplicaciones foliares y al suelo de microorganismos eficientes."
           high: "Muchas aplicaciones foliares y al suelo de microorganismos eficientes."
       soil_conservation:
-        name: "Confeccion de obras de conservacion de suelo"
+        name: "Confección de obras de conservación de suelo"
         scoring:
           low: "Suelo sin obras y/o manejos de conservación de suelo."
           medium: "Algunas áreas de superficie de terrenos en pendiente con obras de conservación (curvas a nivel, zanjas de infiltración, etc.)."
           high: "Todas las áreas de superficie de terrenos en pendiente con obras de conservación (curvas a nivel, zanjas de infiltración, etc.)."
       stubble_burning:
-        name: "Eliminacion de quemas"
+        name: "Eliminación de quemas"
         scoring:
           low: "Utiliza la práctica de quema de rastrojos."
           medium: "Ha reducido la práctica de quema de rastrojos."
           high: "Ha eliminado completamente las prácticas de quema de rastrojos."
       weed_management:
-        name: "Practicas de manejo de malezas (mulch, desbrozadora, rana, cultivos de cobertura, etc.)"
+        name: "Prácticas de manejo de malezas (mulch, desbrozadora, rana, cultivos de cobertura, etc.)"
         scoring:
           low: "Manejo de malezas en base a herbicidas químicos."
           medium: "Incorpora algunas medidas de manejo de malezas y no usa herbicidas."
@@ -247,7 +247,7 @@ es:
           medium: "Menos de un 30 % de cultivos, praderas, frutales, terrazas, etc. separados con barreras vivas."
           high: "Entre un 80 y 100% de cultivos, praderas, frutales o terrazas, etc. separados con barreras vivas."
       live_coverage:
-        name: "Asociacion con cobertura viva"
+        name: "Asociación con cobertura viva"
         scoring:
           low: "Frutales sin cobertura viva."
           medium: "Tiene entre 20 y 50 % de frutales con cobertura vivas."
@@ -265,7 +265,7 @@ es:
           medium: "Cuenta con arboledas y parches boscosos en el predio en mediana cantidad."
           high: "Cuenta con arboledas y parches boscosos en el predio, en cantidad suficiente para el buen funcionamiento predial."
       spontaneous_vegetation:
-        name: "Sitios prediales de vegetacion espontanea"
+        name: "Sitios prediales de vegetación espontánea"
         scoring:
           low: "No cuenta con superficie del predio con vegetación silvestre o espontánea."
           medium: "Cuenta con superficie del predio con vegetación silvestre o espontánea en cantidad mediana."
@@ -283,39 +283,39 @@ es:
           medium: "Se observan cantidad mediana de especies polinizadoras."
           high: "Se observa gran cantidad y variedad de polinizadores en el predio."
       entomophages_released:
-        name: "Entomofagos liberados"
+        name: "Entomófagos liberados"
         scoring:
           low: "No se liberan especies de entomófagos."
           medium: "Se liberan especies de entomófagos."
           high: "Se liberan gran cantidad de especies de entomófagos."
       entomopathogen_applications:
-        name: "Aplicaciones de entomopatogenos"
+        name: "Aplicaciones de entomopatógenos"
         scoring:
           low: "No se realiza aplicaciones de entomopatógenos."
           medium: "Aplicación esporádica de entomopatógenos."
           high: "Aplicación continua de entomopatógenos."
       # farm_planning
       transformation_conviction:
-        name: "Conviccion para iniciar un proceso de transformacion"
+        name: "Convicción para iniciar un proceso de transformación"
         scoring:
           low: "Nivel de convicción básico que se encuentra en la fase de prueba y evaluación."
           medium: "Nivel de convicción intermedio, los avances dependerán del impacto de las prácticas implementadas."
           high: "Nivel de convicción elevado, no existe en su perspectiva más que esta posibilidad de producción."
       decision_for_practices:
-        name: "Decision para la incorporacion de practicas"
+        name: "Decisión para la incorporación de prácticas"
         scoring:
           low: "Incorporación de prácticas de baja complejidad y bajo riesgo."
           medium: "Incorporación de prácticas de un nivel medio de complejidad y de nivel medio de riesgo."
           high: "Incorporación de prácticas de alta complejidad y alto nivel de riesgo."
       experience_transmission:
-        name: "Nivel de acciones de transmision de la experiencia propia"
+        name: "Nivel de acciones de transmisión de la experiencia propia"
         scoring:
           low: "No existen acciones de transmisión de la experiencia propia."
           medium: "Ocasionalmente realiza acciones de transmisión de la experiencia propia."
           high: "Permanentemente se realizan acciones de transmisión de la experiencia propia."
       # input_management
       biocides_use:
-        name: "Elaboracion y uso de biocidas para plagas y enfermedades"
+        name: "Elaboración y uso de biocidas para plagas y enfermedades"
         scoring:
           low: "No elabora ni usa biocidas."
           medium: "Ocasionalmente usa productos biocidas."
@@ -352,13 +352,13 @@ es:
           high: "Más del 70% del total de los insumos requeridos."
       # animal_management
       animal_feed_conservation:
-        name: "Conservacion de alimentos para animales"
+        name: "Conservación de alimentos para animales"
         scoring:
           low: "No tiene alimentos almacenados para los animales."
           medium: "Almacena alimentos para animales pero no suficientes."
           high: "Almacena la cantidad necesaria de alimentos para los animales."
       animal_feed_production_percentage:
-        name: "% de la alimentacion animal proveniente del propio campo"
+        name: "% de la alimentación animal proveniente del propio campo"
         scoring:
           low: "10 a 30 %."
           medium: "40 a 70%."
@@ -371,7 +371,7 @@ es:
           high: "Para el 100% de las especies."
       # economic_viability
       agricultural_commercialized_products:
-        name: "Diversidad de productos agricolas comercializados"
+        name: "Diversidad de productos agrícolas comercializados"
         scoring:
           low: "Comercializa pocos productos agrícolas. Entre 1 y 4."
           medium: "Comercializa entre 5 y 15 productos agrícolas distintos."
@@ -389,7 +389,7 @@ es:
           medium: "Productos comercializados a nivel comunal."
           high: "Productos comercializados a nivel provincial."
       production_destination:
-        name: "Destino de la produccion"
+        name: "Destino de la producción"
         scoring:
           low: "Producción de autoconsumo, ventas menores de excedentes."
           medium: "Producción de autoconsumo y venta de forma equilibrada."
@@ -401,50 +401,50 @@ es:
           medium: "Medio."
           high: "Alto."
       income_sources_diversity:
-        name: "Numero de rubros de donde provienen los ingresos"
+        name: "Número de rubros de donde provienen los ingresos"
         scoring:
           low: "Un rubro."
           medium: "2 a 3 rubros."
           high: "Más de tres rubros."
       # social_wellbeing
       agroecological_farmers_knowledge:
-        name: "Conocimiento de los agricultores de practicas agroecologicas"
+        name: "Conocimiento de los agricultores de prácticas agroecológicas"
         scoring:
           low: "No tiene conocimientos previos de agroecología, ni de fuentes tradicionales de producción."
           medium: "Conoce y utiliza al menos 10 prácticas tradicionales y las relaciona con sistemas más sanos y ecológicos."
           high: "Conoce y utiliza más de 10 prácticas tradicionales en un contexto agroecológico y ha incorporado diferentes técnicas de producción que provienen de fuentes actuales."
       soil_practices_number:
-        name: "Numero de practicas agroecologicas para el manejo ecologico de suelo"
+        name: "Número de prácticas agroecológicas para el manejo ecológico de suelo"
         scoring:
           low: "Realiza menos de 2 prácticas agroecológicas, o no realiza prácticas agroecológicas para el manejo ecológico de suelo."
           medium: "Conoce y realiza entre 2 y 6 prácticas agroecológicas para el manejo ecológico de suelo."
           high: "Conoce y realiza más de 6 prácticas agroecológicas para el manejo ecológico de suelo."
       disease_practices_number:
-        name: "Numero de practicas agroecologicas para el manejo preventivo de plagas y enfermedades"
+        name: "Número de prácticas agroecológicas para el manejo preventivo de plagas y enfermedades"
         scoring:
           low: "Realiza 1 práctica agroecológica, o no realiza prácticas agroecológicas para el manejo ecológico preventivo de plagas y enfermedades."
           medium: "Conoce y realiza entre 3 y 6 prácticas para el manejo ecológico preventivo de plagas y enfermedades."
           high: "Conoce y realiza más de 6 prácticas agroecológicas para el manejo ecológico preventivo de plagas y enfermedades."
       recycling_practices_number:
-        name: "Numero de practicas de reciclaje"
+        name: "Número de prácticas de reciclaje"
         scoring:
           low: "No realiza prácticas de reciclaje."
           medium: "Conoce y realiza al menos 7 prácticas agroecológicas de reciclaje."
           high: "Conoce y realiza más de 7 prácticas agroecológicas de reciclaje."
       agroecological_organizations:
-        name: "Conocimiento y participacion en organizaciones asociadas a la produccion agroecologica"
+        name: "Conocimiento y participación en organizaciones asociadas a la producción agroecológica"
         scoring:
           low: "No tiene conocimientos ni participa de ninguna organización de esta naturaleza."
           medium: "Conoce la existencia de organizaciones de esta naturaleza, y ha participado esporádicamente."
           high: "Conoce y participa activamente en organizaciones de esta naturaleza."
       participation_conviction:
-        name: "Nivel de conviccion para participar en organizaciones vinculadas a la agroecologia"
+        name: "Nivel de convicción para participar en organizaciones vinculadas a la agroecología"
         scoring:
           low: "Nivel de convicción bajo o no le interesa participar."
           medium: "Nivel de convicción intermedio, y podrías participar a medida que va probando y viendo el funcionamiento."
           high: "Nivel de convicción elevado, participa activamente de las organizaciones."
       territorial_participation:
-        name: "Participacion a nivel comunal, regional y nacional"
+        name: "Participación a nivel comunal, regional y nacional"
         scoring:
           low: "No participa o participa ocasionalmente a nivel comunal."
           medium: "Participa a nivel comunal y ocasionalmente a nivel regional."
@@ -456,7 +456,7 @@ es:
           medium: "Entre un 25y 75% de los alimentos los produce en el predio."
           high: "Más del 75% de los alimentos los produce en su predio."
       food_conservation:
-        name: "El nivel de produccion permite conservar alimentos"
+        name: "El nivel de producción permite conservar alimentos"
         scoring:
           low: "Nula conservación de alimento para la familia."
           medium: "Ocasionalmente permite conservar alimentos."
@@ -481,7 +481,7 @@ es:
           medium: "Cultivo más denso pero no muy uniforme, con crecimiento nuevo y con ramas y tallos aun delgados."
           high: "Cultivo denso, uniforme, buen crecimiento con ramas y tallos gruesos y firmes."
       stress_tolerance:
-        name: "Resistencia o tolerancia a estres (sequia, lluvias intensas, ataque de plagas, etc.)"
+        name: "Resistencia o tolerancia a estrés (sequía, lluvias intensas, ataque de plagas, etc.)"
         scoring:
           low: "Muy susceptibles, no se recuperan bien después de un estrés."
           medium: "Sufren con heladas, épocas secas o muy lluviosas, se recuperan lentamente."
@@ -493,7 +493,7 @@ es:
           medium: "Entre 20-45% de plantas con síntomas de leves a medios."
           high: "Menos del 20% de plantas con síntomas leves."
       insects_and_mite_presence:
-        name: "Presencia de insectos y acaros plaga"
+        name: "Presencia de insectos y ácaros plaga"
         scoring:
           low: "Alta presencia de insectos y/o ácaros plaga en los cultivos o frutales."
           medium: "Mediana presencia de insectos y/o ácaros plaga en los cultivos o frutales."

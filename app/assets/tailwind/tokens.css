@@ -1,0 +1,73 @@
+/* Layer 1: tokens. The only colors, fonts and shadows that may exist.
+   Values come from the brand on prediumapp.org. Tailwind's default palette is
+   reset, so `bg-gray-100` or `text-rose-600` compile to nothing;
+   bin/design-check reports them by name. See docs/design-system.md.
+   `static` emits every token as a CSS variable, so canvas code can read
+   them through tokenColor() in lib/ui.js. */
+@theme static {
+  --color-*: initial;
+  --font-*: initial;
+
+  --color-white: #ffffff;
+
+  /* Neutrals: page, raised and sunken surfaces, lines, text */
+  --color-canvas: #f4f6f0;
+  --color-sunken: #e6ecdf;
+  --color-surface: #ffffff;
+  --color-line-soft: #eef2e9;
+  --color-line: #d5dfcc;
+  --color-line-strong: #7f9173;
+  --color-muted: #56675a;
+  --color-ink-soft: #3a4e40;
+  --color-ink: #1a2e22;
+
+  /* Action and brand */
+  --color-primary: #24603a;
+  --color-primary-ink: #1b4a2c;
+  --color-primary-soft: #ecf3e8;
+  --color-primary-line: #cfe1c7;
+  --color-accent: #f2c14e;
+  --color-focus: #a86f08;
+
+  /* Deep forest surfaces (admin sidebar) */
+  --color-deep: #1f4a33;
+  --color-deep-ink: #f6f8f2;
+  --color-deep-soft: #c8d8c8;
+  --color-deep-line: #2f5c43;
+  --color-deep-hover: #275a3e;
+
+  /* Status */
+  --color-warning: #8f570b;
+  --color-warning-soft: #fef9e7;
+  --color-warning-line: #fce791;
+  --color-warning-mark: #d9960e;
+  --color-danger: #be123c;
+  --color-danger-soft: #fff1f2;
+  --color-danger-line: #fecdd3;
+  --color-danger-mark: #f43f5e;
+
+  /* Score bands: reserved for 1-10 scores and their summaries */
+  --color-score-low: #be123c;
+  --color-score-low-soft: #fff1f2;
+  --color-score-low-tint: #ffe4e6;
+  --color-score-low-mark: #f43f5e;
+  --color-score-low-ring: #fda4af;
+  --color-score-mid: #8f570b;
+  --color-score-mid-soft: #fef9e7;
+  --color-score-mid-tint: #fdf0c4;
+  --color-score-mid-mark: #d9960e;
+  --color-score-mid-ring: #f9d85a;
+  --color-score-high: #225c2b;
+  --color-score-high-soft: #f0f7f0;
+  --color-score-high-tint: #dceddc;
+  --color-score-high-mark: #348f41;
+  --color-score-high-ring: #8bbe8b;
+
+  --font-sans: "Atkinson Hyperlegible Next", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+
+  --shadow-raised: 0 1px 2px rgb(20 40 28 / 0.12);
+  --shadow-card: 0 1px 0 var(--color-line), 0 18px 40px -28px rgb(20 40 28 / 0.35);
+  --shadow-pop: 0 12px 32px -12px rgb(20 40 28 / 0.35), 0 0 0 1px var(--color-line);
+  --shadow-bar: 0 -1px 0 var(--color-line), 0 -16px 32px -24px rgb(20 40 28 / 0.45);
+}

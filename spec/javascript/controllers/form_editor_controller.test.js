@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { applyServerForm, db, getForm, getResponses, queueEntries } from "lib/db"
+import { applyServerForm, db, enqueue, getForm, getResponses, queueEntries } from "lib/db"
 import { hydrateForm, syncNow } from "lib/sync"
 import FormEditorController from "controllers/form_editor_controller"
 import QuestionController from "controllers/question_controller"
@@ -23,11 +23,12 @@ function editor({ id = clientId, formsUrl = "/forms" } = {}) {
     <div data-controller="form-editor"
          data-form-editor-client-id-value="${id}"
          data-form-editor-forms-url-value="${formsUrl}">
-      <h1 data-form-editor-target="title">New questionnaire</h1>
+      <h1 data-form-editor-target="title">Loading</h1>
       <span data-form-editor-target="saveState"></span>
       <span data-form-editor-target="progressText"></span>
       <div data-form-editor-target="progressBar" style="width: 0%"></div>
 
+      <details data-form-editor-target="farmInfo" open><summary>Farm details</summary></details>
       <input type="text" id="farm_name" data-farm-field="name">
       <select id="farm_gender" data-farm-field="gender">
         <option value=""></option>
@@ -53,6 +54,7 @@ function editor({ id = clientId, formsUrl = "/forms" } = {}) {
 
       <button type="button" data-form-editor-target="prevButton" data-action="form-editor#previousDimension">Previous</button>
       <button type="button" data-form-editor-target="nextButton" data-action="form-editor#nextDimension">Next</button>
+      <button type="button" class="hidden" data-form-editor-target="missingButton" data-action="form-editor#jumpToMissing">Go to what is missing</button>
       <form action="#" method="post" data-form-editor-target="completeForm">
         <button type="submit" data-form-editor-target="completeButton" disabled>Complete</button>
       </form>
@@ -73,8 +75,13 @@ function card(name) {
     .find((element) => titleOf(element.querySelector("h3")) === name)
 }
 
-function hintRow(name, rangeTarget) {
-  return card(name).querySelector(`[data-question-target="${rangeTarget}"]`)
+function hintRows(name) {
+  return Array.from(card(name).querySelectorAll(".rubric-row"))
+}
+
+// The CSS lights the rubric row whose band matches the checked score's band.
+function checkedBand(name) {
+  return card(name).querySelector("input:checked")?.dataset.band
 }
 
 function showSection(index) {
@@ -152,6 +159,86 @@ describe("form editor controller", () => {
     })
   })
 
+  describe("on an existing form this device does not hold", () => {
+    it("pulls the form from the server while online before rendering it", async () => {
+      hydrateForm.mockImplementation(async () => {
+        await seedForm({}, [response("diversity", 2)])
+        return true
+      })
+
+      await mount(editor(), controllers)
+
+      expect(hydrateForm).toHaveBeenCalledWith(clientId, expect.objectContaining({ signal: expect.anything() }))
+      expect(target("title").textContent).toBe("La Esperanza")
+      expect(field("name").value).toBe("La Esperanza")
+      expect(card("Diversity").querySelector(":checked").value).toBe("2")
+    })
+
+    it("also pulls a cached copy that has no answers", async () => {
+      await seedForm()
+      hydrateForm.mockImplementation(async () => {
+        await seedForm({}, [response("diversity", 2)])
+        return true
+      })
+
+      await mount(editor(), controllers)
+
+      expect(target("progressText").textContent).toBe("1 of 6 indicators")
+    })
+
+    // A slow network must not hold up a form that has unsynced local work;
+    // the server copy could not be applied over it anyway.
+    it("opens a dirty local copy without waiting on the server", async () => {
+      await seedForm()
+      await db.forms.update(clientId, { dirty: 1 })
+
+      await mount(editor(), controllers)
+
+      expect(hydrateForm).not.toHaveBeenCalled()
+      expect(target("title").textContent).toBe("La Esperanza")
+    })
+
+    it("opens a queued local copy without waiting on the server", async () => {
+      await seedForm()
+      await enqueue(clientId)
+
+      await mount(editor(), controllers)
+
+      expect(hydrateForm).not.toHaveBeenCalled()
+    })
+
+    it("keeps the loading state while the server copy is on its way", async () => {
+      let finish
+      hydrateForm.mockImplementation(() => new Promise((resolve) => { finish = resolve }))
+
+      const mounting = mount(editor(), controllers)
+      await vi.waitFor(() => expect(hydrateForm).toHaveBeenCalled())
+
+      expect(target("title").textContent).toBe("Loading")
+      expect(target("indicators").textContent).toContain("Loading questionnaire")
+      await seedForm()
+      finish(true)
+      await mounting
+      expect(target("title").textContent).toBe("La Esperanza")
+    })
+
+    it("starts a new form when the server does not know the id either", async () => {
+      hydrateForm.mockResolvedValue(false)
+
+      await mount(editor(), controllers)
+
+      expect(target("title").textContent).toBe("New questionnaire")
+    })
+
+    it("does not ask the server while offline", async () => {
+      vi.spyOn(navigator, "onLine", "get").mockReturnValue(false)
+
+      await mount(editor(), controllers)
+
+      expect(hydrateForm).not.toHaveBeenCalled()
+    })
+  })
+
   it("leaves the URL alone when editing an existing form", async () => {
     history.replaceState(null, "", "/forms/form-1/edit")
     await seedForm()
@@ -200,8 +287,9 @@ describe("form editor controller", () => {
 
       expect(navLabels()).toEqual(["Principles", "Structure", "Fertility", "Supply"])
       expect(cardTitles()).toEqual(["Diversity", "Recycling"])
-      expect(card("Diversity").querySelector('[name="form_responses[diversity]"]').value).toBe("2")
-      expect(card("Diversity").querySelector('[data-value="2"]').className).toContain("bg-rose-100")
+      const saved = card("Diversity").querySelector('[name="form_responses[diversity]"]:checked')
+      expect(saved.value).toBe("2")
+      expect(saved.closest(".score-option").dataset.band).toBe("low")
       expect(target("progressText").textContent).toBe("1 of 6 indicators")
       expect(target("progressBar").style.width).toBe("17%")
     })
@@ -216,14 +304,32 @@ describe("form editor controller", () => {
       expect(target("progressText").textContent).toBe("0 of 2 indicators")
     })
 
-    it("badges each indicator with its source territory, including inherited ones", async () => {
+    it("badges only the indicators inherited from another territory", async () => {
       await seedForm({ territory_key: "coast" })
       await mount(editor(), controllers)
 
       await showSection(3)
 
       const badges = Array.from(target("indicators").querySelectorAll("h3")).map((h3) => [titleOf(h3), badgeOf(h3)])
-      expect(badges).toEqual([["Irrigation", "Andes extension"], ["Salinity", "Coast extension"]])
+      expect(badges).toEqual([["Irrigation", "Andes extension"], ["Salinity", undefined]])
+    })
+
+    it("resumes a draft on the first section that is not done", async () => {
+      await seedForm({}, [response("diversity", 4), response("recycling", 6), response("compaction", 5, true), response("erosion", 6, true)])
+
+      await mount(editor(), controllers)
+
+      expect(target("dimensionNav").querySelector('[aria-current="step"]').textContent.trim()).toBe("Fertility")
+      expect(cardTitles()).toEqual(["Organic matter"])
+    })
+
+    it("opens a fully scored draft on the last section, where it completes", async () => {
+      await seedForm({}, allScored)
+
+      await mount(editor(), controllers)
+
+      expect(cardTitles()).toEqual(["Irrigation"])
+      expect(target("completeButton").classList).not.toContain("hidden")
     })
 
     it("shows the low, mid, and high range hints for a question that has them", async () => {
@@ -232,8 +338,12 @@ describe("form editor controller", () => {
 
       await showSection(1)
 
-      const rows = ["descLow", "descMedium", "descHigh"].map((name) => hintRow("Compaction", name).textContent.replace(/\s+/g, " ").trim())
-      expect(rows).toEqual(["1-3: Hard to push a rod in", "4-7: A rod goes in with effort", "8-10: Spongy soil"])
+      const rows = hintRows("Compaction").map((row) => [row.dataset.band, row.querySelector("b").textContent, row.querySelector("span").textContent])
+      expect(rows).toEqual([
+        ["low", "1-3", "Hard to push a rod in"],
+        ["mid", "4-7", "A rod goes in with effort"],
+        ["high", "8-10", "Spongy soil"]
+      ])
     })
 
     it("renders a label-only question without range hints", async () => {
@@ -242,25 +352,22 @@ describe("form editor controller", () => {
 
       await showSection(1)
 
-      expect(card("Erosion").querySelectorAll('[data-question-target^="desc"]')).toHaveLength(0)
+      expect(hintRows("Erosion")).toHaveLength(0)
     })
 
     it.each([
-      [3, "descLow"], [4, "descMedium"], [7, "descMedium"], [8, "descHigh"]
-    ])("opens with the range hint for a saved %i highlighted", async (value, matching) => {
+      [3, "low"], [4, "mid"], [7, "mid"], [8, "high"]
+    ])("opens a saved %i in the band of its range hint", async (value, band) => {
       await seedForm({}, [response("compaction", value, true)])
       await mount(editor(), controllers)
 
       await showSection(1)
 
-      for (const name of ["descLow", "descMedium", "descHigh"]) {
-        const row = hintRow("Compaction", name)
-        if (name === matching) expect(row.className).toContain("ring-2")
-        else expect(row.className).toContain("text-earth-400")
-      }
+      expect(checkedBand("Compaction")).toBe(band)
+      expect(hintRows("Compaction").map((row) => row.dataset.band)).toContain(band)
     })
 
-    it("highlights the range hint matching the chosen score", async () => {
+    it("moves the chosen score into the band of the matching range hint", async () => {
       await seedForm()
       await mount(editor(), controllers)
       await showSection(1)
@@ -268,9 +375,7 @@ describe("form editor controller", () => {
       score("Compaction", 5)
       await settle()
 
-      expect(hintRow("Compaction", "descMedium").className).toContain("ring-mustard-200")
-      expect(hintRow("Compaction", "descLow").className).not.toContain("ring-2")
-      expect(hintRow("Compaction", "descHigh").className).not.toContain("ring-2")
+      expect(checkedBand("Compaction")).toBe("mid")
     })
 
     it("moves between dimensions with next, previous, and the nav buttons", async () => {
@@ -290,6 +395,37 @@ describe("form editor controller", () => {
 
       target("prevButton").click()
       expect(cardTitles()).toEqual(["Organic matter"])
+    })
+
+    it("scrolls the new section's heading into view, not the editor top", async () => {
+      await seedForm()
+      await mount(editor(), controllers)
+
+      target("nextButton").click()
+
+      const heading = target("indicators").querySelector("h2")
+      expect(heading.textContent).toBe("Structure")
+      expect(Element.prototype.scrollIntoView.mock.contexts.at(-1)).toBe(heading)
+    })
+
+    it("folds the farm details away when moving on from a named farm", async () => {
+      await seedForm({ name: null })
+      await mount(editor(), controllers)
+      edit(field("name"), "Finca Nueva")
+      await vi.waitFor(() => expect(syncNow).toHaveBeenCalled())
+
+      target("nextButton").click()
+
+      expect(target("farmInfo").open).toBe(false)
+    })
+
+    it("keeps the farm details open while the farm has no name", async () => {
+      await seedForm({ name: null })
+      await mount(editor(), controllers)
+
+      target("nextButton").click()
+
+      expect(target("farmInfo").open).toBe(true)
     })
   })
 
@@ -410,13 +546,35 @@ describe("form editor controller", () => {
       await mount(editor(), controllers)
 
       expect(target("completeButton").disabled).toBe(true)
-      expect(target("completeHint").textContent).toBe("Score every indicator to complete")
+      expect(target("completeHint").textContent).toBe("1 indicator left")
       expect(target("completeHint").classList).not.toContain("hidden")
 
       score("Diversity", 3)
 
       await vi.waitFor(() => expect(target("completeButton").disabled).toBe(false))
       expect(target("completeHint").classList).toContain("hidden")
+    })
+
+    it("offers a jump to the first section with gaps while Complete is disabled", async () => {
+      await seedForm({}, allScored.filter((answer) => answer.indicator_key !== "erosion"))
+      await mount(editor(), controllers)
+      await showSection(3)
+
+      expect(target("completeHint").textContent).toBe("1 indicator left")
+      expect(target("missingButton").classList).not.toContain("hidden")
+
+      target("missingButton").click()
+
+      expect(cardTitles()).toEqual(["Compaction", "Erosion"])
+      expect(target("missingButton").classList).toContain("hidden")
+    })
+
+    it("hides the jump once nothing is missing", async () => {
+      await seedForm({}, allScored)
+
+      await mount(editor(), controllers)
+
+      expect(target("missingButton").classList).toContain("hidden")
     })
 
     it("keeps Complete disabled offline even when every indicator is scored", async () => {

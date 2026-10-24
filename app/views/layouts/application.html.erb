@@ -2,16 +2,17 @@
 <html lang="<%= I18n.locale %>">
   <head>
     <title><%= content_for(:title) || "Predium" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Predium">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <meta name="theme-color" content="#347844">
+    <meta name="theme-color" content="#24603a"><%# design-check:allow browser chrome needs a literal; matches --color-primary %>
     <% if user_signed_in? %>
       <meta name="predium-signed-in" content="true">
+      <meta name="predium-translations" content="<%= QuestionnaireConfig.cached_fingerprint %>">
     <% end %>
     <link rel="manifest" href="<%= pwa_manifest_path %>">
 
@@ -21,12 +22,14 @@
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="apple-touch-icon" href="/favicon-180.png">
 
+    <%= preload_link_tag asset_path("atkinson-hyperlegible-next-latin.woff2"), as: :font, type: "font/woff2", crossorigin: "anonymous" %>
+    <%= preload_link_tag asset_path("bricolage-grotesque-latin.woff2"), as: :font, type: "font/woff2", crossorigin: "anonymous" %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-earth-50 text-earth-900 min-h-screen flex flex-col">
+  <body class="min-h-dvh flex flex-col">
     <% if user_signed_in? %>
       <%= render "shared/navbar" %>
       <%= render "shared/conflict_dialog" %>
@@ -34,11 +37,11 @@
 
     <%= render "shared/flash" %>
 
-    <main class="flex-1 w-full max-w-5xl mx-auto px-4 py-6">
+    <main class="flex-1 w-full max-w-5xl mx-auto px-4 pt-4 pb-8 sm:pt-8">
       <%= yield %>
     </main>
 
-    <footer class="text-center text-sm text-earth-400 py-4">
+    <footer class="text-center text-sm text-muted py-6">
       Predium &copy; <%= Date.current.year %>
     </footer>
   </body>

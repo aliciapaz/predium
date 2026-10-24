@@ -260,13 +260,18 @@ RSpec.describe(QuestionnaireConfig) do
       end
     end
 
-    it "changes when a questionnaire locale file's content changes" do
+    # The client caches translations under this fingerprint, so interface
+    # strings outside questionnaire.yml must invalidate it too.
+    it "changes when any locale file's content changes" do
       with_copied_config do |dir|
-        locale = dir.join("questionnaire.yml")
-        FileUtils.cp(Rails.root.join("config/locales/es/questionnaire.yml"), locale)
-        allow(described_class).to(receive(:questionnaire_locale_files).and_return([locale]))
+        locales = dir.join("locales")
+        locales.join("es").mkpath
+        FileUtils.cp(Rails.root.join("config/locales/es.yml"), locales.join("es.yml"))
+        stub_const("QuestionnaireConfig::LOCALES_DIR", locales)
         original = described_class.fingerprint
-        locale.open("a") { |f| f.puts "# changed" }
+
+        locales.join("es.yml").open("a") { |f| f.puts "# changed" }
+
         expect(described_class.fingerprint).not_to(eq(original))
       end
     end

@@ -51,4 +51,14 @@ RSpec.describe(Form, type: :model) do
       expect(form.missing_sections.first).to(eq("questionnaire.principles_title"))
     end
   end
+
+  describe "attachments" do
+    it "destroys a form along with its attached report" do
+      form = create(:form)
+      form.pdf.attach(io: StringIO.new("%PDF-1.4"), filename: "report.pdf", content_type: "application/pdf")
+
+      expect { form.destroy! }.to(change(ActiveStorage::Attachment, :count).by(-1))
+      expect(Form.exists?(form.id)).to(be(false))
+    end
+  end
 end

@@ -60,11 +60,11 @@ export async function seedFromServer() {
 // Pulls a single form into IndexedDB, for the results/completion flows that
 // need one record rather than the whole set seedFromServer reconciles. Same
 // guards: a queued or dirty local copy is never clobbered by the server pull.
-export async function hydrateForm(clientId) {
+export async function hydrateForm(clientId, { signal } = {}) {
   if (!signedIn() || !navigator.onLine) return false
 
   try {
-    const response = await fetch(`/api/forms/${clientId}`, { headers: { Accept: "application/json" } })
+    const response = await fetch(`/api/forms/${clientId}`, { headers: { Accept: "application/json" }, signal })
     if (!response.ok) return false
     const serverForm = (await response.json()).form
     if (!serverForm) return false

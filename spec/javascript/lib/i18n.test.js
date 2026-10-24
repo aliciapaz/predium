@@ -62,6 +62,71 @@ describe("load", () => {
     expect(fetch).not.toHaveBeenCalled()
   })
 
+  describe("when the page names a newer translations version", () => {
+    beforeEach(() => {
+      const meta = document.createElement("meta")
+      meta.name = "predium-translations"
+      meta.content = "v2"
+      document.head.appendChild(meta)
+    })
+
+    afterEach(() => document.querySelector('meta[name="predium-translations"]').remove())
+
+    it("replaces a stale IndexedDB copy while online, so new keys never render raw", async () => {
+      await dbModule.putLocale("es", { hello: "Hola" }, "v1")
+      const fetch = stubFetch(async () => ({
+        ...jsonResponse({ hello: "Hola", added: "Nuevo" }),
+        headers: new Headers({ "X-Translations-Version": "v2" })
+      }))
+
+      expect(await i18n.load()).toEqual({ hello: "Hola", added: "Nuevo" })
+      expect(fetch).toHaveBeenCalledWith("/translations/es?v=v2")
+      expect(await dbModule.getLocale("es")).toMatchObject({ fingerprint: "v2" })
+    })
+
+    // A stale cached page can ask for an older version; the copy is labelled
+    // with what the server actually sent, not with what the page asked for.
+    it("labels the stored copy with the version the response carries", async () => {
+      await dbModule.putLocale("es", { hello: "Hola" }, "v1")
+      stubFetch(async () => ({ ...jsonResponse({ hello: "Hola" }), headers: new Headers({ "X-Translations-Version": "v3" }) }))
+
+      await i18n.load()
+
+      expect(await dbModule.getLocale("es")).toMatchObject({ fingerprint: "v3" })
+    })
+
+    it("falls back to the stale copy when the network is unreachable despite navigator.onLine", async () => {
+      await dbModule.putLocale("es", { hello: "Hola" }, "v1")
+      stubFetch(async () => { throw new TypeError("Failed to fetch") })
+
+      expect(await i18n.load()).toEqual({ hello: "Hola" })
+    })
+
+    it("keeps the cached copy when it already matches", async () => {
+      await dbModule.putLocale("es", { hello: "Hola" }, "v2")
+      const fetch = stubFetch()
+
+      expect(await i18n.load()).toEqual({ hello: "Hola" })
+      expect(fetch).not.toHaveBeenCalled()
+    })
+
+    it("keeps the stale copy offline", async () => {
+      vi.spyOn(navigator, "onLine", "get").mockReturnValue(false)
+      await dbModule.putLocale("es", { hello: "Hola" }, "v1")
+      const fetch = stubFetch()
+
+      expect(await i18n.load()).toEqual({ hello: "Hola" })
+      expect(fetch).not.toHaveBeenCalled()
+    })
+
+    it("falls back to the stale copy when the refresh fails", async () => {
+      await dbModule.putLocale("es", { hello: "Hola" }, "v1")
+      stubFetch(async () => jsonResponse({}, 500))
+
+      expect(await i18n.load()).toEqual({ hello: "Hola" })
+    })
+  })
+
   it("reloads when the document language changes", async () => {
     await dbModule.putLocale("es", { hello: "Hola" }, "v1")
     await dbModule.putLocale("en", { hello: "Hello" }, "v1")
