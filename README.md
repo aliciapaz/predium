@@ -74,4 +74,5 @@ methodology and is not covered by the AGPL. All rights to it are reserved by CET
 - `config/locales/es/questionnaire.yml`
 - `config/locales/en/questionnaire.yml`
 
-To reuse the questionnaire, contact CET.
+The app runs on whatever questionnaire is in those files, so to run your own instance either
+replace them with your own content or get CET's permission to use theirs.

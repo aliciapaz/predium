@@ -1,6 +1,6 @@
 # Architecture Decision Records
 
-> Predium v2 — Key technical decisions for the ground-up rebuild of PrediApp.
+> Predium v2: key technical decisions for the ground-up rebuild of the previous app.
 
 ---
 
@@ -9,7 +9,7 @@
 **Status:** Accepted
 
 **Context:**
-The original PrediApp stores all indicator scores as 80+ integer columns on a single `forms` table. This creates a fragile schema — adding a new indicator requires a migration, unused territory-specific columns waste storage, and aggregation queries are cumbersome.
+The previous app stores all indicator scores as 80+ integer columns on a single `forms` table. This creates a fragile schema — adding a new indicator requires a migration, unused territory-specific columns waste storage, and aggregation queries are cumbersome.
 
 **Decision:**
 Replace the flat column approach with a `form_responses` join table:
@@ -95,7 +95,7 @@ QuestionnaireConfig.known_key?(key, territory)    # principle or in the territor
 **Status:** Accepted
 
 **Context:**
-PrediApp already uses Workbox + Dexie.js for offline support, but the approach is brittle — questionnaire config is not cached, sync has no conflict detection, and there's no queue for failed syncs.
+The previous app already uses Workbox + Dexie.js for offline support, but the approach is brittle — questionnaire config is not cached, sync has no conflict detection, and there's no queue for failed syncs.
 
 **Decision (amended 2026-08-31):**
 Hand-rolled service worker plus Dexie.js. Workbox made sense in the v1 build; without a JS build step (importmap + Propshaft) it would mean vendoring several Workbox modules to replace ~150 lines of dependency-free service worker code, so v2 owns the worker directly:
@@ -139,7 +139,7 @@ Hand-rolled service worker plus Dexie.js. Workbox made sense in the v1 build; wi
 **Status:** Accepted, not built yet. `prawn` is in the Gemfile, but there is no generator and the "Generate PDF" button is disabled.
 
 **Context:**
-PrediApp uses PDFShift, an external API, to generate diagnosis PDFs. This adds a third-party dependency, costs per-PDF, and fails when the service is down.
+The previous app uses PDFShift, an external API, to generate diagnosis PDFs. This adds a third-party dependency, costs per-PDF, and fails when the service is down.
 
 **Decision:**
 Replace PDFShift with Prawn (Ruby PDF library) for fully self-hosted generation.
@@ -194,7 +194,7 @@ end
 **Status:** Superseded. Charts are rendered with Chart.js (`radar_chart_controller.js`); Vega-Lite is not used.
 
 **Context:**
-PrediApp uses Highcharts for client-side charts. Highcharts requires a commercial license for non-personal use. The admin panel already uses Vega for some visualizations.
+The previous app uses Highcharts for client-side charts. Highcharts requires a commercial license for non-personal use. The admin panel already uses Vega for some visualizations.
 
 **Decision:**
 Standardize on Vega-Lite for all charts (client and PDF).
@@ -259,7 +259,7 @@ Build on Rails 8.1 with the new defaults:
 **Status:** Accepted
 
 **Context:**
-PrediApp is Spanish-only with hardcoded strings in views. Predium v2 must support English and Spanish, with the architecture to add more locales.
+The previous app is Spanish-only with hardcoded strings in views. Predium v2 must support English and Spanish, with the architecture to add more locales.
 
 **Decision:**
 Full Rails I18n with structured locale files:
@@ -303,7 +303,7 @@ config/locales/
 **Status:** Accepted
 
 **Context:**
-PrediApp has separate `users` and `admin_users` tables with independent Devise sessions. Organization admins must maintain two accounts. The `organization_admin_users` join table adds a third layer of complexity.
+The previous app has separate `users` and `admin_users` tables with independent Devise sessions. Organization admins must maintain two accounts. The `organization_admin_users` join table adds a third layer of complexity.
 
 **Decision:**
 Single `users` table with two access dimensions:
