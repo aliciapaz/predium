@@ -1,7 +1,6 @@
 <% content_for(:title, "#{t('navigation.members')} | #{@organization.name}") %>
 
-<% current_membership = current_user.memberships.find_by(organization: @organization) %>
-<% is_admin = current_membership&.admin? %>
+<% is_admin = allowed_to?(:manage?, @organization) %>
 
 <div>
   <%= page_header(@organization.name) do %>

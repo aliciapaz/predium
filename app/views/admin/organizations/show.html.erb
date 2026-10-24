@@ -2,6 +2,7 @@
 
 <div>
   <%= page_header(@organization.name, back: [t("buttons.back"), admin_organizations_path]) do %>
+    <%= link_to t("navigation.members"), organization_memberships_path(@organization), class: "btn-secondary" %>
     <%= link_to t("buttons.edit"), edit_admin_organization_path(@organization), class: "btn-secondary" %>
   <% end %>
 

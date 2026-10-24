@@ -108,4 +108,36 @@ RSpec.describe("Organizations", type: :request) do
       expect(page.at("input[type=email]")["placeholder"]).to(eq("nombre@ejemplo.com"))
     end
   end
+
+  describe "a super admin who is not a member" do
+    let(:super_admin) { create(:user, :super_admin) }
+
+    before { sign_in super_admin }
+
+    it "sees the organization's forms" do
+      get organization_forms_path(organization)
+
+      expect(response).to(have_http_status(:ok))
+    end
+
+    it "gets the invitation action on the members page" do
+      get organization_memberships_path(organization)
+
+      expect(response).to(have_http_status(:ok))
+      expect(page.css("a.btn-primary").map { |link| link.text.strip }).to(eq(["Invitar miembro"]))
+    end
+
+    it "invites a member" do
+      post organization_invitations_path(organization), params: { invitation: { email: "nuevo@example.com" } }
+
+      expect(organization.users.find_by(email: "nuevo@example.com")).to(be_present)
+    end
+
+    it "removes a member" do
+      membership = organization.memberships.find_by!(user: member)
+      delete organization_membership_path(organization, membership)
+
+      expect(organization.memberships.exists?(user: member)).to(be(false))
+    end
+  end
 end

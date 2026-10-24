@@ -35,7 +35,7 @@ module Organizations
     end
 
     def authorize_org_admin
-      unless current_user.memberships.exists?(organization: @organization, role: :admin)
+      unless allowed_to?(:manage?, @organization)
         redirect_to(organization_memberships_path(@organization), alert: t("flash.unauthorized"))
       end
     end
