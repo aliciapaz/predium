@@ -4,16 +4,40 @@ en:
     principles:
       biodiversity:
         name: "Biodiversity"
+        scoring:
+          low: "Little overall diversity on the farm."
+          medium: "Moderate overall diversity on the farm."
+          high: "Maximum diversity on the farm."
       recycling:
         name: "Recycling"
+        scoring:
+          low: "No regular recycling practices."
+          medium: "Partial recycling in some areas of the farm."
+          high: "A high share of the farm's natural resources is recycled through different mechanisms."
       interactions:
         name: "Level of interaction between system components: animal, agricultural, forestry, others"
+        scoring:
+          low: "Not all components are present and no clear interactions are observed."
+          medium: "All components exist, but without a design that makes them clearly interact. Partial interactions."
+          high: "All components are part of a design that establishes concrete, beneficial interactions."
       soil_management:
         name: "Ecological soil management"
+        scoring:
+          low: "No soil conservation practices and no systematic additions of organic matter."
+          medium: "Limited soil conservation practices and occasional applications of organic matter."
+          high: "Defined soil protection and conservation structures and ongoing applications of organic matter."
       pest_management:
         name: "Ecological pest and disease management"
+        scoring:
+          low: "No ecological management and control practices."
+          medium: "A moderate level of ecological control practices, sometimes combined with pesticides."
+          high: "Pest control is based entirely on an agroecological strategy."
       traditional_knowledge:
         name: "Cultural foundations and traditional knowledge in managing the system"
+        scoring:
+          low: "No identifiable traditional practices in the system."
+          medium: "A moderate level of traditional practices consistent with agroecological principles."
+          high: "Traditional practices are central to managing the farm and form the basis of the production strategy."
 
     # ── L1 categories ─────────────────────────────────────
     categories:
@@ -41,163 +65,451 @@ en:
       climate_adaptation: "Climate Adaptation"
       system_resilience: "System Resilience"
 
-    # ── L2 indicators (Chile extension; name only for now) ──
+    # ── L2 indicators (Chile extension; range hints are provisional translations of prediapp's Spanish) ──
     indicators:
       # soil_health
       soil_coverage:
         name: "Soil coverage"
+        scoring:
+          low: "Bare soil, <20% cover."
+          medium: "Soil covered up to 60% by residue, leaf litter, or living cover."
+          high: "More than 80% of the soil with living or dead cover."
       soil_erosion:
         name: "Soil erosion"
+        scoring:
+          low: "Severe erosion: soil washing away, gullies and rills present."
+          medium: "Visible erosion, but still low or moderate."
+          high: "No signs of erosion."
       compaction:
         name: "Compaction"
+        scoring:
+          low: "Compacted: very hard to push a metal rod in."
+          medium: "A metal rod goes in with difficulty and only to a certain depth."
+          high: "Spongy, uncompacted soil that is easy to penetrate."
       infiltration:
         name: "Infiltration"
+        scoring:
+          low: "Water infiltrates very slowly."
+          medium: "Water infiltrates at a moderate rate."
+          high: "Water infiltrates easily."
       soil_depth:
         name: "Effective soil depth"
+        scoring:
+          low: "Subsoil almost exposed. (Effective depth <10cm)"
+          medium: "Shallow soil. (Effective depth between 10 and 30cm)"
+          high: "Deep soil. (Effective depth > 40cm)"
       soil_structure:
         name: "Soil structure"
+        scoring:
+          low: "Powdery soil that breaks apart with no visible granules."
+          medium: "Loose soil with few granules that break under light pressure."
+          high: "Friable, granular soil; aggregates keep their shape under light pressure."
       clod_stability:
         name: "Clod stability"
+        scoring:
+          low: "Clod falls apart quickly when exposed to water."
+          medium: "Clod holds up moderately when exposed to water."
+          high: "Clod keeps its shape when exposed to water."
       color_and_smell:
         name: "Color and smell"
+        scoring:
+          low: "Pale soil, or soil with a bad or chemical smell."
+          medium: "Light brown or reddish soil with little smell."
+          high: "Black or dark brown soil that smells of fresh earth."
       root_development:
         name: "Root development"
+        scoring:
+          low: "Poorly developed, diseased, short roots."
+          medium: "Roots with limited growth; a moderate amount of fine roots is visible."
+          high: "Fine and thick roots with good growth, healthy and deep."
       residue_condition:
         name: "Residue condition"
+        scoring:
+          low: "Organic residue present that does not decompose or decomposes very slowly."
+          medium: "Last year's residue still present and decomposing."
+          high: "Residue at various stages of decomposition, with a large share already incorporated into the soil."
       biological_activity:
         name: "Biological activity"
+        scoring:
+          low: "No signs of biological activity and no organisms present (earthworms, arthropods, etc.)."
+          medium: "Signs of biological activity, some earthworms and arthropods present."
+          high: "High biological activity, abundant earthworms and arthropods present."
       organic_matter:
         name: "Organic matter"
+        scoring:
+          low: "Weak signs of organic matter, low reaction to hydrogen peroxide."
+          medium: "Organic matter present, moderate reaction to hydrogen peroxide."
+          high: "Abundant organic matter, strong reaction to hydrogen peroxide."
       # soil_management
       crop_rotation:
         name: "Crop rotation"
+        scoring:
+          low: "Does not rotate crops."
+          medium: "Some crops in rotation."
+          high: "All crops are part of a rotation system."
       organic_fertilizers:
         name: "Application of organic fertilizers"
+        scoring:
+          low: "Does not make or use organic fertilizers, only chemical ones."
+          medium: "Organic fertilizers incorporated on 25 to 65% of the land area during the year, with few chemical applications."
+          high: "Organic fertilizers incorporated on a large share of the land area during the year, with no chemicals used."
       leaf_fertilizers:
         name: "Foliar organic fertilizers and fertigation"
+        scoring:
+          low: "Does not make or use foliar organic fertilizers."
+          medium: "Foliar organic fertilizers applied to 25 to 65% of crops or fruit trees during the year."
+          high: "Foliar organic fertilizers applied to a large share of crops or fruit trees during the year."
       efficient_microorganisms:
         name: "Efficient microorganisms"
+        scoring:
+          low: "Does not use efficient microorganisms."
+          medium: "Some foliar and soil applications of efficient microorganisms."
+          high: "Many foliar and soil applications of efficient microorganisms."
       soil_conservation:
         name: "Soil conservation works"
+        scoring:
+          low: "No soil conservation works or management on the land."
+          medium: "Some sloped areas have conservation works (contour lines, infiltration ditches, etc.)."
+          high: "All sloped areas have conservation works (contour lines, infiltration ditches, etc.)."
       stubble_burning:
         name: "Elimination of burning"
+        scoring:
+          low: "Burns crop stubble."
+          medium: "Has reduced stubble burning."
+          high: "Has stopped stubble burning entirely."
       weed_management:
         name: "Weed management practices (mulch, brushcutter, cover crops, etc.)"
+        scoring:
+          low: "Weed management relies on chemical herbicides."
+          medium: "Uses some weed management measures and no herbicides."
+          high: "Uses multiple weed management and control measures and no chemical herbicides."
       # water_availability
       irrigation_system:
         name: "Irrigation system"
+        scoring:
+          low: "No irrigation system."
+          medium: "Irrigates through canals and/or springs, with no modern irrigation systems."
+          high: "Irrigates through canals and/or springs and also has a modern irrigation system."
       deep_well_water:
         name: "Deep well water availability"
+        scoring:
+          low: "No deep wells."
+          medium: "Draws water from a deep well, but not enough."
+          high: "Draws enough water from a deep well."
       water_quantity:
         name: "Water quantity"
+        scoring:
+          low: "Water is very scarce and limits production."
+          medium: "There is not enough water and irrigating at normal intervals is impossible."
+          high: "There is enough water to irrigate at normal intervals."
       # crop_diversity
       crop_diversity:
         name: "Crop diversity"
+        scoring:
+          low: "Little diversity of crops and fruit trees."
+          medium: "Moderate diversity of crops and fruit trees."
+          high: "Wide diversity of crops and fruit trees."
       crop_variety:
         name: "Crop variety"
+        scoring:
+          low: "Only one variety of each crop or fruit tree."
+          medium: "2 or 3 varieties of crops or fruit trees."
+          high: "Many different varieties of crops or fruit trees."
       polycultures:
         name: "Polycultures (intercropped or associated crops)"
+        scoring:
+          low: "Crops without associations."
+          medium: "A moderate amount of intercropped or associated crops."
+          high: "A large amount of intercropped and associated crops."
       seed_origin:
         name: "Seed origin"
+        scoring:
+          low: "Very few or no seeds reproduced, exchanged, and used on the farm. Only buys seed."
+          medium: "Reproduces, exchanges, and uses seed on the farm but also relies on buying it."
+          high: "Saves, produces, and exchanges many seeds on the farm; hardly relies on outside seed."
       traditional_crops_seeds:
         name: "Seeds of traditional crops of global importance"
+        scoring:
+          low: "Has and keeps no seeds of the territory's traditional crops of global importance."
+          medium: "Produces and saves a moderate amount of seed of the territory's traditional crops of global importance."
+          high: "Produces, saves, and exchanges many seeds of the territory's traditional crops of global importance."
       local_seed_banks:
         name: "Local seed banks or biodiversity seed-keeper organizations"
+        scoring:
+          low: "No local seed banks, and does not take part in seed-keeper organizations or groups."
+          medium: "Seed-keeper groups exist and the farmer takes part occasionally."
+          high: "Local seed banks exist and the farmer often takes part in exchange activities and seed-keeper spaces."
       # ecosystem_diversity
       live_barriers:
         name: "Living barriers"
+        scoring:
+          low: "No living barriers."
+          medium: "Less than 30% of crops, pastures, fruit trees, terraces, etc. separated by living barriers."
+          high: "Between 80 and 100% of crops, pastures, fruit trees, or terraces, etc. separated by living barriers."
       live_coverage:
         name: "Association with living cover"
+        scoring:
+          low: "Fruit trees without living cover."
+          medium: "Between 20 and 50% of fruit trees have living cover."
+          high: "Over 80% of fruit trees have living cover."
       live_fences:
         name: "Living fences"
+        scoring:
+          low: "No living fences on the farm."
+          medium: "Living fences on 25% of what the farm allows."
+          high: "Living fences on 80 to 100% of what the farm allows."
       forest_patches:
         name: "Woodland or forest patches"
+        scoring:
+          low: "The farm has no woodlands or forest patches."
+          medium: "A moderate amount of woodlands and forest patches on the farm."
+          high: "Enough woodlands and forest patches on the farm for it to function well."
       spontaneous_vegetation:
         name: "On-farm sites of spontaneous vegetation"
+        scoring:
+          low: "No farm area with wild or spontaneous vegetation."
+          medium: "A moderate amount of farm area with wild or spontaneous vegetation."
+          high: "Farm area with wild or spontaneous vegetation."
       natural_enemies_diversity:
         name: "Diversity of natural pest enemies"
+        scoring:
+          low: "No natural enemies observed on crops or fruit trees."
+          medium: "Some natural enemies commonly observed on the farm's crops or fruit trees."
+          high: "An abundance of natural enemies observed on the farm's crops or fruit trees."
       pollinator_diversity:
         name: "Pollinator diversity"
+        scoring:
+          low: "No pollinator species observed."
+          medium: "A moderate number of pollinator species observed."
+          high: "A large number and variety of pollinators observed on the farm."
       entomophages_released:
         name: "Entomophages released"
+        scoring:
+          low: "No entomophage species released."
+          medium: "Entomophage species are released."
+          high: "Many entomophage species are released."
       entomopathogen_applications:
         name: "Entomopathogen applications"
+        scoring:
+          low: "No entomopathogen applications."
+          medium: "Occasional entomopathogen applications."
+          high: "Continuous entomopathogen applications."
       # farm_planning
       transformation_conviction:
         name: "Conviction to begin a transformation process"
+        scoring:
+          low: "Basic level of conviction, still in a testing and evaluation phase."
+          medium: "Intermediate level of conviction; progress will depend on the impact of the practices implemented."
+          high: "High level of conviction; from the farmer's perspective, this is the only way to produce."
       decision_for_practices:
         name: "Decision to adopt practices"
+        scoring:
+          low: "Adopts low-complexity, low-risk practices."
+          medium: "Adopts practices of medium complexity and medium risk."
+          high: "Adopts high-complexity, high-risk practices."
       experience_transmission:
         name: "Level of sharing one's own experience"
+        scoring:
+          low: "Does nothing to share their own experience."
+          medium: "Occasionally shares their own experience."
+          high: "Constantly shares their own experience."
       # input_management
       biocides_use:
         name: "Making and using biocides for pests and diseases"
+        scoring:
+          low: "Does not make or use biocides."
+          medium: "Occasionally uses biocide products."
+          high: "Uses biocide products whenever needed."
       preventive_sanitary_measures:
         name: "Preventive sanitary measures (traps, repellent plants, disinfected seed, etc.)"
+        scoring:
+          low: "Does not use preventive measures."
+          medium: "Occasionally uses preventive measures."
+          high: "Always includes preventive measures."
       infected_plants_removal:
         name: "Removes post-harvest residue or infected plants from the growing area"
+        scoring:
+          low: "Does not remove post-harvest residue or infected plants."
+          medium: "Occasionally removes post-harvest residue or infected plants."
+          high: "Always removes post-harvest residue or infected plants."
       sanitary_crop_rotation:
         name: "Rotates crops in an orderly and permanent way"
+        scoring:
+          low: "Does not rotate crops."
+          medium: "Occasionally rotates crops."
+          high: "Always rotates crops."
       inputs_produced:
         name: "Type of inputs produced"
+        scoring:
+          low: "Produces no inputs."
+          medium: "Produces between 1 and 3 inputs for fertility management."
+          high: "Produces more than three inputs for fertility management and pest and disease control."
       input_production_percentage:
         name: "Percentage of required inputs produced on farm"
+        scoring:
+          low: "Produces few of the inputs required. Up to 20%."
+          medium: "Produces between 30 and 70% of the inputs required."
+          high: "More than 70% of the inputs required."
       # animal_management
       animal_feed_conservation:
         name: "Conservation of animal feed"
+        scoring:
+          low: "No feed stored for the animals."
+          medium: "Stores animal feed, but not enough."
+          high: "Stores the feed the animals need."
       animal_feed_production_percentage:
         name: "% of animal feed sourced from the farm"
+        scoring:
+          low: "10 to 30%."
+          medium: "40 to 70%."
+          high: "80 to 100%."
       animal_feed_production:
         name: "Produces feed for all animal species"
+        scoring:
+          low: "For 10% of animal species."
+          medium: "For 50% of species."
+          high: "For 100% of species."
       # economic_viability
       agricultural_commercialized_products:
         name: "Diversity of agricultural products marketed"
+        scoring:
+          low: "Sells few agricultural products. Between 1 and 4."
+          medium: "Sells between 5 and 15 different agricultural products."
+          high: "Sells more than 15 agricultural products."
       animal_commercialized_products:
         name: "Diversity of animal products marketed"
+        scoring:
+          low: "Sells no animal products, or 1."
+          medium: "Sells between 2 and 3 animal products."
+          high: "Sells more than 3 animal products."
       territorial_commercialization:
         name: "Products marketed at the territorial level"
+        scoring:
+          low: "Products sold locally."
+          medium: "Products sold at the municipal level."
+          high: "Products sold at the provincial level."
       production_destination:
         name: "Destination of production"
+        scoring:
+          low: "Production for own consumption, small sales of surplus."
+          medium: "Production balanced between own consumption and sales."
+          high: "Production for own consumption plus a significant volume of sales."
       income:
         name: "Income level"
+        scoring:
+          low: "Low."
+          medium: "Medium."
+          high: "High."
       income_sources_diversity:
         name: "Number of income sources"
+        scoring:
+          low: "One line of business."
+          medium: "2 to 3 lines of business."
+          high: "More than three lines of business."
       # social_wellbeing
       agroecological_farmers_knowledge:
         name: "Farmers' knowledge of agroecological practices"
+        scoring:
+          low: "No prior knowledge of agroecology or of traditional production sources."
+          medium: "Knows and uses at least 10 traditional practices and links them to healthier, more ecological systems."
+          high: "Knows and uses more than 10 traditional practices in an agroecological context and has adopted different production techniques from current sources."
       soil_practices_number:
         name: "Number of agroecological practices for ecological soil management"
+        scoring:
+          low: "Uses fewer than 2 agroecological practices, or none, for ecological soil management."
+          medium: "Knows and uses between 2 and 6 agroecological practices for ecological soil management."
+          high: "Knows and uses more than 6 agroecological practices for ecological soil management."
       disease_practices_number:
         name: "Number of agroecological practices for preventive pest and disease management"
+        scoring:
+          low: "Uses 1 agroecological practice, or none, for preventive ecological management of pests and diseases."
+          medium: "Knows and uses between 3 and 6 practices for preventive ecological management of pests and diseases."
+          high: "Knows and uses more than 6 agroecological practices for preventive ecological management of pests and diseases."
       recycling_practices_number:
         name: "Number of recycling practices"
+        scoring:
+          low: "Uses no recycling practices."
+          medium: "Knows and uses at least 7 agroecological recycling practices."
+          high: "Knows and uses more than 7 agroecological recycling practices."
       agroecological_organizations:
         name: "Knowledge of and participation in agroecological producer organizations"
+        scoring:
+          low: "Does not know of or take part in any organization of this kind."
+          medium: "Knows such organizations exist and has taken part occasionally."
+          high: "Knows of and actively takes part in organizations of this kind."
       participation_conviction:
         name: "Conviction to participate in agroecology-linked organizations"
+        scoring:
+          low: "Low level of conviction, or not interested in taking part."
+          medium: "Intermediate level of conviction; could take part while trying things out and seeing how they work."
+          high: "High level of conviction; actively takes part in the organizations."
       territorial_participation:
         name: "Participation at communal, regional, and national levels"
+        scoring:
+          low: "Does not take part, or takes part occasionally at the municipal level."
+          medium: "Takes part at the municipal level and occasionally at the regional level."
+          high: "Takes part at every level."
       family_food_availability:
         name: "Food available for the family"
+        scoring:
+          low: "Little of the food is produced on the farm."
+          medium: "Between 25 and 75% of the food is produced on the farm."
+          high: "More than 75% of the food is produced on the farm."
       food_conservation:
         name: "Production level allows food to be conserved"
+        scoring:
+          low: "No food preserved for the family."
+          medium: "Occasionally allows food to be preserved."
+          high: "Always allows food to be preserved."
       family_food_diversity:
         name: "Diversity of food produced for the family"
+        scoring:
+          low: "Low food diversity."
+          medium: "Medium food diversity."
+          high: "High food diversity."
       # system_resilience
       crop_appearance:
         name: "Crop appearance"
+        scoring:
+          low: "Chlorotic or discolored crop with severe signs of nutrient deficiency."
+          medium: "Light green crop with some discoloration."
+          high: "Deep green foliage with no signs of deficiency."
       crop_growth:
         name: "Crop growth"
+        scoring:
+          low: "Sparse crop with poor growth. Short, brittle stems and branches. Almost no new foliage."
+          medium: "Denser but uneven crop, with new growth and branches and stems still thin."
+          high: "Dense, even crop with good growth and thick, firm branches and stems."
       stress_tolerance:
         name: "Resistance or tolerance to stress (drought, heavy rain, pest attack, etc.)"
+        scoring:
+          low: "Very susceptible; does not recover well after stress."
+          medium: "Suffers from frost, dry spells, or very rainy periods; recovers slowly."
+          high: "Withstands drought, frost, and heavy rain; recovers quickly."
       global_disease_incidence:
         name: "Overall disease incidence"
+        scoring:
+          low: "More than 50% of plants with severe symptoms."
+          medium: "Between 20-45% of plants with mild to moderate symptoms."
+          high: "Less than 20% of plants with mild symptoms."
       insects_and_mite_presence:
         name: "Presence of pest insects and mites"
+        scoring:
+          low: "High presence of pest insects and/or mites on crops or fruit trees."
+          medium: "Moderate presence of pest insects and/or mites on crops or fruit trees."
+          high: "Low or no presence of pest insects and/or mites on crops or fruit trees."
       fungi_bacteria_viruses_presence:
         name: "Presence of fungi, bacteria, and viruses that cause crop diseases"
+        scoring:
+          low: "High presence of disease-causing microorganisms on crops or fruit trees."
+          medium: "Moderate presence of disease-causing microorganisms on crops or fruit trees."
+          high: "Low or no presence of disease-causing microorganisms on crops or fruit trees."
       weed_presence:
         name: "Weed presence"
+        scoring:
+          low: "Stressed crops dominated by weeds."
+          medium: "Moderate weed presence; the crop suffers some competition."
+          high: "Vigorous crop that outgrows weeds, or cut weeds cause no problems."
 
     # ── Extensions ────────────────────────────────────────
     extensions:

@@ -221,6 +221,28 @@ RSpec.describe(QuestionnaireConfig) do
         end
       end
     end
+
+    it "has low, medium, and high range hints for every principle in both locales" do
+      with_copied_config do
+        described_class.principle_keys.each do |key|
+          ["low", "medium", "high"].each do |range|
+            expect(es.dig("principles", key, "scoring", range)).to(be_present, "es principle #{key} #{range}")
+            expect(en.dig("principles", key, "scoring", range)).to(be_present, "en principle #{key} #{range}")
+          end
+        end
+      end
+    end
+
+    it "has low, medium, and high range hints for every chile indicator in both locales" do
+      with_copied_config do
+        described_class.extension("chile")[:indicators].each do |ind|
+          ["low", "medium", "high"].each do |range|
+            expect(es.dig("indicators", ind[:key], "scoring", range)).to(be_present, "es #{ind[:key]} #{range}")
+            expect(en.dig("indicators", ind[:key], "scoring", range)).to(be_present, "en #{ind[:key]} #{range}")
+          end
+        end
+      end
+    end
   end
 
   describe ".extension_keys" do
@@ -234,6 +256,17 @@ RSpec.describe(QuestionnaireConfig) do
       with_copied_config do |dir|
         original = described_class.fingerprint
         dir.join("extensions/chile.yml").open("a") { |f| f.puts "# changed" }
+        expect(described_class.fingerprint).not_to(eq(original))
+      end
+    end
+
+    it "changes when a questionnaire locale file's content changes" do
+      with_copied_config do |dir|
+        locale = dir.join("questionnaire.yml")
+        FileUtils.cp(Rails.root.join("config/locales/es/questionnaire.yml"), locale)
+        allow(described_class).to(receive(:questionnaire_locale_files).and_return([locale]))
+        original = described_class.fingerprint
+        locale.open("a") { |f| f.puts "# changed" }
         expect(described_class.fingerprint).not_to(eq(original))
       end
     end

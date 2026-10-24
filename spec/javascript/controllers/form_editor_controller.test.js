@@ -73,6 +73,10 @@ function card(name) {
     .find((element) => titleOf(element.querySelector("h3")) === name)
 }
 
+function hintRow(name, rangeTarget) {
+  return card(name).querySelector(`[data-question-target="${rangeTarget}"]`)
+}
+
 function showSection(index) {
   target("dimensionNav").querySelectorAll("button")[index].click()
   return settle()
@@ -220,6 +224,38 @@ describe("form editor controller", () => {
 
       const badges = Array.from(target("indicators").querySelectorAll("h3")).map((h3) => [titleOf(h3), badgeOf(h3)])
       expect(badges).toEqual([["Irrigation", "Andes extension"], ["Salinity", "Coast extension"]])
+    })
+
+    it("shows the low, mid, and high range hints for a question that has them", async () => {
+      await seedForm()
+      await mount(editor(), controllers)
+
+      await showSection(1)
+
+      const rows = ["descLow", "descMedium", "descHigh"].map((name) => hintRow("Compaction", name).textContent.replace(/\s+/g, " ").trim())
+      expect(rows).toEqual(["1-3: Hard to push a rod in", "4-7: A rod goes in with effort", "8-10: Spongy soil"])
+    })
+
+    it("renders a label-only question without range hints", async () => {
+      await seedForm()
+      await mount(editor(), controllers)
+
+      await showSection(1)
+
+      expect(card("Erosion").querySelectorAll('[data-question-target^="desc"]')).toHaveLength(0)
+    })
+
+    it("highlights the range hint matching the chosen score", async () => {
+      await seedForm()
+      await mount(editor(), controllers)
+      await showSection(1)
+
+      score("Compaction", 5)
+      await settle()
+
+      expect(hintRow("Compaction", "descMedium").className).toContain("ring-mustard-200")
+      expect(hintRow("Compaction", "descLow").className).not.toContain("ring-2")
+      expect(hintRow("Compaction", "descHigh").className).not.toContain("ring-2")
     })
 
     it("moves between dimensions with next, previous, and the nav buttons", async () => {
