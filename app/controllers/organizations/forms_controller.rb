@@ -19,7 +19,7 @@ module Organizations
     end
 
     def authorize_org_access
-      unless current_user.memberships.exists?(organization: @organization)
+      unless allowed_to?(:show?, @organization)
         redirect_to(root_path, alert: t("flash.unauthorized"))
       end
     end
