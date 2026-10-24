@@ -10,7 +10,7 @@ gem "propshaft"
 gem "pg", "~> 1.1"
 # Pin json to the 2.x line: 3.x changes JSON.parse's signature and breaks
 # Rails request parameter parsing. 2.19.9 clears the known advisories.
-gem "json", ">= 2.19.9", "< 3.0"
+gem "json", ">= 2.19.9", "< 4.0"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
