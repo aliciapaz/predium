@@ -1,6 +1,6 @@
 # Predium
 
-Offline-first PWA for conducting agroecological farm diagnoses: field agents fill scored questionnaires on-device, sync when connectivity returns, and generate PDF reports.
+Offline-first PWA for conducting agroecological farm diagnoses: field agents fill scored questionnaires on-device and sync when connectivity returns. PDF reports are planned but not built yet.
 
 ## Tech Stack
 
@@ -10,7 +10,7 @@ Offline-first PWA for conducting agroecological farm diagnoses: field agents fil
 - **Authorization:** `action_policy`
 - **State machine:** `aasm` (on `Form`)
 - **Soft delete:** `discard`
-- **PDF:** `prawn` + `prawn-table`
+- **PDF:** `prawn` + `prawn-table` (installed, not used yet)
 - **Deploy:** Kamal + Thruster
 
 ## Domain Model

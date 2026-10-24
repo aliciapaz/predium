@@ -45,3 +45,7 @@ development.log
 
 # JavaScript dev tooling (lint + tests only; runtime JS ships via importmap)
 /node_modules
+
+# Local agent and worktree state
+.omc/
+/.worktrees/

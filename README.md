@@ -3,7 +3,7 @@
 Farm diagnosis tool for agroecological transition, based on CET's methodology and developed in
 Chile. Field agents score a farm against six agroecology principles (Level 1) and a set of
 territory-specific indicators (Level 2), working offline on their phone or tablet. Forms sync
-when connectivity returns, and each completed diagnosis produces a PDF report.
+when connectivity returns. PDF reports for completed diagnoses are planned.
 
 - Product site: [prediumapp.org](https://prediumapp.org)
 - App: [app.prediumapp.org](https://app.prediumapp.org) (invite-only)
@@ -57,7 +57,6 @@ twice (server, and client for offline previews), and both are pinned to
 | [`CONCEPTS.md`](CONCEPTS.md) | Domain vocabulary: Principle, Indicator, Territory Extension, sync states |
 | [`docs/architecture.md`](docs/architecture.md) | Architecture decision records |
 | [`docs/acceptance-criteria.md`](docs/acceptance-criteria.md) | User stories by feature area |
-| [`docs/database.md`](docs/database.md) | Original schema spec (`db/schema.rb` is authoritative) |
 | [`docs/testing.md`](docs/testing.md) | Testing conventions for both suites |
 | [`docs/deployment.md`](docs/deployment.md) | Releases, inviting users, console access, backups |
 | [`docs/solutions/`](docs/solutions/) | Write-ups of past bugs and the patterns that fixed them |

@@ -136,7 +136,7 @@ Hand-rolled service worker plus Dexie.js. Workbox made sense in the v1 build; wi
 
 ## ADR-4: Prawn for Self-Hosted PDF Generation
 
-**Status:** Accepted
+**Status:** Accepted, not built yet. `prawn` is in the Gemfile, but there is no generator and the "Generate PDF" button is disabled.
 
 **Context:**
 PrediApp uses PDFShift, an external API, to generate diagnosis PDFs. This adds a third-party dependency, costs per-PDF, and fails when the service is down.
@@ -191,7 +191,7 @@ end
 
 ## ADR-5: Vega-Lite for All Visualizations
 
-**Status:** Accepted
+**Status:** Superseded. Charts are rendered with Chart.js (`radar_chart_controller.js`); Vega-Lite is not used.
 
 **Context:**
 PrediApp uses Highcharts for client-side charts. Highcharts requires a commercial license for non-personal use. The admin panel already uses Vega for some visualizations.
