@@ -61,6 +61,9 @@ laptop, and there is no `RAILS_MASTER_KEY`: the app does not use Rails credentia
 | `DEPLOY_HOST` | Droplet IP. A secret only to keep it out of the public repo |
 | `SECRET_KEY_BASE` | Output of `bin/rails secret`. Rotating it signs everyone out |
 | `POSTGRES_PASSWORD` | Password for the `predium` Postgres role, shared by the accessory and the app |
+| `R2_ACCOUNT_ID` | Cloudflare account ID, the subdomain of the R2 S3 endpoint |
+| `R2_ACCESS_KEY_ID` | Access key of the R2 API token scoped to the `predium-production` bucket |
+| `R2_SECRET_ACCESS_KEY` | Secret of that same token |
 
 The registry login uses the workflow's own `GITHUB_TOKEN`, so GHCR needs no extra secret.
 `.kamal/secrets` only maps these environment variables through and must never hold literal
@@ -74,7 +77,29 @@ running container over SSH (`docker exec predium-db env`).
 - **kamal-proxy:** TLS via Let's Encrypt, zero-downtime swaps, health checks on `/up`
 - **App container (`predium-web-*`):** Rails 8.1 on Puma behind Thruster, Solid Queue in-process (`SOLID_QUEUE_IN_PUMA`)
 - **Postgres accessory (`predium-db`):** Postgres 16, data in `/root/predium-db/data` on the host. Holds the primary, cache, queue and cable databases, which `db:prepare` creates on first boot.
-- **Active Storage:** local disk in the `predium_storage` Docker volume
+- **Active Storage:** not on the droplet; uploads go to the `predium-production` Cloudflare R2 bucket (see [File storage](#file-storage))
+
+## File storage
+
+Attachments (form photos, generated PDFs) live in Cloudflare R2, so losing the droplet does not
+lose them. The bucket is private: Rails hands out short-lived signed URLs.
+
+To recreate it:
+
+1. In the Cloudflare dashboard, **R2 > Create bucket** named `predium-production`. Leave public access off.
+2. **R2 > Manage API tokens > Create API token** with **Object Read & Write**, scoped to that bucket only.
+3. Store the token's Access Key ID and Secret Access Key as `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY`, and the account ID shown on the R2 overview page as `R2_ACCOUNT_ID`.
+4. Make sure `.kamal/secrets` maps all three (`R2_ACCOUNT_ID=$R2_ACCOUNT_ID`, and so on), or Kamal will not pass them to the app.
+5. After deploying, confirm the app can reach the bucket from the console:
+
+   ```ruby
+   blob = ActiveStorage::Blob.create_and_upload!(io: StringIO.new("ok"), filename: "r2-check.txt")
+   blob.download # => "ok"
+   blob.purge
+   ```
+
+Browser direct uploads would also need a CORS rule on the bucket allowing `PUT` from
+`https://app.prediumapp.org`. Nothing uses them yet.
 
 ## Rebuilding the server
 

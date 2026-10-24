@@ -2,7 +2,8 @@ name: Deploy
 
 # Manual trigger only. Run "setup" once on a fresh droplet (installs Docker,
 # boots Postgres), then "deploy" for every release.
-# Required repo secrets: SSH_PRIVATE_KEY, DEPLOY_HOST, SECRET_KEY_BASE, POSTGRES_PASSWORD.
+# Required repo secrets: SSH_PRIVATE_KEY, DEPLOY_HOST, SECRET_KEY_BASE, POSTGRES_PASSWORD,
+# R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY.
 on:
   workflow_dispatch:
     inputs:
@@ -38,4 +39,7 @@ jobs:
           KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
           SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: bundle exec kamal ${{ inputs.command }}
