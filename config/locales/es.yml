@@ -65,6 +65,7 @@ es:
     last_sync: "Última sincronización"
     session_expired: "Sesión expirada, inicia sesión para sincronizar"
     saved_locally: "Guardado en este dispositivo"
+    saved_on_server: "Guardado en el servidor"
     loading: "Cargando..."
     loading_questionnaire: "Cargando cuestionario..."
     config_unavailable: "El cuestionario aún no está disponible sin conexión. Conéctate una vez para descargarlo."

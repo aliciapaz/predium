@@ -84,6 +84,7 @@ export const translations = {
   "farm_info.gps_unsupported": "This device cannot read its location.",
   "farm_info.gps_failed": "We could not read your location.",
   "offline.saved_locally": "Saved on this device",
+  "offline.saved_on_server": "Saved to the server",
   "offline.config_unavailable": "Questionnaire not available offline",
   "offline.complete_missing_indicators": "Score every indicator to complete",
   "offline.complete_requires_sync": "Connect to complete",

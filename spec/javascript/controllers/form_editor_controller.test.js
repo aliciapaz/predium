@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { applyServerForm, db, enqueue, getForm, getResponses, queueEntries } from "lib/db"
+import { applyServerForm, db, dequeue, enqueue, getForm, getResponses, queueEntries } from "lib/db"
 import { hydrateForm, syncNow } from "lib/sync"
 import FormEditorController from "controllers/form_editor_controller"
 import QuestionController from "controllers/question_controller"
@@ -477,6 +477,85 @@ describe("form editor controller", () => {
       await vi.waitFor(() => expect(syncNow).toHaveBeenCalled())
       const row = await db.form_responses.get([clientId, "compaction"])
       expect(row).toMatchObject({ value: 9, is_extension: true })
+    })
+  })
+
+  describe("save state", () => {
+    const saveState = () => target("saveState")
+    const syncFinished = () => document.dispatchEvent(new CustomEvent("predium:sync-status", { detail: { status: "finished" } }))
+
+    async function drainQueue(formClientId = clientId) {
+      const entry = (await queueEntries()).find((candidate) => candidate.form_client_id === formClientId)
+      await dequeue(entry.id)
+      syncFinished()
+    }
+
+    it("says the server has the answer once a sync clears this form's queue entry", async () => {
+      await seedForm()
+      await mount(editor(), controllers)
+      score("Recycling", 7)
+      await vi.waitFor(() => expect(saveState().dataset.state).toBe("device"))
+
+      await drainQueue()
+
+      await vi.waitFor(() => expect(saveState().dataset.state).toBe("server"))
+      expect(saveState().textContent).toBe("Saved to the server")
+    })
+
+    it("stays on the device when a sync finishes with this form still queued", async () => {
+      await seedForm()
+      await mount(editor(), controllers)
+      score("Recycling", 7)
+      await vi.waitFor(() => expect(saveState().dataset.state).toBe("device"))
+
+      syncFinished()
+      await settle()
+
+      expect(saveState().dataset.state).toBe("device")
+      expect(saveState().textContent).toBe("Saved on this device")
+    })
+
+    it("ignores another form leaving the queue", async () => {
+      await seedForm()
+      await enqueue("other-form")
+      await mount(editor(), controllers)
+      score("Recycling", 7)
+      await vi.waitFor(() => expect(saveState().dataset.state).toBe("device"))
+
+      await drainQueue("other-form")
+      await settle()
+
+      expect(saveState().dataset.state).toBe("device")
+    })
+
+    it("goes back to the device when the next edit is queued", async () => {
+      await seedForm()
+      await mount(editor(), controllers)
+      score("Recycling", 7)
+      await vi.waitFor(() => expect(saveState().dataset.state).toBe("device"))
+      await drainQueue()
+      await vi.waitFor(() => expect(saveState().dataset.state).toBe("server"))
+
+      score("Diversity", 3)
+
+      await vi.waitFor(() => expect(saveState().dataset.state).toBe("device"))
+    })
+
+    it("opens on the device state when this form has unsynced edits", async () => {
+      await seedForm()
+      await enqueue(clientId)
+      await mount(editor(), controllers)
+
+      expect(saveState().dataset.state).toBe("device")
+      expect(saveState().textContent).toBe("Saved on this device")
+    })
+
+    it("makes no claim on open when nothing is waiting to sync", async () => {
+      await seedForm()
+      await mount(editor(), controllers)
+
+      expect(saveState().dataset.state).toBeUndefined()
+      expect(saveState().textContent).toBe("")
     })
   })
 

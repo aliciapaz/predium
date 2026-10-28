@@ -65,6 +65,7 @@ en:
     last_sync: "Last sync"
     session_expired: "Session expired, log in to sync"
     saved_locally: "Saved on this device"
+    saved_on_server: "Saved to the server"
     loading: "Loading..."
     loading_questionnaire: "Loading questionnaire..."
     config_unavailable: "The questionnaire is not available offline yet. Connect once to download it."
