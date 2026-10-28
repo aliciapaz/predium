@@ -45,8 +45,6 @@ es:
     profile_updated: "Perfil actualizado exitosamente."
     name_updated: "Nombre actualizado."
     password_changed: "Contraseña cambiada."
-    email_change_pending: "Te enviamos un enlace a %{email}. Tu correo cambia cuando lo abras."
-    email_unchanged: "Tu correo no cambió."
     form_locked: "Los formularios completados no se pueden editar."
     missing_indicators: "Por favor completa todos los indicadores. Faltan: %{dimensions}"
     user_role_updated: "Rol de usuario actualizado."
@@ -98,13 +96,10 @@ es:
     account_edit: "Cuenta"
 
   account:
-    manage: "Cambiar nombre, correo o contraseña"
+    manage: "Cambiar nombre o contraseña"
     name_heading: "Nombre"
-    email_heading: "Correo electrónico"
     password_heading: "Contraseña"
     save_name: "Guardar nombre"
-    change_email: "Cambiar correo"
-    email_hint: "Escribe tu contraseña actual para cambiar el correo. Te enviaremos un enlace a la dirección nueva."
 
   # ── Etiquetas de Formulario ─────────────────────────────
   labels:

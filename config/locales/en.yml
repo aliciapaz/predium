@@ -45,8 +45,6 @@ en:
     profile_updated: "Profile updated successfully."
     name_updated: "Name updated."
     password_changed: "Password changed."
-    email_change_pending: "We sent a link to %{email}. Your email changes once you open it."
-    email_unchanged: "Your email did not change."
     form_locked: "Completed forms cannot be edited."
     missing_indicators: "Please complete all indicators. Missing: %{dimensions}"
     user_role_updated: "User role updated."
@@ -98,13 +96,10 @@ en:
     account_edit: "Account"
 
   account:
-    manage: "Change name, email or password"
+    manage: "Change name or password"
     name_heading: "Name"
-    email_heading: "Email"
     password_heading: "Password"
     save_name: "Save name"
-    change_email: "Change email"
-    email_hint: "Enter your current password to change your email. We will send a link to the new address."
 
   # ── Form Labels ─────────────────────────────────────────
   labels:

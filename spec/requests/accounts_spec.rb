@@ -76,25 +76,4 @@ RSpec.describe("Account settings", type: :request) do
       expect(page.at("#password_user_password + p.field-error").text).to(eq("Escribe una contraseña."))
     end
   end
-
-  describe "PATCH /account/email" do
-    it "asks the user to confirm the new address before switching to it" do
-      expect do
-        patch(account_email_path, params: { user: { email: "ana.nueva@example.com", current_password: "password123" } })
-      end.to(change { ActionMailer::Base.deliveries.size }.by(1))
-
-      expect(response).to(redirect_to(edit_account_path))
-      expect(user.reload.email).to(eq("ana@example.com"))
-      expect(user.unconfirmed_email).to(eq("ana.nueva@example.com"))
-      expect(ActionMailer::Base.deliveries.last.to).to(eq(["ana.nueva@example.com"]))
-    end
-
-    it "refuses a wrong current password" do
-      patch account_email_path, params: { user: { email: "ana.nueva@example.com", current_password: "wrong" } }
-
-      expect(response).to(have_http_status(:unprocessable_content))
-      expect(page.at("#email_user_current_password + p.field-error").text).to(eq("La contraseña actual no es correcta."))
-      expect(user.reload.unconfirmed_email).to(be_nil)
-    end
-  end
 end

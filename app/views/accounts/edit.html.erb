@@ -1,6 +1,5 @@
 <% content_for(:title, t("titles.account_edit")) %>
 <% name_user = @name_user || current_user %>
-<% email_user = @email_user || current_user %>
 <% password_user = @password_user || current_user %>
 
 <div class="max-w-lg mx-auto">
@@ -21,25 +20,6 @@
           </div>
         </div>
         <%= f.submit t("account.save_name"), class: "btn-secondary sm:self-end" %>
-      <% end %>
-    </section>
-
-    <section class="card">
-      <h2 class="section-title mb-4"><%= t("account.email_heading") %></h2>
-      <%= form_with(model: email_user, url: account_email_path, method: :patch, namespace: "email", class: "flex flex-col gap-5") do |f| %>
-        <% if current_user.pending_reconfirmation? %>
-          <%= alert_box t("devise_views.pending_reconfirmation", email: current_user.unconfirmed_email), tone: :warning %>
-        <% end %>
-        <div>
-          <%= f.label :email %>
-          <%= f.email_field :email, autocomplete: "email", inputmode: "email" %>
-        </div>
-        <div>
-          <%= f.label :current_password %>
-          <%= f.password_field :current_password, autocomplete: "current-password", "aria-describedby": "email_current_password_hint" %>
-          <p class="field-hint" id="email_current_password_hint"><%= t("account.email_hint") %></p>
-        </div>
-        <%= f.submit t("account.change_email"), class: "btn-secondary sm:self-end" %>
       <% end %>
     </section>
 

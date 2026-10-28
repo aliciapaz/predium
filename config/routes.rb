@@ -9,7 +9,6 @@ Rails.application.routes.draw do
 
   resource :profile, only: [:show, :edit, :update]
   resource :account, only: [:edit, :update] do
-    resource :email, only: [:update], module: :accounts
     resource :password, only: [:update], module: :accounts
   end
 
