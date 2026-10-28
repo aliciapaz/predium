@@ -12,6 +12,15 @@ RSpec.describe("Forms", type: :request) do
   end
 
   describe "GET /forms" do
+    it "deletes from the whole page, so the list does not lose the card's frame" do
+      form = create(:form, user: user)
+      get forms_path
+
+      delete_form = page.at("form[data-turbo-confirm]")
+      expect(delete_form["data-turbo-frame"]).to(eq("_top"))
+      expect(delete_form["data-offline-forms-client-id-param"]).to(eq(form.client_id))
+    end
+
     it "names the farm in the delete action and its confirmation" do
       create(:form, user: user, name: "La Esperanza")
       get forms_path
@@ -100,10 +109,12 @@ RSpec.describe("Forms", type: :request) do
       expect(response.body).not_to(include("Generar PDF"))
     end
 
-    it "redirects a draft to the editor" do
+    it "shows a draft's partial results with a way back to the questionnaire" do
       form = create(:form, user: user)
       get form_path(form)
-      expect(response).to(redirect_to(edit_form_path(form)))
+
+      expect(response).to(have_http_status(:ok))
+      expect(page.at("[data-results-target='continue']")["href"]).to(eq(edit_form_path(form)))
     end
 
     it "renders the shell for a form that only exists client-side" do

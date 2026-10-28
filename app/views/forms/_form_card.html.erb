@@ -29,7 +29,9 @@
       <% end %>
 
       <% name = form.name.presence || t("forms.untitled") %>
-      <%= form_with url: form_path(form), method: :delete, data: { turbo_confirm: t("forms.confirm_delete", name: name) } do %>
+      <%= form_with url: form_path(form), method: :delete,
+          data: { turbo_frame: "_top", turbo_confirm: t("forms.confirm_delete", name: name),
+                  action: "turbo:submit-end->offline-forms#forget", offline_forms_client_id_param: form.client_id } do %>
         <%= icon_button :trash, label: t("forms.delete_named", name: name), type: "submit", class: "hover:text-danger" %>
       <% end %>
     </div>

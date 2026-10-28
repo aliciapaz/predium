@@ -12,7 +12,10 @@
       <%= t("forms.back_to_forms") %>
     <% end %>
     <h1 class="page-title break-words" data-form-editor-target="title"><%= client_id.present? ? t("offline.loading") : t("questionnaire.new_questionnaire") %></h1>
-    <p class="text-sm text-muted min-h-5" data-form-editor-target="saveState" aria-live="polite"></p>
+    <div class="flex flex-wrap items-center justify-between gap-x-3">
+      <p class="text-sm text-muted min-h-5" data-form-editor-target="saveState" aria-live="polite"></p>
+      <a class="btn-quiet btn-compact" hidden data-form-editor-target="resultsLink"><%= t("forms.view_partial_results") %></a>
+    </div>
   </header>
 
   <div class="mb-6">

@@ -9,7 +9,7 @@ import { averageBand, badge, band, escape, icon } from "lib/ui"
 // Hydrates the results shell from IndexedDB (KTD-4 amended): scores and
 // charts always compute client-side via lib/scoring.js, online and offline.
 export default class extends Controller {
-  static targets = ["missing", "farmInfo", "radar", "dimensions", "indicators"]
+  static targets = ["missing", "farmInfo", "radar", "dimensions", "indicators", "continue"]
   static values = { clientId: String }
 
   async connect() {
@@ -36,6 +36,7 @@ export default class extends Controller {
     this.scores = calculateScores(this.config, responses, this.form.territory_key)
 
     this.renderFarmInfo()
+    if (this.hasContinueTarget) this.continueTarget.hidden = this.form.state !== "draft"
     this.renderRadar()
     this.renderDimensions()
     this.renderIndicators()

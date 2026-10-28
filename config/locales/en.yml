@@ -194,6 +194,7 @@ en:
     no_completed: "No completed questionnaires yet."
     edit_farm_info: "Edit farm info"
     view_results: "View results"
+    view_partial_results: "View partial results"
     back_to_forms: "Back to my forms"
     create_and_start: "Create & start questionnaire"
     updated_on: "Updated %{date}"

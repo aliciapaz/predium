@@ -20,7 +20,7 @@ export default class extends Controller {
   static targets = [
     "title", "saveState", "progressText", "progressBar", "dimensionNav", "dimensionProgress",
     "indicators", "prevButton", "nextButton", "nextCaption", "completeForm", "completeButton", "completeHint",
-    "completeSlot", "missingButton", "farmInfo", "farmInfoCount"
+    "completeSlot", "missingButton", "farmInfo", "farmInfoCount", "resultsLink"
   ]
   static values = { clientId: String, formsUrl: String }
 
@@ -43,6 +43,11 @@ export default class extends Controller {
     if (this.form.state === "completed") {
       window.Turbo.visit(this.formPath())
       return
+    }
+
+    if (this.hasResultsLinkTarget) {
+      this.resultsLinkTarget.href = this.formPath()
+      this.resultsLinkTarget.hidden = false
     }
 
     this.responses = await getResponses(this.clientId)

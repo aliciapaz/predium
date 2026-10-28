@@ -87,12 +87,14 @@ export async function syncNow() {
   notify("started")
 
   try {
+    let synced = 0
     for (const entry of await queueEntries()) {
       const done = await pushEntry(entry)
       if (!done) break
+      synced++
     }
     localStorage.setItem("predium:last_sync", new Date().toISOString())
-    notify("finished", { pending: await pendingCount() })
+    notify("finished", { synced, pending: await pendingCount() })
   } finally {
     syncing = false
   }
