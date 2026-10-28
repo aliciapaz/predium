@@ -91,7 +91,11 @@ or icon, a field without a label) so the mistake surfaces in development.
 - **`safe-top`**: top padding that clears the notch for edge content outside `app-bar`.
 
 Server-side validation errors mark the control with `aria-invalid="true"`
-(`config/initializers/field_error_proc.rb`), which the `field` primitive styles.
+(`config/initializers/field_error_proc.rb`), which the `field` primitive styles,
+and `PrediumFormBuilder` puts the message in a `field-error` right under the
+control, linked with `aria-describedby`. Write those messages as plain
+instructions per attribute ("Escribe tu correo electrónico.") under
+`activerecord.errors.models.<model>.attributes`.
 
 ## Layer 4: rules
 

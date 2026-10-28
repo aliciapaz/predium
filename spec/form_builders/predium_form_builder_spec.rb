@@ -45,4 +45,29 @@ RSpec.describe(PrediumFormBuilder, type: :helper) do
     expect(html.at("input[type=email]")["aria-invalid"]).to(eq("true"))
     expect(html.at(".field_with_errors")).to(be_nil)
   end
+
+  it "shows the attribute's error under the control and points the control at it" do
+    user.errors.add(:email, :blank)
+
+    html = form { |f| f.email_field(:email) }
+
+    error = html.at("input[type=email] + p.field-error")
+    expect(error.text).to(eq("Escribe tu correo electrónico."))
+    expect(html.at("input[type=email]")["aria-describedby"]).to(eq(error["id"]))
+  end
+
+  it "keeps a description the view already gave the control" do
+    user.errors.add(:email, :blank)
+
+    html = form { |f| f.email_field(:email, "aria-describedby": "email_hint") }
+
+    expect(html.at("input[type=email]")["aria-describedby"]).to(eq("email_hint user_email_error"))
+  end
+
+  it "adds no error text to a valid control" do
+    html = form { |f| f.email_field(:email) }
+
+    expect(html.at(".field-error")).to(be_nil)
+    expect(html.at("input[type=email]")["aria-describedby"]).to(be_nil)
+  end
 end
