@@ -27,7 +27,7 @@
     <turbo-frame id="org_forms_results">
       <% if @forms.any? %>
         <div class="card-flush overflow-x-auto">
-          <table class="data-table">
+          <table class="data-table data-table-stacked">
             <thead>
               <tr>
                 <th scope="col"><%= t("labels.name") %></th>
@@ -40,19 +40,19 @@
             <tbody>
               <% @forms.each do |form| %>
                 <tr>
-                  <td><%= form.user.first_name %> <%= form.user.last_name %></td>
-                  <td>
+                  <td data-label="<%= t("labels.name") %>"><%= form.user.first_name %> <%= form.user.last_name %></td>
+                  <td data-label="<%= t("labels.farm_name") %>">
                     <% if allowed_to?(:show?, form) %>
                       <%= link_to form.name, form_path(form), class: "link" %>
                     <% else %>
                       <%= form.name %>
                     <% end %>
                   </td>
-                  <td>
+                  <td data-label="<%= t("labels.status") %>">
                     <%= badge(t("states.#{form.state}"), tone: form.state == "completed" ? :success : :warning) %>
                   </td>
-                  <td><%= [form.locality, form.region].compact_blank.join(", ").presence || "-" %></td>
-                  <td class="text-muted"><%= form_date(form) %></td>
+                  <td data-label="<%= t("labels.location") %>"><%= [form.locality, form.region].compact_blank.join(", ").presence || "-" %></td>
+                  <td data-label="<%= t("labels.date") %>" class="text-muted"><%= form_date(form) %></td>
                 </tr>
               <% end %>
             </tbody>

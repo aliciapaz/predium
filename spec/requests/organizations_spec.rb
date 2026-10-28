@@ -80,6 +80,16 @@ RSpec.describe("Organizations", type: :request) do
 
       expect(page.at("table tbody a")["href"]).to(eq(form_path(form)))
     end
+
+    it "labels every cell so rows stack on phones" do
+      create(:form, user: member, name: "La Esperanza")
+      sign_in org_admin
+      get organization_forms_path(organization)
+
+      expect(page.at("table")["class"]).to(include("data-table-stacked"))
+      labels = page.css("table tbody tr:first-child td").map { |cell| cell["data-label"] }
+      expect(labels).to(eq(["Nombre", "Nombre del predio", "Estado", "Ubicación", "Fecha"]))
+    end
   end
 
   describe "GET /organizations/:id/memberships" do
@@ -115,6 +125,15 @@ RSpec.describe("Organizations", type: :request) do
       get organization_memberships_path(organization)
 
       expect(page.at("table tbody").text).to(include("22 oct 2026"))
+    end
+
+    it "labels every data cell so rows stack on phones" do
+      sign_in org_admin
+      get organization_memberships_path(organization)
+
+      expect(page.at("table")["class"]).to(include("data-table-stacked"))
+      labels = page.css("table tbody tr:first-child td").map { |cell| cell["data-label"] }
+      expect(labels).to(eq(["Nombre", "Correo electrónico", "Rol", "Ingreso", nil]))
     end
   end
 

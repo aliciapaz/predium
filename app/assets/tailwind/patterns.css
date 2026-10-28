@@ -359,7 +359,8 @@
 }
 
 /* Tabular data. Wrap in `card-flush overflow-x-auto` so wide tables scroll
-   sideways on phones instead of squeezing columns. */
+   sideways on phones instead of squeezing columns, or add
+   `data-table-stacked` to stack the rows instead. */
 @utility data-table {
   width: 100%;
   font-size: 0.9375rem;
@@ -394,6 +395,65 @@
   @media (hover: hover) {
     & tbody tr:hover td {
       background-color: var(--color-canvas);
+    }
+  }
+}
+
+/* Add to a data-table whose last columns matter on phones (status, actions).
+   Below sm each row stacks as a block and every cell shows its data-label,
+   so nothing hides off the right edge. A cell without a label holds
+   controls and collapses when it has none. */
+@utility data-table-stacked {
+  @media (width < 40rem) {
+    & thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+
+    & tbody,
+    & tr {
+      display: block;
+    }
+
+    & tbody tr {
+      display: grid;
+      gap: 0.5rem;
+      padding: 1rem;
+      border-bottom: 1px solid var(--color-line-soft);
+    }
+
+    & tbody tr:last-child {
+      border-bottom: 0;
+    }
+
+    & tbody td {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0;
+      text-align: right;
+      white-space: normal;
+      border-bottom: 0;
+    }
+
+    & td[data-label]::before {
+      content: attr(data-label);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--color-muted);
+      text-align: left;
+    }
+
+    & td:not([data-label]) {
+      justify-content: flex-end;
+    }
+
+    & td:not([data-label]):not(:has(*)) {
+      display: none;
     }
   }
 }
