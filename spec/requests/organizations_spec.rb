@@ -44,6 +44,37 @@ RSpec.describe("Organizations", type: :request) do
     end
   end
 
+  describe "GET /organizations/:id" do
+    it "takes an org admin to the organization's forms" do
+      sign_in org_admin
+      get organization_path(organization)
+
+      expect(response).to(redirect_to(organization_forms_path(organization)))
+    end
+
+    it "takes a super admin to the organization's forms" do
+      sign_in create(:user, :super_admin)
+      get organization_path(organization)
+
+      expect(response).to(redirect_to(organization_forms_path(organization)))
+    end
+
+    it "takes a regular member to the member list" do
+      sign_in member
+      get organization_path(organization)
+
+      expect(response).to(redirect_to(organization_memberships_path(organization)))
+    end
+
+    it "turns away someone outside the organization" do
+      sign_in create(:user)
+      get organization_path(organization)
+
+      expect(response).to(redirect_to(root_path))
+      expect(flash[:alert]).to(eq(I18n.t("flash.unauthorized")))
+    end
+  end
+
   describe "GET /organizations/:id/forms" do
     it "shows the forms and members tabs with forms current" do
       sign_in org_admin
