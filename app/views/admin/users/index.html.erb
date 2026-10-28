@@ -33,7 +33,14 @@
                 <%= link_to "#{user.first_name} #{user.last_name}", admin_user_path(user), class: "link" %>
               </td>
               <td><%= user.email %></td>
-              <td><%= role_badge(user.platform_role) %></td>
+              <td>
+                <div class="flex flex-wrap gap-2">
+                  <%= role_badge(user.platform_role) %>
+                  <% user.memberships.each do |membership| %>
+                    <%= role_badge(membership.role, organization: membership.organization) %>
+                  <% end %>
+                </div>
+              </td>
               <td><%= user.organizations.size %></td>
               <td><%= user.forms.size %></td>
               <td><%= format_admin_date(user.created_at) %></td>

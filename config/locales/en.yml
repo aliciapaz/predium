@@ -132,6 +132,7 @@ en:
 
   # ── Role Names ──────────────────────────────────────────
   roles:
+    regular: "Standard user"
     super_admin: "Super Admin"
     admin: "Admin"
     member: "Member"
@@ -296,6 +297,7 @@ en:
     professional_role: "Professional role"
     edit_role: "Edit role"
     edit_user_role: "Edit user role"
+    role_in_organization: "%{role} at %{organization}"
     platform_role: "Platform role"
     role_warning: "Super Admin grants full access to the admin panel, all organizations, and all user data. Assign with caution."
     update_role: "Update role"
