@@ -23,6 +23,7 @@ Rails.application.routes.draw do
     root "dashboard#show"
     resources :organizations
     resources :users, only: [:index, :show, :edit, :update]
+    resources :forms, only: [:show]
   end
 
   namespace :api, defaults: { format: :json } do

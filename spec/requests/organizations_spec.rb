@@ -62,6 +62,24 @@ RSpec.describe("Organizations", type: :request) do
 
       expect(page.at("table tbody").text).to(include("Actualizado 22 oct 2026"))
     end
+
+    it "links a form name only for viewers who may open it" do
+      create(:form, user: org_admin, name: "Mi Finca")
+      create(:form, user: member, name: "La Esperanza")
+      sign_in member
+      get organization_forms_path(organization)
+
+      expect(page.css("table tbody a").map { |link| link.text.strip }).to(eq(["La Esperanza"]))
+      expect(page.at("table tbody").text).to(include("Mi Finca"))
+    end
+
+    it "links every member's form for an org admin" do
+      form = create(:form, user: member, name: "La Esperanza")
+      sign_in org_admin
+      get organization_forms_path(organization)
+
+      expect(page.at("table tbody a")["href"]).to(eq(form_path(form)))
+    end
   end
 
   describe "GET /organizations/:id/memberships" do

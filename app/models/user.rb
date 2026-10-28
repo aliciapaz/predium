@@ -25,4 +25,9 @@ class User < ApplicationRecord
   def administered_organization
     organizations.merge(Membership.admin).first
   end
+
+  # An organization this user runs as an admin that the given user belongs to.
+  def administered_organization_of(member_id)
+    organizations.merge(Membership.admin).find_by(id: Membership.where(user_id: member_id).select(:organization_id))
+  end
 end

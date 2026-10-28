@@ -2,7 +2,7 @@
 
 class FormPolicy < ApplicationPolicy
   def show?
-    owner? || super_admin?
+    owner? || super_admin? || owner_supervisor?
   end
 
   def create?
@@ -15,5 +15,11 @@ class FormPolicy < ApplicationPolicy
 
   def destroy?
     owner? || super_admin?
+  end
+
+  private
+
+  def owner_supervisor?
+    user.administered_organization_of(record.user_id).present?
   end
 end
