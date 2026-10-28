@@ -35,6 +35,16 @@ describe("radar chart controller", () => {
     expect(options.options.scales.r).toMatchObject({ min: 0, max: 10 })
   })
 
+  it("wraps a long label onto lines without cutting any of it", async () => {
+    const label = "Bases culturales y conocimiento tradicional en el manejo del sistema"
+    await mount(fixture.replace('["Soil","Water"]', JSON.stringify([label, "Water"])), { "radar-chart": RadarChartController })
+
+    const [, options] = Chart.mock.calls[0]
+    const lines = options.data.labels[0]
+    expect(lines.length).toBeGreaterThan(1)
+    expect(lines.join(" ")).toBe(label)
+  })
+
   it("destroys the chart when disconnected", async () => {
     await mount(fixture, { "radar-chart": RadarChartController })
     const chart = Chart.mock.instances[0]

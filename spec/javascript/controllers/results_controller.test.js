@@ -258,11 +258,52 @@ describe("results controller", () => {
         .toEqual(["Structure"])
     })
 
+    it("headlines the overall principle score with the highest and lowest principle", async () => {
+      await saveResponse(clientId, "recycling", 3)
+
+      await mount(fixture, { results: ResultsController })
+
+      const overall = target("farmInfo").querySelector("[data-overall]")
+      const chip = overall.querySelector(".score-chip")
+      expect(chip.textContent).toBe("4.5")
+      expect(chip.dataset.band).toBe("mid")
+      expect(overall.textContent).toContain("Overall score")
+      expect(overall.textContent).toContain("Average of 2 principles.")
+      expect(overall.textContent).toContain("Highest: Diversity.")
+      expect(overall.textContent).toContain("Lowest: Reuse.")
+    })
+
+    it("averages only the scored principles of a draft", async () => {
+      await mount(fixture, { results: ResultsController })
+
+      const overall = target("farmInfo").querySelector("[data-overall]")
+      expect(overall.querySelector(".score-chip").textContent).toBe("6.0")
+      expect(overall.textContent).toContain("Average of 1 principle.")
+      expect(overall.textContent).not.toContain("Highest")
+    })
+
+    it("leaves the headline out when no principle is scored", async () => {
+      await applyServerForm(serverForm({ responses: [] }))
+
+      await mount(fixture, { results: ResultsController })
+
+      expect(target("farmInfo").querySelector("[data-overall]")).toBeNull()
+    })
+
+    it("shows each dimension's score on its indicator group", async () => {
+      await mount(fixture, { results: ResultsController })
+
+      const summaries = Array.from(target("indicators").querySelectorAll("summary"))
+      const chips = summaries.map((summary) => summary.querySelector(".score-chip"))
+      expect(chips.map((chip) => chip.textContent)).toEqual(["3.0", "9.0", "-"])
+      expect(chips.map((chip) => chip.dataset.band)).toEqual(["low", "high", undefined])
+    })
+
     it("mounts the radar chart with translated principle labels and principle scores", async () => {
       await mount(fixture, { results: ResultsController })
 
       const radar = target("radar").querySelector('[data-controller="radar-chart"]')
-      expect(JSON.parse(radar.dataset.radarChartLabelsValue)).toEqual(["Diversity", "Recycling"])
+      expect(JSON.parse(radar.dataset.radarChartLabelsValue)).toEqual(["Diversity", "Reuse"])
       expect(JSON.parse(radar.dataset.radarChartScoresValue)).toEqual([6, 0])
       expect(radar.querySelector('canvas[data-radar-chart-target="canvas"]')).not.toBeNull()
     })

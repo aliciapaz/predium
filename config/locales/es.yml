@@ -272,6 +272,12 @@ es:
     people: "personas"
     system_types: "Tipos de sistema"
     completed_on: "Completado el %{date}"
+    overall_score: "Puntaje general"
+    overall_hint:
+      one: "Promedio de %{count} principio."
+      other: "Promedio de %{count} principios."
+    highest: "Más alto: %{name}."
+    lowest: "Más bajo: %{name}."
 
   # ── Admin ──────────────────────────────────────────────
   admin:
