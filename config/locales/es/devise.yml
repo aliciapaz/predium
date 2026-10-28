@@ -65,6 +65,13 @@ es:
       models:
         user:
           attributes:
+            first_name:
+              blank: "Escribe tu nombre."
+            last_name:
+              blank: "Escribe tu apellido."
+            current_password:
+              blank: "Escribe tu contraseña actual."
+              invalid: "La contraseña actual no es correcta."
             email:
               blank: "Escribe tu correo electrónico."
               invalid: "Escribe un correo válido, como nombre@ejemplo.com."

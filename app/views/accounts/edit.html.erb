@@ -1,0 +1,66 @@
+<% content_for(:title, t("titles.account_edit")) %>
+<% name_user = @name_user || current_user %>
+<% email_user = @email_user || current_user %>
+<% password_user = @password_user || current_user %>
+
+<div class="max-w-lg mx-auto">
+  <%= page_header(t("titles.account_edit"), back: [t("titles.profile_show"), profile_path]) %>
+
+  <div class="flex flex-col gap-6">
+    <section class="card">
+      <h2 class="section-title mb-4"><%= t("account.name_heading") %></h2>
+      <%= form_with(model: name_user, url: account_path, method: :patch, namespace: "name", class: "flex flex-col gap-5") do |f| %>
+        <div class="grid gap-5 sm:grid-cols-2">
+          <div>
+            <%= f.label :first_name %>
+            <%= f.text_field :first_name, autocomplete: "given-name" %>
+          </div>
+          <div>
+            <%= f.label :last_name %>
+            <%= f.text_field :last_name, autocomplete: "family-name" %>
+          </div>
+        </div>
+        <%= f.submit t("account.save_name"), class: "btn-secondary sm:self-end" %>
+      <% end %>
+    </section>
+
+    <section class="card">
+      <h2 class="section-title mb-4"><%= t("account.email_heading") %></h2>
+      <%= form_with(model: email_user, url: account_email_path, method: :patch, namespace: "email", class: "flex flex-col gap-5") do |f| %>
+        <% if current_user.pending_reconfirmation? %>
+          <%= alert_box t("devise_views.pending_reconfirmation", email: current_user.unconfirmed_email), tone: :warning %>
+        <% end %>
+        <div>
+          <%= f.label :email %>
+          <%= f.email_field :email, autocomplete: "email", inputmode: "email" %>
+        </div>
+        <div>
+          <%= f.label :current_password %>
+          <%= f.password_field :current_password, autocomplete: "current-password", "aria-describedby": "email_current_password_hint" %>
+          <p class="field-hint" id="email_current_password_hint"><%= t("account.email_hint") %></p>
+        </div>
+        <%= f.submit t("account.change_email"), class: "btn-secondary sm:self-end" %>
+      <% end %>
+    </section>
+
+    <section class="card">
+      <h2 class="section-title mb-4"><%= t("account.password_heading") %></h2>
+      <%= form_with(model: password_user, url: account_password_path, method: :patch, namespace: "password", class: "flex flex-col gap-5") do |f| %>
+        <div>
+          <%= f.label :current_password %>
+          <%= f.password_field :current_password, autocomplete: "current-password" %>
+        </div>
+        <div>
+          <%= f.label :password, t("devise_views.new_password") %>
+          <%= f.password_field :password, autocomplete: "new-password", "aria-describedby": "password_length_hint" %>
+          <p class="field-hint" id="password_length_hint"><%= t("devise_views.characters_minimum", count: User.password_length.min) %></p>
+        </div>
+        <div>
+          <%= f.label :password_confirmation, t("devise_views.confirm_new_password") %>
+          <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
+        </div>
+        <%= f.submit t("devise_views.change_password_button"), class: "btn-secondary sm:self-end" %>
+      <% end %>
+    </section>
+  </div>
+</div>
