@@ -2,6 +2,7 @@ import {
   getForm, listForms, snapshotForm, rebaseForm, queueEntries, dequeue, markAttempt,
   applyServerForm, acknowledgePush, deleteLocalForm, pendingCount, queueChanged
 } from "lib/db"
+import { claimDevice } from "lib/device_owner"
 
 // Page-context sync per KTD-6: Background Sync is progressive enhancement
 // (registered in lib/pwa.js); the primary triggers are the online event, app
@@ -27,11 +28,16 @@ function notify(status, detail = {}) {
   document.dispatchEvent(new CustomEvent("predium:sync-status", { detail: { status, ...detail } }))
 }
 
+// The service worker otherwise answers a failed /api/ GET from its cache, and
+// an old copy applied here would roll back a clean local form.
+const SERVER_PULL_HEADERS = { Accept: "application/json", "X-Predium-Network-Only": "1" }
+
 export async function seedFromServer() {
   if (!signedIn() || !navigator.onLine) return
 
   try {
-    const response = await fetch("/api/forms", { headers: { Accept: "application/json" } })
+    await claimDevice()
+    const response = await fetch("/api/forms", { headers: SERVER_PULL_HEADERS })
     if (!response.ok) return
     const payload = await response.json()
     const pending = new Set((await queueEntries()).map((entry) => entry.form_client_id))
@@ -64,7 +70,8 @@ export async function hydrateForm(clientId, { signal } = {}) {
   if (!signedIn() || !navigator.onLine) return false
 
   try {
-    const response = await fetch(`/api/forms/${clientId}`, { headers: { Accept: "application/json" }, signal })
+    await claimDevice()
+    const response = await fetch(`/api/forms/${clientId}`, { headers: SERVER_PULL_HEADERS, signal })
     if (!response.ok) return false
     const serverForm = (await response.json()).form
     if (!serverForm) return false
@@ -87,6 +94,8 @@ export async function syncNow() {
   notify("started")
 
   try {
+    // A Turbo sign-in as someone else must not push the previous user's queue.
+    await claimDevice()
     for (const entry of await queueEntries()) {
       const done = await pushEntry(entry)
       if (!done) break

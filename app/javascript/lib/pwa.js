@@ -1,5 +1,6 @@
-import { db } from "lib/db"
 import { refresh as refreshConfig } from "lib/config_cache"
+import { claimDevice, releaseDevice } from "lib/device_owner"
+import { requestPersistentStorage } from "lib/persistence"
 import { seedFromServer, syncNow } from "lib/sync"
 
 function signedIn() {
@@ -7,17 +8,22 @@ function signedIn() {
 }
 
 // On a shared browser the offline stores outlive the session, so a signed-out
-// page must wipe the previous user's forms and cached authenticated responses
-// before anyone else signs in.
-async function purgeOfflineData() {
-  // Devise signs in through Turbo, so this same db instance serves the next
-  // session; Dexie 4 otherwise leaves it closed after delete().
-  try { await db.delete({ disableAutoOpen: false }) } catch { /* nothing cached yet */ }
+// page must hide the previous user's forms and cached authenticated responses
+// before anyone else signs in. Unsynced work is set aside, not deleted.
+async function endSession() {
+  try { await releaseDevice() } catch { /* IndexedDB unavailable */ }
   if (!("caches" in window)) return
   try {
     const keys = await caches.keys()
     await Promise.all(keys.map((key) => caches.delete(key)))
   } catch { /* Cache API unavailable */ }
+}
+
+// Devise signs in and out through Turbo, which fires turbo:load but not load.
+async function reconcileSession() {
+  if (!signedIn()) return endSession()
+  try { await claimDevice() } catch { /* IndexedDB unavailable */ }
+  requestPersistentStorage()
 }
 
 async function registerServiceWorker() {
@@ -41,12 +47,12 @@ function warmShells() {
   fetch("/forms/shell").catch(() => {})
 }
 
+document.addEventListener("turbo:load", () => reconcileSession())
+
 window.addEventListener("load", async () => {
   await registerServiceWorker().catch(() => {})
-  if (!signedIn()) {
-    await purgeOfflineData()
-    return
-  }
+  await reconcileSession()
+  if (!signedIn()) return
   warmShells()
   if (navigator.onLine) {
     await refreshConfig()

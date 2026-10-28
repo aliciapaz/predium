@@ -20,7 +20,8 @@
       <div class="hidden md:flex items-center gap-3">
         <%= render "shared/locale_switch" %>
         <span class="text-sm font-semibold text-ink-soft"><%= current_user.first_name %></span>
-        <%= button_to t("nav.sign_out"), destroy_user_session_path, method: :delete, class: "btn-quiet" %>
+        <%= button_to t("nav.sign_out"), destroy_user_session_path, method: :delete, class: "btn-quiet",
+            form: { data: { controller: "sign-out", action: "submit->sign-out#confirm", sign_out_message_value: t("nav.sign_out_pending") } } %>
       </div>
 
       <%= icon_button :menu, label: t("nav.menu"), class: "md:hidden",
@@ -40,7 +41,8 @@
 
       <div class="mt-2 pt-3 border-t border-line-soft flex items-center justify-between gap-3">
         <%= render "shared/locale_switch" %>
-        <%= button_to t("nav.sign_out"), destroy_user_session_path, method: :delete, class: "btn-secondary" %>
+        <%= button_to t("nav.sign_out"), destroy_user_session_path, method: :delete, class: "btn-secondary",
+            form: { data: { controller: "sign-out", action: "submit->sign-out#confirm", sign_out_message_value: t("nav.sign_out_pending") } } %>
       </div>
     </div>
   </div>
