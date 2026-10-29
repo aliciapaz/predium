@@ -258,32 +258,40 @@ describe("results controller", () => {
         .toEqual(["Structure"])
     })
 
-    it("headlines the overall principle score with the highest and lowest principle", async () => {
-      await saveResponse(clientId, "recycling", 3)
-
+    it("headlines the average of the scored dimensions with the highest and lowest one", async () => {
       await mount(fixture, { results: ResultsController })
 
       const overall = target("farmInfo").querySelector("[data-overall]")
       const chip = overall.querySelector(".score-chip")
-      expect(chip.textContent).toBe("4.5")
+      expect(chip.textContent).toBe("6.0")
       expect(chip.dataset.band).toBe("mid")
       expect(overall.textContent).toContain("Overall score")
-      expect(overall.textContent).toContain("Average of 2 principles.")
-      expect(overall.textContent).toContain("Highest: Diversity.")
-      expect(overall.textContent).toContain("Lowest: Reuse.")
+      expect(overall.textContent).toContain("Average of 2 dimensions.")
+      expect(overall.textContent).toContain("Highest: Fertility.")
+      expect(overall.textContent).toContain("Lowest: Structure.")
     })
 
-    it("averages only the scored principles of a draft", async () => {
+    it("leaves the principle answers out of the headline", async () => {
+      await saveResponse(clientId, "recycling", 1)
+
+      await mount(fixture, { results: ResultsController })
+
+      expect(target("farmInfo").querySelector("[data-overall] .score-chip").textContent).toBe("6.0")
+    })
+
+    it("averages only the dimensions a draft has scored so far", async () => {
+      await applyServerForm(serverForm({ responses: [{ indicator_key: "compaction", value: 5, is_extension: true }] }))
+
       await mount(fixture, { results: ResultsController })
 
       const overall = target("farmInfo").querySelector("[data-overall]")
-      expect(overall.querySelector(".score-chip").textContent).toBe("6.0")
-      expect(overall.textContent).toContain("Average of 1 principle.")
+      expect(overall.querySelector(".score-chip").textContent).toBe("5.0")
+      expect(overall.textContent).toContain("Average of 1 dimension.")
       expect(overall.textContent).not.toContain("Highest")
     })
 
-    it("leaves the headline out when no principle is scored", async () => {
-      await applyServerForm(serverForm({ responses: [] }))
+    it("leaves the headline out until an indicator is scored", async () => {
+      await applyServerForm(serverForm({ responses: [{ indicator_key: "diversity", value: 6, is_extension: false }] }))
 
       await mount(fixture, { results: ResultsController })
 

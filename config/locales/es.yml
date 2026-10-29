@@ -269,8 +269,8 @@ es:
     completed_on: "Completado el %{date}"
     overall_score: "Puntaje general"
     overall_hint:
-      one: "Promedio de %{count} principio."
-      other: "Promedio de %{count} principios."
+      one: "Promedio de %{count} dimensión."
+      other: "Promedio de %{count} dimensiones."
     highest: "Más alto: %{name}."
     lowest: "Más bajo: %{name}."
 

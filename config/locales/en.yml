@@ -269,8 +269,8 @@ en:
     completed_on: "Completed %{date}"
     overall_score: "Overall score"
     overall_hint:
-      one: "Average of %{count} principle."
-      other: "Average of %{count} principles."
+      one: "Average of %{count} dimension."
+      other: "Average of %{count} dimensions."
     highest: "Highest: %{name}."
     lowest: "Lowest: %{name}."
 
