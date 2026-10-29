@@ -26,6 +26,11 @@ export default class extends Controller {
 
   async connect() {
     this.clientId = this.clientIdValue || newClientId()
+    // Registered before the first await so a disconnect during loading
+    // always finds them to remove.
+    this.refreshSaveState = this.refreshSaveState.bind(this)
+    document.addEventListener("predium:sync-status", this.refreshSaveState)
+    document.addEventListener("predium:queue-changed", this.refreshSaveState)
     if (!this.clientIdValue) {
       history.replaceState(null, "", this.formPath("/edit"))
     }
@@ -65,9 +70,6 @@ export default class extends Controller {
     this.element.addEventListener("change", (event) => this.handleChange(event))
     this.element.addEventListener("input", (event) => this.handleInput(event))
     this.completeFormTarget.addEventListener("submit", (event) => this.handleComplete(event))
-    this.refreshSaveState = this.refreshSaveState.bind(this)
-    document.addEventListener("predium:sync-status", this.refreshSaveState)
-    document.addEventListener("predium:queue-changed", this.refreshSaveState)
 
     this.render()
     await this.refreshSaveState()

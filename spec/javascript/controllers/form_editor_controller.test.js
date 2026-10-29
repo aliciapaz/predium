@@ -490,6 +490,25 @@ describe("form editor controller", () => {
       syncFinished()
     }
 
+    it("stops listening when the editor is left while it is still loading", async () => {
+      let finish
+      hydrateForm.mockImplementation(() => new Promise((resolve) => { finish = resolve }))
+      const mounting = mount(editor(), controllers)
+      await vi.waitFor(() => expect(hydrateForm).toHaveBeenCalled())
+      const left = saveState()
+
+      document.body.innerHTML = ""
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      await seedForm()
+      finish(true)
+      await mounting
+      await new Promise((resolve) => setTimeout(resolve, 20))
+      await enqueue(clientId)
+      await new Promise((resolve) => setTimeout(resolve, 20))
+
+      expect(left.dataset.state).toBeUndefined()
+    })
+
     it("says the server has the answer once a sync clears this form's queue entry", async () => {
       await seedForm()
       await mount(editor(), controllers)
