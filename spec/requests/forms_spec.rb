@@ -173,6 +173,14 @@ RSpec.describe("Forms", type: :request) do
         end
       end
 
+      it "embeds the form for a super admin who is not in the organization" do
+        user.update!(platform_role: :super_admin)
+        get form_path(form)
+
+        expect(response).to(have_http_status(:ok))
+        expect(embedded_form).to(include("client_id" => form.client_id, "name" => "Los Andes"))
+      end
+
       it "denies an admin of a different organization" do
         create(:membership, :admin, user: user, organization: create(:organization))
         get form_path(form)
