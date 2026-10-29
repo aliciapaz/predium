@@ -412,4 +412,16 @@ describe("sync finished event", () => {
 
     expect(events.at(-1)).toMatchObject({ status: "finished", synced: 1, pending: 0 })
   })
+
+  // The forms list reloads when synced > 0, and a reload re-runs the sync, so a
+  // rejected entry counted here would reload the list forever.
+  it("does not count a rejected form that stays queued", async () => {
+    await queueLocalForm()
+    stubFetch(async () => jsonResponse({}, 422))
+    const events = recordEvents("predium:sync-status")
+
+    await syncNow()
+
+    expect(events.at(-1)).toMatchObject({ status: "finished", synced: 0, pending: 1 })
+  })
 })
