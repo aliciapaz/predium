@@ -1,8 +1,8 @@
 import {
-  getForm, listForms, snapshotForm, rebaseForm, queueEntries, dequeue, markAttempt,
+  getForm, listForms, rebaseForm, queueEntries, dequeue, markAttempt,
   applyServerForm, acknowledgePush, deleteLocalForm, pendingCount, queueChanged
 } from "lib/db"
-import { claimDevice } from "lib/device_owner"
+import { claimDevice, OWNER_CHANGED, snapshotOwnedForm } from "lib/device_owner"
 
 // Page-context sync per KTD-6: Background Sync is progressive enhancement
 // (registered in lib/pwa.js); the primary triggers are the online event, app
@@ -108,7 +108,8 @@ export async function syncNow() {
 }
 
 async function pushEntry(entry, force = false) {
-  const snapshot = await snapshotForm(entry.form_client_id)
+  const snapshot = await snapshotOwnedForm(entry.form_client_id)
+  if (snapshot === OWNER_CHANGED) return false
   if (!snapshot) {
     await dequeue(entry.id)
     return true

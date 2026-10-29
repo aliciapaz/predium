@@ -1,7 +1,7 @@
 import { refresh as refreshConfig } from "lib/config_cache"
 import { claimDevice, releaseDevice } from "lib/device_owner"
 import { requestPersistentStorage } from "lib/persistence"
-import { seedFromServer, syncNow } from "lib/sync"
+import { resumeAfterLogin, seedFromServer, syncNow } from "lib/sync"
 
 function signedIn() {
   return Boolean(document.querySelector('meta[name="predium-signed-in"]'))
@@ -47,7 +47,14 @@ function warmShells() {
   fetch("/forms/shell").catch(() => {})
 }
 
-document.addEventListener("turbo:load", () => reconcileSession())
+// A Turbo sign-in keeps this page's JS, including the pause from the 401
+// that sent the user to sign in, and restored work has nothing else to push it.
+document.addEventListener("turbo:load", async () => {
+  await reconcileSession()
+  if (!signedIn()) return
+  resumeAfterLogin()
+  syncNow()
+})
 
 window.addEventListener("load", async () => {
   await registerServiceWorker().catch(() => {})

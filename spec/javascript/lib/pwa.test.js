@@ -163,3 +163,20 @@ describe("persistent storage", () => {
     expect(storage.persist).not.toHaveBeenCalled()
   })
 })
+
+describe("signing back in through Turbo after the session expired", () => {
+  it("resumes sync and pushes the restored answers", async () => {
+    signInAs("1")
+    await visit()
+    await fillOffline("offline-form")
+    stubFetch(async () => jsonResponse({}, 401))
+    await syncNow()
+
+    await signedOutPage("turbo:load")
+    const fetch = stubFetch(async () => jsonResponse({ form: { client_id: "offline-form", updated_at: "2026-10-29T00:00:00.000Z", responses: [] } }))
+    signInAs("1")
+    await visit()
+
+    expect(fetch.mock.calls.some(([url, options]) => url === "/api/forms/offline-form" && options?.method === "PUT")).toBe(true)
+  })
+})
