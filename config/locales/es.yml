@@ -65,6 +65,7 @@ es:
     loading_questionnaire: "Cargando cuestionario..."
     config_unavailable: "El cuestionario aún no está disponible sin conexión. Conéctate una vez para descargarlo."
     results_unavailable: "Este formulario no está guardado en este dispositivo. Conéctate una vez para descargar tus formularios."
+    results_load_failed: "No se pudo cargar este formulario desde el servidor. Inténtalo de nuevo en un momento."
     complete_requires_sync: "Completar un formulario requiere conexión para respaldar los resultados primero."
     complete_missing_indicators: "Califica todos los indicadores para completar el cuestionario."
     extension_badge: "Extensión territorial"

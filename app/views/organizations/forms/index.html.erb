@@ -42,7 +42,11 @@
                 <tr>
                   <td><%= form.user.first_name %> <%= form.user.last_name %></td>
                   <td>
-                    <%= link_to form.name, form_path(form), class: "link" %>
+                    <% if allowed_to?(:show?, form) %>
+                      <%= link_to form.name, form_path(form), class: "link" %>
+                    <% else %>
+                      <%= form.name %>
+                    <% end %>
                   </td>
                   <td>
                     <%= badge(t("states.#{form.state}"), tone: form.state == "completed" ? :success : :warning) %>

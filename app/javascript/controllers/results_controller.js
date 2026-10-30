@@ -6,33 +6,26 @@ import { calculateScores } from "lib/scoring"
 import { hydrateForm } from "lib/sync"
 import { averageBand, badge, band, escape, icon } from "lib/ui"
 
-// Hydrates the results shell from IndexedDB (KTD-4 amended): scores and
-// charts always compute client-side via lib/scoring.js, online and offline.
+// Hydrates the results shell from IndexedDB (KTD-4 amended), or from the form
+// the server embedded when the viewer does not own it. Scores and charts
+// always compute client-side via lib/scoring.js, online and offline.
 export default class extends Controller {
-  static targets = ["missing", "farmInfo", "radar", "dimensions", "indicators", "continue"]
-  static values = { clientId: String }
+  static targets = ["missing", "loadFailed", "farmInfo", "radar", "dimensions", "indicators", "continue"]
+  static values = { clientId: String, form: Object }
 
   async connect() {
     this.config = await cachedConfig()
     await loadTranslations()
-    this.form = await getForm(this.clientIdValue)
-
-    // getForm is a bare cache read; unlike cachedConfig it does not self-heal.
-    // A form completed on another device (or after a cache purge) lives in the
-    // DB but is not in IndexedDB here, and Turbo navigation never fires the
-    // window-load seed. Fetch just this form before giving up.
-    if (!this.form && navigator.onLine) {
-      await hydrateForm(this.clientIdValue)
-      this.form = await getForm(this.clientIdValue)
-    }
+    this.form = this.hasFormValue ? this.formValue : await this.localForm()
 
     if (!this.config || !this.form) {
-      this.missingTarget.classList.remove("hidden")
+      const target = navigator.onLine ? this.loadFailedTarget : this.missingTarget
+      target.classList.remove("hidden")
       this.farmInfoTarget.innerHTML = ""
       return
     }
 
-    const responses = await getResponses(this.clientIdValue)
+    const responses = this.hasFormValue ? this.embeddedResponses() : await getResponses(this.clientIdValue)
     this.scores = calculateScores(this.config, responses, this.form.territory_key)
 
     this.renderFarmInfo()
@@ -40,6 +33,22 @@ export default class extends Controller {
     this.renderRadar()
     this.renderDimensions()
     this.renderIndicators()
+  }
+
+  // getForm is a bare cache read; unlike cachedConfig it does not self-heal.
+  // A form completed on another device (or after a cache purge) lives in the
+  // DB but is not in IndexedDB here, and Turbo navigation never fires the
+  // window-load seed. Fetch just this form before giving up.
+  async localForm() {
+    const form = await getForm(this.clientIdValue)
+    if (form || !navigator.onLine) return form
+
+    await hydrateForm(this.clientIdValue)
+    return getForm(this.clientIdValue)
+  }
+
+  embeddedResponses() {
+    return Object.fromEntries((this.formValue.responses || []).map((response) => [response.indicator_key, response.value]))
   }
 
   renderFarmInfo() {

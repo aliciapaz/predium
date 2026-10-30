@@ -25,4 +25,10 @@ class User < ApplicationRecord
   def administered_organization
     organizations.merge(Membership.admin).first
   end
+
+  # Joining an organization must not hand its admins the member's earlier work.
+  def administered_organization_for(form)
+    joined_before = Membership.where(user_id: form.user_id, created_at: ..form.created_at)
+    organizations.merge(Membership.admin).find_by(id: joined_before.select(:organization_id))
+  end
 end

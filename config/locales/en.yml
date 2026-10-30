@@ -65,6 +65,7 @@ en:
     loading_questionnaire: "Loading questionnaire..."
     config_unavailable: "The questionnaire is not available offline yet. Connect once to download it."
     results_unavailable: "This form is not stored on this device. Connect once to download your forms."
+    results_load_failed: "This form could not be loaded from the server. Try again in a moment."
     complete_requires_sync: "Completing a form needs a connection so results are backed up first."
     complete_missing_indicators: "Score all indicators to complete the questionnaire."
     extension_badge: "Territory extension"
