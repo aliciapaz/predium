@@ -171,6 +171,22 @@ RSpec.describe("Forms", type: :request) do
 
           expect(page.at("a.back-link")["href"]).to(eq(organization_forms_path(organization)))
         end
+
+        it "denies a form the member made before joining the organization" do
+          earlier = create(:form, :completed, user: member, created_at: 1.day.ago)
+          get form_path(earlier)
+
+          expect(response).to(redirect_to(root_path))
+          expect(flash[:alert]).to(eq(I18n.t("flash.unauthorized")))
+        end
+      end
+
+      it "embeds the form for a super admin who is not in the organization" do
+        user.update!(platform_role: :super_admin)
+        get form_path(form)
+
+        expect(response).to(have_http_status(:ok))
+        expect(embedded_form).to(include("client_id" => form.client_id, "name" => "Los Andes"))
       end
 
       it "denies an admin of a different organization" do

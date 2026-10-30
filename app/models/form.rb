@@ -33,7 +33,11 @@ class Form < ApplicationRecord
   scope :completed_on_or_after, ->(time) { where(completed_at: time..) }
   scope :completed_on_or_before, ->(time) { where(completed_at: ..time) }
   scope :name_matches, ->(term) { where("forms.name ILIKE ?", "%#{sanitize_sql_like(term)}%") }
-  scope :for_organization, ->(organization) { joins(user: :memberships).where(memberships: { organization_id: organization.id }) }
+  scope :for_organization, ->(organization) {
+    joins(user: :memberships)
+      .where(memberships: { organization_id: organization.id })
+      .where("forms.created_at >= memberships.created_at")
+  }
   scope :recent_completed, ->(limit) { completed.with_user.order(completed_at: :desc).limit(limit) }
   scope :recent, ->(limit) { order(created_at: :desc).limit(limit) }
 

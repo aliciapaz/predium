@@ -20,6 +20,6 @@ class FormPolicy < ApplicationPolicy
   private
 
   def owner_supervisor?
-    user.administered_organization_of(record.user_id).present?
+    user.administered_organization_for(record).present?
   end
 end

@@ -49,7 +49,7 @@ class FormsController < ApplicationController
   end
 
   def shared_form_back_path(form)
-    organization = current_user.administered_organization_of(form.user_id)
+    organization = current_user.administered_organization_for(form)
     return organization_forms_path(organization) if organization
 
     url_from(request.referer) || root_path
