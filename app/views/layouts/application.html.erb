@@ -12,6 +12,7 @@
     <meta name="theme-color" content="#24603a"><%# design-check:allow browser chrome needs a literal; matches --color-primary %>
     <% if user_signed_in? %>
       <meta name="predium-signed-in" content="true">
+      <meta name="predium-user" content="<%= current_user.id %>">
       <meta name="predium-translations" content="<%= QuestionnaireConfig.cached_fingerprint %>">
     <% end %>
     <link rel="manifest" href="<%= pwa_manifest_path %>">
@@ -33,6 +34,7 @@
     <% if user_signed_in? %>
       <%= render "shared/navbar" %>
       <%= render "shared/conflict_dialog" %>
+      <%= render "shared/install_hint" %>
     <% end %>
 
     <%= render "shared/flash" %>

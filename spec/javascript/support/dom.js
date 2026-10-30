@@ -1,6 +1,12 @@
-export function signIn(csrfToken = "test-csrf-token") {
+export function signIn(csrfToken = "test-csrf-token", userId = "1") {
   addMeta("predium-signed-in", "true")
+  addMeta("predium-user", userId)
   addMeta("csrf-token", csrfToken)
+}
+
+export function signInAs(userId) {
+  resetHead()
+  signIn("test-csrf-token", userId)
 }
 
 export function resetHead() {

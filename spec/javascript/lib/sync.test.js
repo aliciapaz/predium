@@ -401,3 +401,25 @@ describe("syncNow", () => {
     expect(fetch).not.toHaveBeenCalled()
   })
 })
+
+// The service worker answers /api/ GETs from its cache when the network fails,
+// and an old cached form would roll back a clean local copy.
+describe("server pulls", () => {
+  const networkOnly = (fetch) => fetch.mock.calls[0][1].headers["X-Predium-Network-Only"]
+
+  it("tells the service worker not to fall back to a cached form list", async () => {
+    const fetch = stubFetch(async () => jsonResponse({ forms: [] }))
+
+    await seedFromServer()
+
+    expect(networkOnly(fetch)).toBe("1")
+  })
+
+  it("tells the service worker not to fall back to a cached form", async () => {
+    const fetch = stubFetch(async () => jsonResponse({ form: serverForm() }))
+
+    await hydrateForm("form-1")
+
+    expect(networkOnly(fetch)).toBe("1")
+  })
+})

@@ -58,7 +58,8 @@ npm run lint                      # ESLint
 
 These are checked by hand in a browser:
 
-- `lib/pwa.js` and the service worker (`app/views/pwa/service-worker.js`): registration, caching strategies, Background Sync, purge on sign-out.
+- The service worker (`app/views/pwa/service-worker.js`) and the browser side of `lib/pwa.js`: registration, caching strategies, Background Sync. Setting work aside on sign-out is covered in `spec/javascript/lib/pwa.test.js`.
+- On a real iPhone: Safari shows the home-screen hint, and after installing, `navigator.storage.persisted()` returns true.
 - Real network and browser timing: going offline mid-sync, multiple tabs, actual IndexedDB quota behavior.
 - Chart rendering and visual layout.
 

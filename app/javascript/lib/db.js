@@ -1,4 +1,5 @@
 import Dexie from "dexie"
+import { requestPersistentStorage } from "lib/persistence"
 
 // The five ADR-3 stores. Forms are keyed by client_id (KTD-3), which is also
 // the URL param and the sync idempotency key.
@@ -10,6 +11,13 @@ db.version(1).stores({
   questionnaire_config: "id",
   locale_data: "locale",
   sync_queue: "++id, form_client_id, queued_at"
+})
+
+// held_work keeps each signed-out user's unsynced forms until that user signs
+// in again; device_meta records whose session filled the live stores.
+db.version(2).stores({
+  held_work: "owner_id",
+  device_meta: "key"
 })
 
 export function newClientId() {
@@ -164,6 +172,7 @@ export async function putLocale(locale, translations, fingerprint) {
 // One queue entry per form: repeated edits collapse into a single upsert
 // whose payload is built from the current store state at drain time.
 export async function enqueue(formClientId) {
+  if (!navigator.onLine) requestPersistentStorage()
   await db.transaction("rw", db.sync_queue, async () => {
     const existing = await db.sync_queue.where({ form_client_id: formClientId }).first()
     if (existing) {
