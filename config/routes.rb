@@ -8,6 +8,9 @@ Rails.application.routes.draw do
   root "forms#index"
 
   resource :profile, only: [:show, :edit, :update]
+  resource :account, only: [:edit, :update] do
+    resource :password, only: [:update], module: :accounts
+  end
 
   resources :forms, only: [:index, :show, :new, :edit, :destroy] do
     resource :completion, only: [:create], controller: "forms/completions"

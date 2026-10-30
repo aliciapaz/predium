@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 import { getForm, getResponses } from "lib/db"
 import { cachedConfig, principles, dimensionIndicators, visibleDimensions } from "lib/config_cache"
-import { load as loadTranslations, t } from "lib/i18n"
+import { load as loadTranslations, t, has } from "lib/i18n"
 import { calculateScores } from "lib/scoring"
 import { hydrateForm } from "lib/sync"
 import { averageBand, badge, band, escape, icon } from "lib/ui"
@@ -72,7 +72,41 @@ export default class extends Controller {
         ${badge(t(completed ? "states.completed" : "states.draft"), completed ? "success" : "warning")}
       </div>
       <p class="mt-1 text-muted">${escape([location, completedOn].filter(Boolean).join(", "))}</p>
+      ${this.overallSummary()}
       ${facts.length ? `<dl class="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-4">${facts.join("")}</dl>` : ""}`
+  }
+
+  // The headline is the mean of the scored dimensions, each weighted equally;
+  // principles keep their own section and radar. Weighting is open in #43.
+  overallSummary() {
+    const scored = visibleDimensions(this.config, this.form.territory_key)
+      .map((dimension) => ({ name: t(dimension.i18n_key), score: this.scores.l2Scores[dimension.key] }))
+      .filter((item) => item.score > 0)
+    if (!scored.length) return ""
+
+    const overall = Math.round((scored.reduce((sum, item) => sum + item.score, 0) / scored.length) * 10) / 10
+    const values = scored.map((item) => item.score)
+    const namesAt = (score) => scored.filter((item) => item.score === score).map((item) => item.name).join(", ")
+    const notes = [t(`results.overall_hint.${scored.length === 1 ? "one" : "other"}`, { count: scored.length })]
+    if (Math.max(...values) > Math.min(...values)) {
+      notes.push(t("results.highest", { name: namesAt(Math.max(...values)) }))
+      notes.push(t("results.lowest", { name: namesAt(Math.min(...values)) }))
+    }
+
+    return `<div class="mt-5 flex items-center gap-4 rounded-lg bg-canvas px-4 py-3" data-overall>
+              <span class="score-chip" data-band="${averageBand(overall)}">${overall.toFixed(1)}</span>
+              <div class="min-w-0">
+                <p class="font-semibold text-ink">${escape(t("results.overall_score"))}</p>
+                <p class="text-sm text-muted">${escape(notes.join(" "))}</p>
+              </div>
+            </div>`
+  }
+
+  // Full principle names run to 70 characters; the chart and headline use the
+  // short chart_label when the locale has one.
+  chartLabel(principle) {
+    const key = `${principle.i18n_key}.chart_label`
+    return t(has(key) ? key : `${principle.i18n_key}.name`)
   }
 
   fact(label, value, wide = false) {
@@ -84,7 +118,8 @@ export default class extends Controller {
 
   renderRadar() {
     const items = principles(this.config)
-    const labels = items.map((principle) => t(`${principle.i18n_key}.name`))
+    const names = items.map((principle) => t(`${principle.i18n_key}.name`))
+    const labels = items.map((principle) => this.chartLabel(principle))
     const scores = items.map((principle) => this.scores.l1Scores[principle.key] || 0)
 
     // Built via DOM APIs: the JSON attribute values contain double quotes,
@@ -103,7 +138,7 @@ export default class extends Controller {
     list.innerHTML = items.map((principle, index) => {
       const score = scores[index]
       return `<li class="flex items-center justify-between gap-4 py-2.5">
-                <span class="text-ink-soft">${escape(labels[index])}</span>
+                <span class="text-ink-soft">${escape(names[index])}</span>
                 <span class="score-chip"${score ? ` data-band="${band(Math.round(score))}"` : ""}>${score ? Number(score.toFixed(1)) : "-"}</span>
               </li>`
     }).join("")
@@ -126,6 +161,8 @@ export default class extends Controller {
 
   renderIndicators() {
     this.indicatorsTarget.innerHTML = visibleDimensions(this.config, this.form.territory_key).map((dimension) => {
+      const score = this.scores.l2Scores[dimension.key] || 0
+      const level = averageBand(score)
       const rows = dimensionIndicators(this.config, dimension.key, this.form.territory_key).map((indicator) => {
         const value = this.scores.indicatorScores[indicator.key]
         const chip = value != null
@@ -142,7 +179,8 @@ export default class extends Controller {
 
       return `<details class="disclosure">
                 <summary>
-                  <span class="font-semibold text-ink">${escape(t(dimension.i18n_key))}</span>
+                  <span class="flex-1 min-w-0 font-semibold text-ink">${escape(t(dimension.i18n_key))}</span>
+                  <span class="score-chip"${level ? ` data-band="${level}"` : ""}>${score > 0 ? score.toFixed(1) : "-"}</span>
                   ${icon("chevron_down", "disclosure-chevron")}
                 </summary>
                 <div class="divide-y divide-line-soft">${rows}</div>

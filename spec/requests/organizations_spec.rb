@@ -44,6 +44,37 @@ RSpec.describe("Organizations", type: :request) do
     end
   end
 
+  describe "GET /organizations/:id" do
+    it "takes an org admin to the organization's forms" do
+      sign_in org_admin
+      get organization_path(organization)
+
+      expect(response).to(redirect_to(organization_forms_path(organization)))
+    end
+
+    it "takes a super admin to the organization's forms" do
+      sign_in create(:user, :super_admin)
+      get organization_path(organization)
+
+      expect(response).to(redirect_to(organization_forms_path(organization)))
+    end
+
+    it "takes a regular member to the member list" do
+      sign_in member
+      get organization_path(organization)
+
+      expect(response).to(redirect_to(organization_memberships_path(organization)))
+    end
+
+    it "turns away someone outside the organization" do
+      sign_in create(:user)
+      get organization_path(organization)
+
+      expect(response).to(redirect_to(root_path))
+      expect(flash[:alert]).to(eq(I18n.t("flash.unauthorized")))
+    end
+  end
+
   describe "GET /organizations/:id/forms" do
     it "shows the forms and members tabs with forms current" do
       sign_in org_admin
@@ -79,6 +110,16 @@ RSpec.describe("Organizations", type: :request) do
       get organization_forms_path(organization)
 
       expect(page.at("table tbody a")["href"]).to(eq(form_path(form)))
+    end
+
+    it "labels every cell so rows stack on phones" do
+      create(:form, user: member, name: "La Esperanza")
+      sign_in org_admin
+      get organization_forms_path(organization)
+
+      expect(page.at("table")["class"]).to(include("data-table-stacked"))
+      labels = page.css("table tbody tr:first-child td").map { |cell| cell["data-label"] }
+      expect(labels).to(eq(["Nombre", "Nombre del predio", "Estado", "Ubicación", "Fecha"]))
     end
 
     it "leaves out forms a member made before joining the organization" do
@@ -125,6 +166,15 @@ RSpec.describe("Organizations", type: :request) do
       get organization_memberships_path(organization)
 
       expect(page.at("table tbody").text).to(include("22 oct 2026"))
+    end
+
+    it "labels every data cell so rows stack on phones" do
+      sign_in org_admin
+      get organization_memberships_path(organization)
+
+      expect(page.at("table")["class"]).to(include("data-table-stacked"))
+      labels = page.css("table tbody tr:first-child td").map { |cell| cell["data-label"] }
+      expect(labels).to(eq(["Nombre", "Correo electrónico", "Rol", "Ingreso", nil]))
     end
   end
 

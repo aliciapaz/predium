@@ -8,7 +8,7 @@
       <%= form_with model: [:admin, @user], class: "flex flex-col gap-5" do |f| %>
         <div>
           <%= f.label :platform_role, t("admin.platform_role") %>
-          <%= f.select :platform_role, User.platform_roles.keys.map { |r| [r.titleize, r] } %>
+          <%= f.select :platform_role, User.platform_roles.keys.map { |r| [t("roles.#{r}"), r] } %>
         </div>
 
         <%= alert_box t("admin.role_warning"), tone: :warning %>

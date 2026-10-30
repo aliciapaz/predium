@@ -7,12 +7,12 @@ es:
     failure:
       already_authenticated: "Ya has iniciado sesión."
       inactive: "Tu cuenta aún no ha sido activada."
-      invalid: "%{authentication_keys} o contraseña inválidos."
+      invalid: "El correo o la contraseña no son correctos. Revísalos e intenta de nuevo."
       locked: "Tu cuenta está bloqueada."
       last_attempt: "Tienes un intento más antes de que tu cuenta sea bloqueada."
-      not_found_in_database: "%{authentication_keys} o contraseña inválidos."
+      not_found_in_database: "El correo o la contraseña no son correctos. Revísalos e intenta de nuevo."
       timeout: "Tu sesión ha expirado. Por favor inicia sesión nuevamente para continuar."
-      unauthenticated: "Necesitas iniciar sesión o registrarte antes de continuar."
+      unauthenticated: "Inicia sesión para continuar."
       unconfirmed: "Debes confirmar tu cuenta antes de continuar."
     mailer:
       confirmation_instructions:
@@ -60,3 +60,29 @@ es:
       not_saved:
         one: "1 error impidió guardar este %{resource}:"
         other: "%{count} errores impidieron guardar este %{resource}:"
+  activerecord:
+    errors:
+      models:
+        user:
+          attributes:
+            first_name:
+              blank: "Escribe tu nombre."
+            last_name:
+              blank: "Escribe tu apellido."
+            current_password:
+              blank: "Escribe tu contraseña actual."
+              invalid: "La contraseña actual no es correcta."
+            email:
+              blank: "Escribe tu correo electrónico."
+              invalid: "Escribe un correo válido, como nombre@ejemplo.com."
+              taken: "Ya hay una cuenta con este correo."
+              not_found: "No encontramos una cuenta con este correo."
+            password:
+              blank: "Escribe una contraseña."
+              too_short: "Usa al menos %{count} caracteres."
+              too_long: "Usa como máximo %{count} caracteres."
+            password_confirmation:
+              confirmation: "Las contraseñas no coinciden."
+            reset_password_token:
+              invalid: "El enlace para cambiar la contraseña no es válido. Pide uno nuevo."
+              expired: "El enlace para cambiar la contraseña expiró. Pide uno nuevo."

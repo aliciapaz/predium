@@ -26,6 +26,11 @@ export default class extends Controller {
 
   async connect() {
     this.clientId = this.clientIdValue || newClientId()
+    // Registered before the first await so a disconnect during loading
+    // always finds them to remove.
+    this.refreshSaveState = this.refreshSaveState.bind(this)
+    document.addEventListener("predium:sync-status", this.refreshSaveState)
+    document.addEventListener("predium:queue-changed", this.refreshSaveState)
     if (!this.clientIdValue) {
       history.replaceState(null, "", this.formPath("/edit"))
     }
@@ -67,6 +72,12 @@ export default class extends Controller {
     this.completeFormTarget.addEventListener("submit", (event) => this.handleComplete(event))
 
     this.render()
+    await this.refreshSaveState()
+  }
+
+  disconnect() {
+    document.removeEventListener("predium:sync-status", this.refreshSaveState)
+    document.removeEventListener("predium:queue-changed", this.refreshSaveState)
   }
 
   // Same self-heal as the results view: the window-load seed may not have run
@@ -218,7 +229,25 @@ export default class extends Controller {
   }
 
   markSaved() {
-    this.saveStateTarget.textContent = t("offline.saved_locally")
+    this.showSaveState("device")
+  }
+
+  // The server has this form once its queue entry is gone. Before anything is
+  // saved or queued the subtitle makes no claim. Each check bumps a ticket so a
+  // slower, older queue read cannot overwrite a newer state.
+  async refreshSaveState() {
+    this.saveStateTicket = (this.saveStateTicket || 0) + 1
+    const ticket = this.saveStateTicket
+    const queued = (await queueEntries()).some((entry) => entry.form_client_id === this.clientId)
+    if (ticket !== this.saveStateTicket) return
+    if (queued) this.showSaveState("device")
+    else if (this.saveStateTarget.dataset.state) this.showSaveState("server")
+  }
+
+  showSaveState(state) {
+    this.saveStateTicket = (this.saveStateTicket || 0) + 1
+    this.saveStateTarget.dataset.state = state
+    this.saveStateTarget.textContent = t(state === "device" ? "offline.saved_locally" : "offline.saved_on_server")
   }
 
   // ── Completion ─────────────────────────────────────────
