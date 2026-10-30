@@ -80,6 +80,16 @@ RSpec.describe("Organizations", type: :request) do
 
       expect(page.at("table tbody a")["href"]).to(eq(form_path(form)))
     end
+
+    it "leaves out forms a member made before joining the organization" do
+      create(:form, user: member, name: "Antes", created_at: 1.day.ago)
+      create(:form, user: member, name: "Después")
+      sign_in org_admin
+      get organization_forms_path(organization)
+
+      expect(page.at("table tbody").text).to(include("Después"))
+      expect(page.at("table tbody").text).not_to(include("Antes"))
+    end
   end
 
   describe "GET /organizations/:id/memberships" do
