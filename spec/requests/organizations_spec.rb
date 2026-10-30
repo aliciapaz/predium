@@ -198,6 +198,13 @@ RSpec.describe("Organizations", type: :request) do
       expect(response).to(have_http_status(:ok))
     end
 
+    it "sees forms a member made before joining the organization" do
+      create(:form, user: member, name: "Antes", created_at: 1.day.ago)
+      get organization_forms_path(organization)
+
+      expect(page.at("table tbody").text).to(include("Antes"))
+    end
+
     it "gets the invitation action on the members page" do
       get organization_memberships_path(organization)
 
