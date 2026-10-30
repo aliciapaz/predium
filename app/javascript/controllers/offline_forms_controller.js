@@ -1,7 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
-import { listForms, getResponses, queueEntries } from "lib/db"
+import { deleteLocalForm, listForms, getResponses, pendingCount, queueEntries } from "lib/db"
 import { cachedConfig, principles, territoryIndicators } from "lib/config_cache"
 import { load as loadTranslations, t } from "lib/i18n"
+import { syncNow } from "lib/sync"
 import { badge, escape, icon } from "lib/ui"
 
 // Form list: server-rendered when online; hydrated from IndexedDB when the
@@ -10,7 +11,7 @@ export default class extends Controller {
   static targets = ["list"]
 
   async connect() {
-    if (navigator.onLine) return
+    if (navigator.onLine) return this.followSync()
 
     await loadTranslations()
     const config = await cachedConfig()
@@ -41,6 +42,28 @@ export default class extends Controller {
     this.listTarget.innerHTML = `
       ${this.section(t("forms.drafts"), await cards(drafts), drafts.length, "warning", t("forms.no_drafts"))}
       ${this.section(t("forms.completed"), await cards(completed), completed.length, "success", t("forms.no_completed"))}`
+  }
+
+  disconnect() {
+    if (this.onSyncStatus) document.removeEventListener("predium:sync-status", this.onSyncStatus)
+  }
+
+  // The server-rendered list only holds forms that had synced when the page
+  // rendered, so re-render it whenever a sync lands more.
+  async followSync() {
+    this.onSyncStatus = (event) => {
+      if (event.detail.status === "finished" && event.detail.synced > 0) {
+        window.Turbo?.visit(window.location.href, { action: "replace" })
+      }
+    }
+    document.addEventListener("predium:sync-status", this.onSyncStatus)
+    if (await pendingCount() > 0) syncNow()
+  }
+
+  // A server-side delete leaves the device copy behind, and the offline list
+  // would keep showing the form.
+  async forget(event) {
+    if (event.detail.success) await deleteLocalForm(event.params.clientId)
   }
 
   // Mirrors forms/index and forms/_form_card so the offline list matches the

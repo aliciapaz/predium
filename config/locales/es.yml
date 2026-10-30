@@ -194,6 +194,7 @@ es:
     no_completed: "Aún no hay cuestionarios completados."
     edit_farm_info: "Editar info del predio"
     view_results: "Ver resultados"
+    view_partial_results: "Ver resultados parciales"
     back_to_forms: "Volver a mis formularios"
     create_and_start: "Crear e iniciar cuestionario"
     updated_on: "Actualizado %{date}"

@@ -25,6 +25,7 @@ function editor({ id = clientId, formsUrl = "/forms" } = {}) {
          data-form-editor-forms-url-value="${formsUrl}">
       <h1 data-form-editor-target="title">Loading</h1>
       <span data-form-editor-target="saveState"></span>
+      <a data-form-editor-target="resultsLink" hidden>View results</a>
       <span data-form-editor-target="progressText"></span>
       <div data-form-editor-target="progressBar" style="width: 0%"></div>
 
@@ -237,6 +238,16 @@ describe("form editor controller", () => {
 
       expect(hydrateForm).not.toHaveBeenCalled()
     })
+  })
+
+  it("links to the draft's partial results, keeping the query string", async () => {
+    await seedForm()
+
+    await mount(editor({ formsUrl: "/forms?locale=es" }), controllers)
+
+    const link = document.querySelector('[data-form-editor-target="resultsLink"]')
+    expect(link.getAttribute("href")).toBe("/forms/form-1?locale=es")
+    expect(link.hidden).toBe(false)
   })
 
   it("leaves the URL alone when editing an existing form", async () => {

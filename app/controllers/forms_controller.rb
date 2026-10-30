@@ -2,7 +2,7 @@
 
 class FormsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_form, only: [:show, :edit]
+  before_action :set_form, only: [:edit]
   before_action :ensure_draft, only: [:edit]
 
   def index
@@ -13,9 +13,8 @@ class FormsController < ApplicationController
 
   # Results shell: scores hydrate client-side from IndexedDB (KTD-4 in the
   # offline-first plan), so the form may not exist server-side yet when it
-  # was created offline and has not synced.
+  # was created offline and has not synced. Drafts show partial results.
   def show
-    redirect_to(edit_form_path(@form)) if @form&.draft?
   end
 
   def new

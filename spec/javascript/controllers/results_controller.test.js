@@ -20,6 +20,7 @@ const fixture = `
     <div data-results-target="radar"></div>
     <div data-results-target="dimensions"></div>
     <div data-results-target="indicators"></div>
+    <a data-results-target="continue" href="/forms/${clientId}/edit" hidden>Continue</a>
   </div>`
 
 function serverForm(overrides = {}) {
@@ -62,6 +63,25 @@ beforeEach(async () => {
 afterEach(() => unmount())
 
 describe("results controller", () => {
+  describe("for a draft", () => {
+    it("shows partial results with a way back to the questionnaire", async () => {
+      await applyServerForm(serverForm({ state: "draft", completed_at: null }))
+
+      await mount(fixture, { results: ResultsController })
+
+      expect(target("farmInfo").textContent).toContain("La Esperanza")
+      expect(target("continue").hidden).toBe(false)
+    })
+
+    it("offers no way back once the form is completed", async () => {
+      await applyServerForm(serverForm())
+
+      await mount(fixture, { results: ResultsController })
+
+      expect(target("continue").hidden).toBe(true)
+    })
+  })
+
   describe("when the form is not cached on this device", () => {
     it("hydrates it from the server while online and renders it instead of the missing state", async () => {
       hydrateForm.mockImplementation(async (id) => {

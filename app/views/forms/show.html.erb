@@ -31,7 +31,11 @@
     <div class="flex flex-col gap-3" data-results-target="indicators"></div>
   </section>
 
-  <div class="pt-6 border-t border-line">
+  <div class="pt-6 border-t border-line flex flex-wrap items-center justify-between gap-3">
     <%= link_to t("forms.back_to_forms"), forms_path, class: "btn-quiet" %>
+    <%= link_to edit_form_path(params[:id]), class: "btn-primary", hidden: true, data: { results_target: "continue" } do %>
+      <%= t("questionnaire.continue") %>
+      <%= icon(:chevron_right) %>
+    <% end %>
   </div>
 </div>

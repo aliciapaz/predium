@@ -204,7 +204,7 @@ describe("syncNow", () => {
 
     expect(await getForm("form-1")).toMatchObject({ name: "Server name", dirty: 0 })
     expect(await queueEntries()).toEqual([])
-    expect(statuses).toEqual([{ status: "started" }, { status: "finished", pending: 0 }])
+    expect(statuses).toEqual([{ status: "started" }, { status: "finished", synced: 1, pending: 0 }])
     expect(localStorage.getItem("predium:last_sync")).not.toBeNull()
   })
 
@@ -306,7 +306,7 @@ describe("syncNow", () => {
     expect(fetch).toHaveBeenCalledTimes(1)
     expect((await getForm("form-1")).name).toBe("Local name")
     expect(await queueEntries()).toHaveLength(2)
-    expect(statuses.at(-1)).toEqual({ status: "finished", pending: 2 })
+    expect(statuses.at(-1)).toEqual({ status: "finished", synced: 0, pending: 2 })
   })
 
   it("pauses on 401 until resumeAfterLogin is called", async () => {
@@ -399,5 +399,29 @@ describe("syncNow", () => {
     await syncNow()
 
     expect(fetch).not.toHaveBeenCalled()
+  })
+})
+
+describe("sync finished event", () => {
+  it("reports how many queued forms reached the server", async () => {
+    await queueLocalForm()
+    stubFetch(async () => jsonResponse({ form: serverForm({ updated_at: "2026-01-02T00:00:00.000Z" }) }))
+    const events = recordEvents("predium:sync-status")
+
+    await syncNow()
+
+    expect(events.at(-1)).toMatchObject({ status: "finished", synced: 1, pending: 0 })
+  })
+
+  // The forms list reloads when synced > 0, and a reload re-runs the sync, so a
+  // rejected entry counted here would reload the list forever.
+  it("does not count a rejected form that stays queued", async () => {
+    await queueLocalForm()
+    stubFetch(async () => jsonResponse({}, 422))
+    const events = recordEvents("predium:sync-status")
+
+    await syncNow()
+
+    expect(events.at(-1)).toMatchObject({ status: "finished", synced: 0, pending: 1 })
   })
 })

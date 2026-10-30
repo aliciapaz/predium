@@ -1,9 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { applyServerForm, db, enqueue } from "lib/db"
+import { applyServerForm, db, enqueue, getForm } from "lib/db"
+import { syncNow } from "lib/sync"
 import OfflineFormsController from "controllers/offline_forms_controller"
 import { clearDb } from "../support/db"
 import { seedQuestionnaire } from "../support/questionnaire"
 import { mount, unmount } from "../support/stimulus"
+
+vi.mock("lib/sync", async (importOriginal) => ({
+  ...(await importOriginal()),
+  syncNow: vi.fn()
+}))
 
 const fixture = `
   <div data-controller="offline-forms">
@@ -40,7 +46,10 @@ beforeEach(async () => {
   await seedQuestionnaire()
 })
 
-afterEach(() => unmount())
+afterEach(async () => {
+  await unmount()
+  delete window.Turbo
+})
 
 describe("offline forms controller", () => {
   it("keeps the server-rendered list while online", async () => {
@@ -49,6 +58,88 @@ describe("offline forms controller", () => {
     await mount(fixture, { "offline-forms": OfflineFormsController })
 
     expect(list().querySelector("#server-rendered")).not.toBeNull()
+  })
+
+  describe("online", () => {
+    function syncFinished(synced) {
+      document.dispatchEvent(new CustomEvent("predium:sync-status", { detail: { status: "finished", synced, pending: 0 } }))
+    }
+
+    beforeEach(() => {
+      window.Turbo = { visit: vi.fn() }
+      syncNow.mockReset()
+    })
+
+    it("pushes forms still waiting to sync so they can join the list", async () => {
+      await seedForm("form-1", { name: "Made offline" })
+      await enqueue("form-1")
+
+      await mount(fixture, { "offline-forms": OfflineFormsController })
+
+      expect(syncNow).toHaveBeenCalled()
+    })
+
+    it("does not start a sync when nothing is waiting", async () => {
+      await mount(fixture, { "offline-forms": OfflineFormsController })
+
+      expect(syncNow).not.toHaveBeenCalled()
+    })
+
+    it("reloads the list from the server once a sync pushed something", async () => {
+      await mount(fixture, { "offline-forms": OfflineFormsController })
+
+      syncFinished(1)
+
+      expect(window.Turbo.visit).toHaveBeenCalledWith(window.location.href, { action: "replace" })
+    })
+
+    it("leaves the list alone when a sync had nothing to push", async () => {
+      await mount(fixture, { "offline-forms": OfflineFormsController })
+
+      syncFinished(0)
+
+      expect(window.Turbo.visit).not.toHaveBeenCalled()
+    })
+
+    it("stops listening once the list is gone", async () => {
+      await mount(fixture, { "offline-forms": OfflineFormsController })
+      await unmount()
+
+      syncFinished(1)
+
+      expect(window.Turbo.visit).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("deleting a form", () => {
+    const withDeleteForm = `
+      <div data-controller="offline-forms">
+        <div data-offline-forms-target="list">
+          <form data-action="turbo:submit-end->offline-forms#forget" data-offline-forms-client-id-param="form-1"></form>
+        </div>
+      </div>`
+
+    async function submitEnd(success) {
+      await mount(withDeleteForm, { "offline-forms": OfflineFormsController })
+      document.querySelector("form").dispatchEvent(new CustomEvent("turbo:submit-end", { bubbles: true, detail: { success } }))
+      await new Promise((resolve) => setTimeout(resolve, 20))
+    }
+
+    it("drops the device copy once the server deleted it", async () => {
+      await seedForm("form-1", { name: "Deleted farm" })
+
+      await submitEnd(true)
+
+      expect(await getForm("form-1")).toBeUndefined()
+    })
+
+    it("keeps the device copy when the delete failed", async () => {
+      await seedForm("form-1", { name: "Kept farm" })
+
+      await submitEnd(false)
+
+      expect(await getForm("form-1")).toMatchObject({ name: "Kept farm" })
+    })
   })
 
   describe("offline", () => {

@@ -9,6 +9,9 @@ import {
 let syncing = false
 let paused = false
 
+// A rejected (422) entry stays queued but must not stop the drain.
+const SKIPPED = "skipped"
+
 const FARM_FIELDS = [
   "name", "national_id", "date_of_birth", "phone", "gender", "work_force",
   "land_area", "latitude", "longitude", "country", "region", "locality",
@@ -87,12 +90,14 @@ export async function syncNow() {
   notify("started")
 
   try {
+    let synced = 0
     for (const entry of await queueEntries()) {
       const done = await pushEntry(entry)
       if (!done) break
+      if (done !== SKIPPED) synced++
     }
     localStorage.setItem("predium:last_sync", new Date().toISOString())
-    notify("finished", { pending: await pendingCount() })
+    notify("finished", { synced, pending: await pendingCount() })
   } finally {
     syncing = false
   }
@@ -147,7 +152,7 @@ async function pushEntry(entry, force = false) {
 
   await markAttempt(entry.id, `HTTP ${response.status}`)
   notify("error", { httpStatus: response.status, name: form.name })
-  return response.status === 422 ? true : false
+  return response.status === 422 ? SKIPPED : false
 }
 
 function buildPayload(form, responses, force) {
