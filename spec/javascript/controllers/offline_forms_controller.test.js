@@ -119,9 +119,10 @@ describe("offline forms controller", () => {
         </div>
       </div>`
 
-    async function submitEnd(success) {
+    async function submitEnd(success, landedOn = window.location.href) {
       await mount(withDeleteForm, { "offline-forms": OfflineFormsController })
-      document.querySelector("form").dispatchEvent(new CustomEvent("turbo:submit-end", { bubbles: true, detail: { success } }))
+      const detail = { success, fetchResponse: { location: new URL(landedOn, window.location.href) } }
+      document.querySelector("form").dispatchEvent(new CustomEvent("turbo:submit-end", { bubbles: true, detail }))
       await new Promise((resolve) => setTimeout(resolve, 20))
     }
 
@@ -131,6 +132,16 @@ describe("offline forms controller", () => {
       await submitEnd(true)
 
       expect(await getForm("form-1")).toBeUndefined()
+    })
+
+    // An expired session is redirected to sign-in, which Turbo also reports
+    // as a success although nothing was deleted.
+    it("keeps the device copy when the delete ended on the sign-in page", async () => {
+      await seedForm("form-1", { name: "Kept farm" })
+
+      await submitEnd(true, "/users/sign_in")
+
+      expect(await getForm("form-1")).toMatchObject({ name: "Kept farm" })
     })
 
     it("keeps the device copy when the delete failed", async () => {
