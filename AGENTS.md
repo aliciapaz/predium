@@ -42,8 +42,8 @@ app/
   jobs/           # only ApplicationJob (no background jobs yet)
   mailers/        # devise mailers
   javascript/
-    controllers/  # 12 Stimulus controllers
-    lib/          # offline-first client layer: db, sync, pwa, i18n, scoring, config_cache
+    controllers/  # 16 Stimulus controllers
+    lib/          # offline-first client layer: db, sync, device_owner, persistence, pwa, i18n, scoring, config_cache, ui
   views/          # server-rendered Slim/ERB
 ```
 
