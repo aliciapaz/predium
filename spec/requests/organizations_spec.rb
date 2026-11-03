@@ -122,6 +122,14 @@ RSpec.describe("Organizations", type: :request) do
       expect(labels).to(eq(["Nombre", "Nombre del predio", "Estado", "Ubicación", "Fecha"]))
     end
 
+    it "opens a form on its own page, outside the filtered results frame" do
+      create(:form, user: member, name: "La Esperanza")
+      sign_in org_admin
+      get organization_forms_path(organization)
+
+      expect(page.at("turbo-frame#org_forms_results table tbody a")["data-turbo-frame"]).to(eq("_top"))
+    end
+
     it "leaves out forms a member made before joining the organization" do
       create(:form, user: member, name: "Antes", created_at: 1.day.ago)
       create(:form, user: member, name: "Después")
