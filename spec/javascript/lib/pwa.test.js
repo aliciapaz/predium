@@ -67,6 +67,22 @@ describe("signed-out page load", () => {
     expect(await getForm("synced-form")).toBeUndefined()
   })
 
+  it("gives back an edited form whose save never reached the queue", async () => {
+    signInAs("1")
+    await visit()
+    await saveForm({ client_id: "unqueued-form", name: "Farm unqueued", state: "draft" })
+    await saveResponse("unqueued-form", "diversity", 6)
+
+    await signedOutPage()
+    expect(await getForm("unqueued-form")).toBeUndefined()
+
+    signInAs("1")
+    await visit()
+
+    expect(await getForm("unqueued-form")).toMatchObject({ name: "Farm unqueued", dirty: 1 })
+    expect(await getResponses("unqueued-form")).toEqual({ diversity: 6 })
+  })
+
   it("also clears the session left behind by a Turbo sign-out", async () => {
     signInAs("1")
     await visit()
@@ -117,8 +133,9 @@ describe("another user on the same device", () => {
 
     signInAs("2")
     await syncNow()
-
     expect(fetch).not.toHaveBeenCalled()
+
+    await visit()
     expect(await getForm("agent-one-form")).toBeUndefined()
 
     signInAs("1")

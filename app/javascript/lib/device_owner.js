@@ -27,6 +27,29 @@ export async function claimDevice() {
   if (changed) queueChanged()
 }
 
+// Only a page the server just rendered claims the device (lib/pwa.js). Work
+// fired from an older tab may still carry a user who has since signed out, so
+// it runs only while that user owns the device.
+export async function ownsDevice() {
+  return (await recordedOwner()) === currentUserId()
+}
+
+// An unowned device belongs to whoever is editing; one owned by someone else
+// means this page is stale and must not write its user's edits into their stores.
+export async function mayWrite() {
+  if (currentUserId() && !(await recordedOwner())) await claimDevice()
+  return ownsDevice()
+}
+
+// A pull can outlast the session it was fetched for.
+export function whileOwner(userId, work) {
+  return db.transaction("rw", [db.forms, db.form_responses, db.sync_queue, db.device_meta], async () => {
+    if ((await recordedOwner()) !== userId) return false
+    await work()
+    return true
+  })
+}
+
 export const OWNER_CHANGED = "owner-changed"
 
 // Another tab still showing a different user can claim the device between

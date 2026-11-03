@@ -55,4 +55,12 @@ describe("sign out", () => {
 
     expect(submitted).toHaveBeenCalled()
   })
+
+  it("still signs out when the pending count cannot be read", async () => {
+    vi.spyOn(db.sync_queue, "count").mockRejectedValue(new Error("IndexedDB unavailable"))
+
+    await clickSignOut()
+
+    expect(submitted).toHaveBeenCalled()
+  })
 })

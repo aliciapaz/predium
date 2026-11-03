@@ -9,7 +9,8 @@ export default class extends Controller {
   async confirm(event) {
     if (this.confirmed) return
     event.preventDefault()
-    if (await pendingCount() > 0 && !window.confirm(this.messageValue)) return
+    const pending = await pendingCount().catch(() => 0)
+    if (pending > 0 && !window.confirm(this.messageValue)) return
     this.confirmed = true
     this.element.requestSubmit()
   }

@@ -61,6 +61,7 @@ es:
     last_sync: "Última sincronización"
     session_expired: "Sesión expirada, inicia sesión para sincronizar"
     saved_locally: "Guardado en este dispositivo"
+    session_changed: "Se abrió otra sesión en este dispositivo. Recarga la página para seguir."
     install_hint: "Para no perder respuestas guardadas sin conexión, agrega Predium a tu pantalla de inicio: toca Compartir y luego \"Agregar a inicio\"."
     install_hint_dismiss: "Ocultar aviso"
     loading: "Cargando..."

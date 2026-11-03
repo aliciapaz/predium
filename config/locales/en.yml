@@ -61,6 +61,7 @@ en:
     last_sync: "Last sync"
     session_expired: "Session expired, log in to sync"
     saved_locally: "Saved on this device"
+    session_changed: "Another session started on this device. Reload the page to keep working."
     install_hint: "To keep answers saved offline, add Predium to your home screen: tap Share, then \"Add to Home Screen\"."
     install_hint_dismiss: "Hide notice"
     loading: "Loading..."
