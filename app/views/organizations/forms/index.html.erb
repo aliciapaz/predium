@@ -43,7 +43,7 @@
                   <td><%= form.user.first_name %> <%= form.user.last_name %></td>
                   <td>
                     <% if allowed_to?(:show?, form) %>
-                      <%= link_to form.name, form_path(form), class: "link" %>
+                      <%= link_to form.name, form_path(form), class: "link", data: { turbo_frame: "_top" } %>
                     <% else %>
                       <%= form.name %>
                     <% end %>

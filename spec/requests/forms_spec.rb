@@ -189,6 +189,20 @@ RSpec.describe("Forms", type: :request) do
         expect(embedded_form).to(include("client_id" => form.client_id, "name" => "Los Andes"))
       end
 
+      it "links a super admin back to the page they came from" do
+        user.update!(platform_role: :super_admin)
+        get form_path(form), headers: { "HTTP_REFERER" => "http://www.example.com/admin/users/7" }
+
+        expect(page.at("a.back-link")["href"]).to(eq("http://www.example.com/admin/users/7"))
+      end
+
+      it "never links a super admin back to another site" do
+        user.update!(platform_role: :super_admin)
+        get form_path(form), headers: { "HTTP_REFERER" => "https://evil.example/phish" }
+
+        expect(page.at("a.back-link")["href"]).to(eq(root_path))
+      end
+
       it "denies an admin of a different organization" do
         create(:membership, :admin, user: user, organization: create(:organization))
         get form_path(form)
