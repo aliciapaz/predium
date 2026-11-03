@@ -76,15 +76,15 @@ export default class extends Controller {
       ${facts.length ? `<dl class="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-4">${facts.join("")}</dl>` : ""}`
   }
 
-  // The headline is the mean of the scored dimensions, each weighted equally;
-  // principles keep their own section and radar. Weighting is open in #43.
+  // Principles keep their own section and radar; the headline is the
+  // dimensions' overall score.
   overallSummary() {
+    const overall = this.scores.overall
+    if (overall === null) return ""
+
     const scored = visibleDimensions(this.config, this.form.territory_key)
       .map((dimension) => ({ name: t(dimension.i18n_key), score: this.scores.l2Scores[dimension.key] }))
       .filter((item) => item.score > 0)
-    if (!scored.length) return ""
-
-    const overall = Math.round((scored.reduce((sum, item) => sum + item.score, 0) / scored.length) * 10) / 10
     const values = scored.map((item) => item.score)
     const namesAt = (score) => scored.filter((item) => item.score === score).map((item) => item.name).join(", ")
     const notes = [t(`results.overall_hint.${scored.length === 1 ? "one" : "other"}`, { count: scored.length })]
