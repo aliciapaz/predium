@@ -61,9 +61,14 @@ export default class extends Controller {
   }
 
   // A server-side delete leaves the device copy behind, and the offline list
-  // would keep showing the form.
+  // would keep showing the form. Only a delete that lands back on this list
+  // ran: an expired session is redirected to sign-in, which Turbo also
+  // reports as a success.
   async forget(event) {
-    if (event.detail.success) await deleteLocalForm(event.params.clientId)
+    const landedOn = event.detail.fetchResponse?.location?.pathname
+    if (event.detail.success && landedOn === window.location.pathname) {
+      await deleteLocalForm(event.params.clientId)
+    }
   }
 
   // Mirrors forms/index and forms/_form_card so the offline list matches the
