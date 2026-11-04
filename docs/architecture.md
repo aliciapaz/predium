@@ -124,6 +124,7 @@ Hand-rolled service worker plus Dexie.js. Workbox made sense in the v1 build; wi
 - Digested assets (Propshaft) and images: cache-first
 - Questionnaire config JSON and locale files: stale-while-revalidate, invalidated by a server-computed content fingerprint
 - Other API responses: network-first with cache fallback
+- Precache on sign-in: the worker only caches what passes through it, and neither the first page load nor a Turbo sign-in does, so each signed-in document posts its digested asset URLs to the worker, which stores them plus `/`, the editor shell, and the results shell. Without this, a fresh home-screen install opens to a blank page offline.
 
 **Consequences:**
 - Forms can be created, edited, and viewed entirely offline

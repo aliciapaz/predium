@@ -5,6 +5,8 @@
 //   - /api/questionnaire and /translations/:locale: stale-while-revalidate
 //   - other GET /api/ requests: network-first with cache fallback
 //   - images: cache-first
+//   - "predium:precache" message: the page posts its asset URLs; the worker
+//     stores them plus the shell pages so a fresh install boots offline
 // Bump VERSION to invalidate all caches on the next activate.
 const VERSION = "v1"
 const SHELL_CACHE = `predium-shell-${VERSION}`
@@ -12,6 +14,7 @@ const DATA_CACHE = `predium-data-${VERSION}`
 
 const EDITOR_SHELL = "/forms/new"
 const RESULTS_SHELL = "/forms/shell"
+const SHELL_PAGES = ["/", EDITOR_SHELL, RESULTS_SHELL]
 
 self.addEventListener("install", (event) => {
   event.waitUntil(self.skipWaiting())
@@ -38,6 +41,32 @@ self.addEventListener("sync", (event) => {
     )
   }
 })
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "predium:precache") event.waitUntil(precache(event.data.assets))
+})
+
+// Pages are refetched every time so the offline copy stays current; digested
+// assets never change, so only missing ones are fetched.
+async function precache(assets) {
+  const cache = await caches.open(SHELL_CACHE)
+  const missing = []
+  for (const url of assets) {
+    if (!(await cache.match(url))) missing.push(url)
+  }
+  await Promise.all([...SHELL_PAGES, ...missing].map((url) => storeResponse(cache, url)))
+}
+
+// Safari refuses a redirected response served to a navigation, so a page
+// that bounced (e.g. to sign-in) must not be stored under its own URL.
+async function storeResponse(cache, url) {
+  try {
+    const response = await fetch(url)
+    if (response.ok && !response.redirected) await cache.put(url, response)
+  } catch {
+    // offline: keep whatever is already cached
+  }
+}
 
 self.addEventListener("fetch", (event) => {
   const request = event.request
