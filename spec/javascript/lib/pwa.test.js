@@ -138,6 +138,7 @@ describe("another user on the same device", () => {
     await visit()
     expect(await getForm("agent-one-form")).toBeUndefined()
 
+    fetch.mockRejectedValue(new TypeError("offline"))
     signInAs("1")
     await visit()
     expect(await getResponses("agent-one-form")).toEqual({ diversity: 4 })
