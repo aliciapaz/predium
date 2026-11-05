@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="<%= I18n.locale %>">
   <head>
-    <title><%= content_for(:title) || "Admin - Predium" %></title>
+    <title><%= content_for(:title) || [content_for(:page_title), "Admin - Predium"].compact.join(" | ") %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -43,8 +43,7 @@
         <div class="px-4 h-16 flex items-center gap-3">
           <%= icon_button :menu, label: t("nav.menu"), class: "md:hidden -ml-2",
               data: { action: "admin-sidebar#toggle" } %>
-          <h2 class="flex-1 min-w-0 truncate font-semibold text-ink-soft"><%= yield :page_title %></h2>
-          <span class="max-w-40 truncate text-sm font-semibold text-ink-soft"><%= current_user.first_name %> <%= current_user.last_name %></span>
+          <span class="ml-auto max-w-40 truncate text-sm font-semibold text-ink-soft"><%= current_user.first_name %> <%= current_user.last_name %></span>
         </div>
       </header>
 

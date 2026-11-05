@@ -19,7 +19,7 @@ class User < ApplicationRecord
   validates :last_name, presence: true
 
   scope :ordered_by_name, -> { order(:last_name, :first_name) }
-  scope :with_organizations_and_forms, -> { includes(:organizations, :forms) }
+  scope :with_organizations_and_forms, -> { includes(:organizations, :forms, memberships: :organization) }
   scope :search, ->(term) { where("first_name ILIKE :q OR last_name ILIKE :q OR email ILIKE :q", q: "%#{term}%") }
 
   def administered_organization

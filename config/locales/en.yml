@@ -43,6 +43,8 @@ en:
     member_invited: "Member invited successfully."
     member_removed: "Member removed from the organization."
     profile_updated: "Profile updated successfully."
+    name_updated: "Name updated."
+    password_changed: "Password changed."
     form_locked: "Completed forms cannot be edited."
     missing_indicators: "Please complete all indicators. Missing: %{dimensions}"
     user_role_updated: "User role updated."
@@ -61,6 +63,7 @@ en:
     last_sync: "Last sync"
     session_expired: "Session expired, log in to sync"
     saved_locally: "Saved on this device"
+    saved_on_server: "Saved to the server"
     loading: "Loading..."
     loading_questionnaire: "Loading questionnaire..."
     config_unavailable: "The questionnaire is not available offline yet. Connect once to download it."
@@ -90,6 +93,13 @@ en:
     admin_users: "Manage users"
     admin_organizations: "Manage organizations"
     profile_show: "My profile"
+    account_edit: "Account"
+
+  account:
+    manage: "Change name or password"
+    name_heading: "Name"
+    password_heading: "Password"
+    save_name: "Save name"
 
   # ── Form Labels ─────────────────────────────────────────
   labels:
@@ -132,6 +142,7 @@ en:
 
   # ── Role Names ──────────────────────────────────────────
   roles:
+    regular: "Standard user"
     super_admin: "Super Admin"
     admin: "Admin"
     member: "Member"
@@ -256,6 +267,12 @@ en:
     people: "people"
     system_types: "System types"
     completed_on: "Completed %{date}"
+    overall_score: "Overall score"
+    overall_hint:
+      one: "Average of %{count} dimension."
+      other: "Average of %{count} dimensions."
+    highest: "Highest: %{name}."
+    lowest: "Lowest: %{name}."
 
   # ── Admin ──────────────────────────────────────────────
   admin:
@@ -296,6 +313,7 @@ en:
     professional_role: "Professional role"
     edit_role: "Edit role"
     edit_user_role: "Edit user role"
+    role_in_organization: "%{role} at %{organization}"
     platform_role: "Platform role"
     role_warning: "Super Admin grants full access to the admin panel, all organizations, and all user data. Assign with caution."
     update_role: "Update role"
@@ -378,6 +396,9 @@ en:
         status: "Status"
       user:
         email: "Email"
+        first_name: "First name"
+        last_name: "Last name"
+        current_password: "Current password"
         name: "Name"
         locale: "Language"
       organization:

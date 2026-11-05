@@ -43,6 +43,8 @@ es:
     member_invited: "Miembro invitado exitosamente."
     member_removed: "Miembro quitado de la organización."
     profile_updated: "Perfil actualizado exitosamente."
+    name_updated: "Nombre actualizado."
+    password_changed: "Contraseña cambiada."
     form_locked: "Los formularios completados no se pueden editar."
     missing_indicators: "Por favor completa todos los indicadores. Faltan: %{dimensions}"
     user_role_updated: "Rol de usuario actualizado."
@@ -61,6 +63,7 @@ es:
     last_sync: "Última sincronización"
     session_expired: "Sesión expirada, inicia sesión para sincronizar"
     saved_locally: "Guardado en este dispositivo"
+    saved_on_server: "Guardado en el servidor"
     loading: "Cargando..."
     loading_questionnaire: "Cargando cuestionario..."
     config_unavailable: "El cuestionario aún no está disponible sin conexión. Conéctate una vez para descargarlo."
@@ -90,6 +93,13 @@ es:
     admin_users: "Gestionar usuarios"
     admin_organizations: "Gestionar organizaciones"
     profile_show: "Mi perfil"
+    account_edit: "Cuenta"
+
+  account:
+    manage: "Cambiar nombre o contraseña"
+    name_heading: "Nombre"
+    password_heading: "Contraseña"
+    save_name: "Guardar nombre"
 
   # ── Etiquetas de Formulario ─────────────────────────────
   labels:
@@ -132,6 +142,7 @@ es:
 
   # ── Nombres de Roles ────────────────────────────────────
   roles:
+    regular: "Usuario estándar"
     super_admin: "Super administrador"
     admin: "Administrador"
     member: "Miembro"
@@ -256,6 +267,12 @@ es:
     people: "personas"
     system_types: "Tipos de sistema"
     completed_on: "Completado el %{date}"
+    overall_score: "Puntaje general"
+    overall_hint:
+      one: "Promedio de %{count} dimensión."
+      other: "Promedio de %{count} dimensiones."
+    highest: "Más alto: %{name}."
+    lowest: "Más bajo: %{name}."
 
   # ── Admin ──────────────────────────────────────────────
   admin:
@@ -296,6 +313,7 @@ es:
     professional_role: "Rol profesional"
     edit_role: "Editar rol"
     edit_user_role: "Editar rol de usuario"
+    role_in_organization: "%{role} en %{organization}"
     platform_role: "Rol de plataforma"
     role_warning: "Super Admin otorga acceso completo al panel de administración, todas las organizaciones y datos de usuarios. Asignar con precaución."
     update_role: "Actualizar rol"
@@ -378,6 +396,8 @@ es:
         status: "Estado"
       user:
         email: "Correo electrónico"
+        first_name: "Nombre"
+        last_name: "Apellido"
         password: "Contraseña"
         password_confirmation: "Confirmar contraseña"
         current_password: "Contraseña actual"
