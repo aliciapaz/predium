@@ -14,7 +14,7 @@
   <%= render "organizations/tabs", organization: @organization %>
 
   <div class="card-flush overflow-x-auto">
-    <table class="data-table">
+    <table class="data-table data-table-stacked">
       <thead>
         <tr>
           <th scope="col"><%= t("labels.name") %></th>
@@ -29,10 +29,10 @@
       <tbody>
         <% @memberships.each do |membership| %>
           <tr>
-            <td><%= membership.user.first_name %> <%= membership.user.last_name %></td>
-            <td><%= membership.user.email %></td>
-            <td><%= badge(t("roles.#{membership.role}"), tone: membership.admin? ? :success : :neutral) %></td>
-            <td><%= l(membership.created_at, format: :short) %></td>
+            <td data-label="<%= t("labels.name") %>"><%= membership.user.first_name %> <%= membership.user.last_name %></td>
+            <td data-label="<%= t("labels.email") %>"><%= membership.user.email %></td>
+            <td data-label="<%= t("labels.role") %>"><%= badge(t("roles.#{membership.role}"), tone: membership.admin? ? :success : :neutral) %></td>
+            <td data-label="<%= t("labels.joined") %>"><%= l(membership.created_at, format: :short) %></td>
             <% if is_admin %>
               <td class="text-right">
                 <% unless membership.user == current_user %>

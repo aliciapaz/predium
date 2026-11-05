@@ -13,15 +13,18 @@ vi.mock("lib/sync", async (importOriginal) => ({
 
 const clientId = "form-1"
 
-const fixture = `
-  <div data-controller="results" data-results-client-id-value="${clientId}">
+const shell = (attributes = "") => `
+  <div data-controller="results" data-results-client-id-value="${clientId}"${attributes}>
     <div data-results-target="missing" class="hidden">Results unavailable</div>
+    <div data-results-target="loadFailed" class="hidden">Could not load</div>
     <div data-results-target="farmInfo"><p>Loading</p></div>
     <div data-results-target="radar"></div>
     <div data-results-target="dimensions"></div>
     <div data-results-target="indicators"></div>
     <a data-results-target="continue" href="/forms/${clientId}/edit" hidden>Continue</a>
   </div>`
+
+const fixture = shell()
 
 function serverForm(overrides = {}) {
   return {
@@ -48,6 +51,10 @@ function serverForm(overrides = {}) {
 }
 
 const target = (name) => document.querySelector(`[data-results-target="${name}"]`)
+
+function embedded(form) {
+  return shell(` data-results-form-value="${JSON.stringify(form).replaceAll("&", "&amp;").replaceAll('"', "&quot;")}"`)
+}
 
 function indicatorRow(name) {
   return Array.from(target("indicators").querySelectorAll("span"))
@@ -96,11 +103,12 @@ describe("results controller", () => {
       expect(target("farmInfo").querySelector("h1").textContent).toBe("La Esperanza")
     })
 
-    it("shows the missing state when the server has no copy either", async () => {
+    it("says the server could not provide it when it has no copy either", async () => {
       await mount(fixture, { results: ResultsController })
 
       expect(hydrateForm).toHaveBeenCalledWith(clientId)
-      expect(target("missing").classList).not.toContain("hidden")
+      expect(target("loadFailed").classList).not.toContain("hidden")
+      expect(target("missing").classList).toContain("hidden")
       expect(target("farmInfo").innerHTML).toBe("")
     })
 
@@ -111,7 +119,30 @@ describe("results controller", () => {
 
       expect(hydrateForm).not.toHaveBeenCalled()
       expect(target("missing").classList).not.toContain("hidden")
+      expect(target("loadFailed").classList).toContain("hidden")
       expect(target("farmInfo").innerHTML).toBe("")
+    })
+  })
+
+  describe("with the form embedded by the server", () => {
+    it("renders it and its scores without touching IndexedDB or the server", async () => {
+      await mount(embedded(serverForm()), { results: ResultsController })
+
+      expect(hydrateForm).not.toHaveBeenCalled()
+      expect(target("missing").classList).toContain("hidden")
+      expect(target("farmInfo").querySelector("h1").textContent).toBe("La Esperanza")
+      expect(indicatorRow("Compaction").lastElementChild.textContent).toBe("2")
+      expect(await db.forms.count()).toBe(0)
+      expect(await db.form_responses.count()).toBe(0)
+    })
+
+    it("prefers the embedded copy over one cached on this device", async () => {
+      await applyServerForm(serverForm({ name: "Stale copy", responses: [] }))
+
+      await mount(embedded(serverForm()), { results: ResultsController })
+
+      expect(target("farmInfo").querySelector("h1").textContent).toBe("La Esperanza")
+      expect(indicatorRow("Compaction").lastElementChild.textContent).toBe("2")
     })
   })
 
@@ -227,11 +258,60 @@ describe("results controller", () => {
         .toEqual(["Structure"])
     })
 
+    it("headlines the average of the scored dimensions with the highest and lowest one", async () => {
+      await mount(fixture, { results: ResultsController })
+
+      const overall = target("farmInfo").querySelector("[data-overall]")
+      const chip = overall.querySelector(".score-chip")
+      expect(chip.textContent).toBe("6.0")
+      expect(chip.dataset.band).toBe("mid")
+      expect(overall.textContent).toContain("Overall score")
+      expect(overall.textContent).toContain("Average of 2 dimensions.")
+      expect(overall.textContent).toContain("Highest: Fertility.")
+      expect(overall.textContent).toContain("Lowest: Structure.")
+    })
+
+    it("leaves the principle answers out of the headline", async () => {
+      await saveResponse(clientId, "recycling", 1)
+
+      await mount(fixture, { results: ResultsController })
+
+      expect(target("farmInfo").querySelector("[data-overall] .score-chip").textContent).toBe("6.0")
+    })
+
+    it("averages only the dimensions a draft has scored so far", async () => {
+      await applyServerForm(serverForm({ responses: [{ indicator_key: "compaction", value: 5, is_extension: true }] }))
+
+      await mount(fixture, { results: ResultsController })
+
+      const overall = target("farmInfo").querySelector("[data-overall]")
+      expect(overall.querySelector(".score-chip").textContent).toBe("5.0")
+      expect(overall.textContent).toContain("Average of 1 dimension.")
+      expect(overall.textContent).not.toContain("Highest")
+    })
+
+    it("leaves the headline out until an indicator is scored", async () => {
+      await applyServerForm(serverForm({ responses: [{ indicator_key: "diversity", value: 6, is_extension: false }] }))
+
+      await mount(fixture, { results: ResultsController })
+
+      expect(target("farmInfo").querySelector("[data-overall]")).toBeNull()
+    })
+
+    it("shows each dimension's score on its indicator group", async () => {
+      await mount(fixture, { results: ResultsController })
+
+      const summaries = Array.from(target("indicators").querySelectorAll("summary"))
+      const chips = summaries.map((summary) => summary.querySelector(".score-chip"))
+      expect(chips.map((chip) => chip.textContent)).toEqual(["3.0", "9.0", "-"])
+      expect(chips.map((chip) => chip.dataset.band)).toEqual(["low", "high", undefined])
+    })
+
     it("mounts the radar chart with translated principle labels and principle scores", async () => {
       await mount(fixture, { results: ResultsController })
 
       const radar = target("radar").querySelector('[data-controller="radar-chart"]')
-      expect(JSON.parse(radar.dataset.radarChartLabelsValue)).toEqual(["Diversity", "Recycling"])
+      expect(JSON.parse(radar.dataset.radarChartLabelsValue)).toEqual(["Diversity", "Reuse"])
       expect(JSON.parse(radar.dataset.radarChartScoresValue)).toEqual([6, 0])
       expect(radar.querySelector('canvas[data-radar-chart-target="canvas"]')).not.toBeNull()
     })

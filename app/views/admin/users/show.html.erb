@@ -63,7 +63,7 @@
             <% @recent_forms.each do |form| %>
               <tr>
                 <td>
-                  <%= link_to form.name, form_path(form), class: "link" %>
+                  <%= link_to form.name, admin_form_path(form), class: "link" %>
                 </td>
                 <td><%= badge(form.state.titleize, tone: form.completed? ? :success : :warning) %></td>
                 <td><%= form.country %></td>

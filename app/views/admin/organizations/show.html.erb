@@ -63,7 +63,7 @@
             <% @recent_forms.each do |form| %>
               <tr>
                 <td>
-                  <%= link_to form.name, form_path(form), class: "link" %>
+                  <%= link_to form.name, admin_form_path(form), class: "link" %>
                 </td>
                 <td>
                   <%= form.user.first_name %> <%= form.user.last_name %>

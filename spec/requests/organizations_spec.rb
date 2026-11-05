@@ -44,6 +44,37 @@ RSpec.describe("Organizations", type: :request) do
     end
   end
 
+  describe "GET /organizations/:id" do
+    it "takes an org admin to the organization's forms" do
+      sign_in org_admin
+      get organization_path(organization)
+
+      expect(response).to(redirect_to(organization_forms_path(organization)))
+    end
+
+    it "takes a super admin to the organization's forms" do
+      sign_in create(:user, :super_admin)
+      get organization_path(organization)
+
+      expect(response).to(redirect_to(organization_forms_path(organization)))
+    end
+
+    it "takes a regular member to the member list" do
+      sign_in member
+      get organization_path(organization)
+
+      expect(response).to(redirect_to(organization_memberships_path(organization)))
+    end
+
+    it "turns away someone outside the organization" do
+      sign_in create(:user)
+      get organization_path(organization)
+
+      expect(response).to(redirect_to(root_path))
+      expect(flash[:alert]).to(eq(I18n.t("flash.unauthorized")))
+    end
+  end
+
   describe "GET /organizations/:id/forms" do
     it "shows the forms and members tabs with forms current" do
       sign_in org_admin
@@ -61,6 +92,52 @@ RSpec.describe("Organizations", type: :request) do
       get organization_forms_path(organization)
 
       expect(page.at("table tbody").text).to(include("Actualizado 22 oct 2026"))
+    end
+
+    it "links a form name only for viewers who may open it" do
+      create(:form, user: org_admin, name: "Mi Finca")
+      create(:form, user: member, name: "La Esperanza")
+      sign_in member
+      get organization_forms_path(organization)
+
+      expect(page.css("table tbody a").map { |link| link.text.strip }).to(eq(["La Esperanza"]))
+      expect(page.at("table tbody").text).to(include("Mi Finca"))
+    end
+
+    it "links every member's form for an org admin" do
+      form = create(:form, user: member, name: "La Esperanza")
+      sign_in org_admin
+      get organization_forms_path(organization)
+
+      expect(page.at("table tbody a")["href"]).to(eq(form_path(form)))
+    end
+
+    it "labels every cell so rows stack on phones" do
+      create(:form, user: member, name: "La Esperanza")
+      sign_in org_admin
+      get organization_forms_path(organization)
+
+      expect(page.at("table")["class"]).to(include("data-table-stacked"))
+      labels = page.css("table tbody tr:first-child td").map { |cell| cell["data-label"] }
+      expect(labels).to(eq(["Nombre", "Nombre del predio", "Estado", "Ubicación", "Fecha"]))
+    end
+
+    it "opens a form on its own page, outside the filtered results frame" do
+      create(:form, user: member, name: "La Esperanza")
+      sign_in org_admin
+      get organization_forms_path(organization)
+
+      expect(page.at("turbo-frame#org_forms_results table tbody a")["data-turbo-frame"]).to(eq("_top"))
+    end
+
+    it "leaves out forms a member made before joining the organization" do
+      create(:form, user: member, name: "Antes", created_at: 1.day.ago)
+      create(:form, user: member, name: "Después")
+      sign_in org_admin
+      get organization_forms_path(organization)
+
+      expect(page.at("table tbody").text).to(include("Después"))
+      expect(page.at("table tbody").text).not_to(include("Antes"))
     end
   end
 
@@ -98,6 +175,15 @@ RSpec.describe("Organizations", type: :request) do
 
       expect(page.at("table tbody").text).to(include("22 oct 2026"))
     end
+
+    it "labels every data cell so rows stack on phones" do
+      sign_in org_admin
+      get organization_memberships_path(organization)
+
+      expect(page.at("table")["class"]).to(include("data-table-stacked"))
+      labels = page.css("table tbody tr:first-child td").map { |cell| cell["data-label"] }
+      expect(labels).to(eq(["Nombre", "Correo electrónico", "Rol", "Ingreso", nil]))
+    end
   end
 
   describe "GET /organizations/:id/invitations/new" do
@@ -118,6 +204,13 @@ RSpec.describe("Organizations", type: :request) do
       get organization_forms_path(organization)
 
       expect(response).to(have_http_status(:ok))
+    end
+
+    it "sees forms a member made before joining the organization" do
+      create(:form, user: member, name: "Antes", created_at: 1.day.ago)
+      get organization_forms_path(organization)
+
+      expect(page.at("table tbody").text).to(include("Antes"))
     end
 
     it "gets the invitation action on the members page" do
