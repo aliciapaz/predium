@@ -20,6 +20,7 @@ const dependencies = {
     t: (key, values) => values ? `${values.answered}/${values.total}` : key
   },
   "lib/sync": { syncNow: noop, hydrateForm: noop, csrfToken: noop },
+  "lib/device_owner": { mayWrite: async () => true },
   "lib/ui": {
     escape: (text) => String(text ?? ""), icon: () => "", iconButton: () => "",
     badge: (text) => String(text), band: () => null

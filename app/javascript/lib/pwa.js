@@ -1,23 +1,29 @@
-import { db } from "lib/db"
 import { refresh as refreshConfig } from "lib/config_cache"
-import { seedFromServer, syncNow } from "lib/sync"
+import { claimDevice, releaseDevice } from "lib/device_owner"
+import { requestPersistentStorage } from "lib/persistence"
+import { resumeAfterLogin, seedFromServer, syncNow } from "lib/sync"
 
 function signedIn() {
   return Boolean(document.querySelector('meta[name="predium-signed-in"]'))
 }
 
 // On a shared browser the offline stores outlive the session, so a signed-out
-// page must wipe the previous user's forms and cached authenticated responses
-// before anyone else signs in.
-async function purgeOfflineData() {
-  // Devise signs in through Turbo, so this same db instance serves the next
-  // session; Dexie 4 otherwise leaves it closed after delete().
-  try { await db.delete({ disableAutoOpen: false }) } catch { /* nothing cached yet */ }
+// page must hide the previous user's forms and cached authenticated responses
+// before anyone else signs in. Unsynced work is set aside, not deleted.
+async function endSession() {
+  try { await releaseDevice() } catch { /* IndexedDB unavailable */ }
   if (!("caches" in window)) return
   try {
     const keys = await caches.keys()
     await Promise.all(keys.map((key) => caches.delete(key)))
   } catch { /* Cache API unavailable */ }
+}
+
+// Devise signs in and out through Turbo, which fires turbo:load but not load.
+async function reconcileSession() {
+  if (!signedIn()) return endSession()
+  try { await claimDevice() } catch { /* IndexedDB unavailable */ }
+  requestPersistentStorage()
 }
 
 async function registerServiceWorker() {
@@ -61,10 +67,6 @@ let prepared = false
 // Sign-out also goes through Turbo, so the same document can host a second
 // sign-in that needs its own setup.
 async function prepareOffline() {
-  if (!signedIn()) {
-    prepared = false
-    return
-  }
   if (prepared) return
   prepared = true
   warmShells().catch(() => {})
@@ -75,11 +77,19 @@ async function prepareOffline() {
   }
 }
 
-window.addEventListener("load", async () => {
-  await registerServiceWorker().catch(() => {})
-  if (signedIn()) return prepareOffline()
-  await purgeOfflineData()
+// A Turbo sign-in keeps this page's JS, including the pause from the 401
+// that sent the user to sign in, and restored work has nothing else to push it.
+document.addEventListener("turbo:load", async () => {
+  if (!signedIn()) prepared = false
+  await reconcileSession()
+  if (!signedIn()) return
+  resumeAfterLogin()
+  await prepareOffline()
+  syncNow()
 })
 
-// Devise signs in through Turbo, which never fires window load.
-document.addEventListener("turbo:load", prepareOffline)
+window.addEventListener("load", async () => {
+  await registerServiceWorker().catch(() => {})
+  await reconcileSession()
+  if (signedIn()) await prepareOffline()
+})

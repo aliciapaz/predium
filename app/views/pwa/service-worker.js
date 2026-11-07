@@ -3,7 +3,8 @@
 //     form URLs so offline-created forms have a page to boot from
 //   - Propshaft assets (digested, immutable): cache-first
 //   - /api/questionnaire and /translations/:locale: stale-while-revalidate
-//   - other GET /api/ requests: network-first with cache fallback
+//   - other GET /api/ requests: network-first with cache fallback, unless
+//     the page sends X-Predium-Network-Only (sync pulls must not get old data)
 //   - images: cache-first
 //   - "predium:precache" message: the page posts its asset URLs; the worker
 //     stores them plus the shell pages so a fresh install boots offline
@@ -76,6 +77,7 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return
   if (url.pathname.startsWith("/users")) return
   if (url.pathname === "/service-worker") return
+  if (request.headers.has("X-Predium-Network-Only")) return
 
   if (isDocument(request)) {
     event.respondWith(documentStrategy(request, url))
