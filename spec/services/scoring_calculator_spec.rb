@@ -17,6 +17,7 @@ RSpec.describe(Scoring::Calculator) do
 
     expect(result[:l1_scores].transform_keys(&:to_s)).to(eq(fixture["expected"]["l1_scores"]))
     expect(result[:l2_scores].transform_keys(&:to_s)).to(eq(fixture["expected"]["l2_scores"]))
+    expect(result[:overall]).to(eq(fixture["expected"]["overall"]))
   end
 
   it "scores Level 1 from principles and leaves every dimension zero without a territory" do

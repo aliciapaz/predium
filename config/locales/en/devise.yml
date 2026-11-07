@@ -7,12 +7,12 @@ en:
     failure:
       already_authenticated: "You are already signed in."
       inactive: "Your account is not activated yet."
-      invalid: "Invalid %{authentication_keys} or password."
+      invalid: "That email or password is not right. Check them and try again."
       locked: "Your account is locked."
       last_attempt: "You have one more attempt before your account is locked."
-      not_found_in_database: "Invalid %{authentication_keys} or password."
+      not_found_in_database: "That email or password is not right. Check them and try again."
       timeout: "Your session expired. Please sign in again to continue."
-      unauthenticated: "You need to sign in or sign up before continuing."
+      unauthenticated: "Sign in to continue."
       unconfirmed: "You have to confirm your email address before continuing."
     mailer:
       confirmation_instructions:
@@ -60,3 +60,29 @@ en:
       not_saved:
         one: "1 error prohibited this %{resource} from being saved:"
         other: "%{count} errors prohibited this %{resource} from being saved:"
+  activerecord:
+    errors:
+      models:
+        user:
+          attributes:
+            first_name:
+              blank: "Enter your first name."
+            last_name:
+              blank: "Enter your last name."
+            current_password:
+              blank: "Enter your current password."
+              invalid: "That is not your current password."
+            email:
+              blank: "Enter your email."
+              invalid: "Enter a valid email, like name@example.com."
+              taken: "There is already an account with this email."
+              not_found: "We could not find an account with this email."
+            password:
+              blank: "Enter a password."
+              too_short: "Use at least %{count} characters."
+              too_long: "Use at most %{count} characters."
+            password_confirmation:
+              confirmation: "The passwords do not match."
+            reset_password_token:
+              invalid: "This password reset link is not valid. Ask for a new one."
+              expired: "This password reset link has expired. Ask for a new one."

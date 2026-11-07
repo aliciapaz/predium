@@ -1,7 +1,7 @@
 <% content_for(:title, t("titles.profile_edit")) %>
 
 <div class="max-w-lg mx-auto">
-  <%= page_header(t("titles.profile_edit")) %>
+  <%= page_header(t("titles.profile_edit"), back: [t("titles.profile_show"), profile_path]) %>
 
   <div class="card">
     <%= render "form", profile: @profile %>

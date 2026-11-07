@@ -27,6 +27,11 @@ describe("calculateScores", () => {
     expect(l2Scores).toEqual({ structure: 3.5, fertility: 8, supply: 6 })
   })
 
+  it("headlines the equal-weight mean of the scored dimensions, none before any is scored", () => {
+    expect(calculateScores(config, { a: 3, b: 4, c: 8 }, "andes").overall).toBe(5.8)
+    expect(calculateScores(config, { diversity: 7 }, "andes").overall).toBeNull()
+  })
+
   it("takes Level 1 straight from the principle answers, null when unanswered", () => {
     const { l1Scores } = calculateScores(config, { diversity: 7 }, "andes")
 
@@ -83,11 +88,12 @@ describe("parity with Scoring::Calculator", () => {
   it("produces the scores in spec/fixtures/scoring_parity.json", () => {
     const fixture = JSON.parse(readFileSync("spec/fixtures/scoring_parity.json", "utf8"))
 
-    const { l2Scores, l1Scores } = calculateScores(
+    const { l2Scores, l1Scores, overall } = calculateScores(
       questionnaireConfig(fixture.territory_key), fixture.responses, fixture.territory_key
     )
 
     expect(l2Scores).toEqual(fixture.expected.l2_scores)
     expect(l1Scores).toEqual(fixture.expected.l1_scores)
+    expect(overall).toBe(fixture.expected.overall)
   })
 })

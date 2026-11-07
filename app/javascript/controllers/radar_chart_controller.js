@@ -64,17 +64,14 @@ export default class extends Controller {
   }
 }
 
-// Principle names are long and the chart is phone-width; Chart.js draws an
-// array label as stacked lines instead of clipping it at the canvas edge. The
-// full names are listed under the chart, so three lines are enough here.
-function wrap(label, width = 14, maxLines = 3) {
+// The chart is phone-width; Chart.js draws an array label as stacked lines and
+// shrinks the radar to fit them, so a label is wrapped, never cut short.
+function wrap(label, width = 14) {
   if (label.length <= width) return label
-  const lines = label.split(" ").reduce((acc, word) => {
+  return label.split(" ").reduce((acc, word) => {
     const last = acc[acc.length - 1]
     if (last && `${last} ${word}`.length <= width) acc[acc.length - 1] = `${last} ${word}`
     else acc.push(word)
     return acc
   }, [])
-  if (lines.length <= maxLines) return lines
-  return [...lines.slice(0, maxLines - 1), `${lines[maxLines - 1]}…`]
 }

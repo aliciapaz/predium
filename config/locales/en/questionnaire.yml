@@ -16,24 +16,28 @@ en:
           high: "A high share of the farm's natural resources is recycled through different mechanisms."
       interactions:
         name: "Level of interaction between system components: animal, agricultural, forestry, others"
+        chart_label: "System interactions"
         scoring:
           low: "Not all components are present and no clear interactions are observed."
           medium: "All components exist, but without a design that makes them clearly interact. Partial interactions."
           high: "All components are part of a design that establishes concrete, beneficial interactions."
       soil_management:
         name: "Ecological soil management"
+        chart_label: "Soil management"
         scoring:
           low: "No soil conservation practices and no systematic additions of organic matter."
           medium: "Limited soil conservation practices and occasional applications of organic matter."
           high: "Defined soil protection and conservation structures and ongoing applications of organic matter."
       pest_management:
         name: "Ecological pest and disease management"
+        chart_label: "Pests and diseases"
         scoring:
           low: "No ecological management and control practices."
           medium: "A moderate level of ecological control practices, sometimes combined with pesticides."
           high: "Pest control is based entirely on an agroecological strategy."
       traditional_knowledge:
         name: "Cultural foundations and traditional knowledge in managing the system"
+        chart_label: "Traditional knowledge"
         scoring:
           low: "No identifiable traditional practices in the system."
           medium: "A moderate level of traditional practices consistent with agroecological principles."

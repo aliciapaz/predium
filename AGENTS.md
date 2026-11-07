@@ -34,10 +34,10 @@ See `CONCEPTS.md` for domain vocabulary (Indicator, Territory Extension, Sync Qu
 
 ```
 app/
-  controllers/    # thin; admin/, api/, organizations/, forms/ namespaces
+  controllers/    # thin; accounts/, admin/, api/, forms/, organizations/, users/ namespaces
   form_builders/  # PrediumFormBuilder: default builder, applies design-system primitives
   models/         # 6 domain models, no concerns
-  services/       # forms/sync_upsert, questionnaire_config, scoring/calculator
+  services/       # forms/serializer, forms/sync_upsert, admin/dashboard_report, organizations/member_inviter, questionnaire_config, scoring/calculator
   policies/       # ActionPolicy: application, admin/base, form, organization
   jobs/           # only ApplicationJob (no background jobs yet)
   mailers/        # devise mailers

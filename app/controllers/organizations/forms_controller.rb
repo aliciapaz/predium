@@ -8,6 +8,7 @@ module Organizations
 
     def index
       @forms = Form.for_organization(@organization).with_user.recently_updated
+      @forms = @forms.made_after_joining unless current_user.super_admin?
       @forms = @forms.with_state(params[:state]) if params[:state].present?
       @forms = @forms.name_matches(params[:search]) if params[:search].present?
     end
