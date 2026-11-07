@@ -86,10 +86,16 @@ or icon, a field without a label) so the mistake surfaces in development.
 - **`popover`**: help text anchored to its trigger.
 - **`auth-panel`**: the centered column for sign in and other account forms.
 - **`data-table`**: tables, always inside `card-flush overflow-x-auto` so they scroll sideways on phones.
+  Add `data-table-stacked` when status or actions sit in the last columns: below `sm` each row stacks
+  and every cell shows its `data-label`. A cell without a label holds controls and collapses when empty.
 - **`safe-top`**: top padding that clears the notch for edge content outside `app-bar`.
 
 Server-side validation errors mark the control with `aria-invalid="true"`
-(`config/initializers/field_error_proc.rb`), which the `field` primitive styles.
+(`config/initializers/field_error_proc.rb`), which the `field` primitive styles,
+and `PrediumFormBuilder` puts the message in a `field-error` right under the
+control, linked with `aria-describedby`. Write those messages as plain
+instructions per attribute ("Escribe tu correo electrónico.") under
+`activerecord.errors.models.<model>.attributes`.
 
 ## Layer 4: rules
 

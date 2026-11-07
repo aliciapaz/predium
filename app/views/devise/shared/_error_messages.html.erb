@@ -1,14 +1,9 @@
-<% if resource.errors.any? %>
+<%# Field errors render under their control (PrediumFormBuilder); this lists only errors with no visible control, such as a bad reset link. %>
+<% messages = resource.errors.select { |error| error.attribute == :base || error.attribute.end_with?("_token") }.map { |error| error.message.upcase_first } %>
+<% if messages.any? %>
   <%= alert_box tone: :danger, data: { turbo_temporary: true } do %>
-    <h3 class="font-semibold">
-      <%= I18n.t("errors.messages.not_saved",
-                 count: resource.errors.count,
-                 resource: resource.class.model_name.human.downcase) %>
-    </h3>
-    <ul class="mt-2 list-disc list-inside space-y-1">
-      <% resource.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-    </ul>
+    <% messages.each do |message| %>
+      <p><%= message %></p>
+    <% end %>
   <% end %>
 <% end %>

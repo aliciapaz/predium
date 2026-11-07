@@ -16,24 +16,28 @@ es:
           high: "Elevado porcentaje de recursos naturales del predio se reciclan por distintos mecanismos."
       interactions:
         name: "Nivel de interacción entre los componentes del sistema: animal, agrícola, forestal, otros"
+        chart_label: "Interacciones del sistema"
         scoring:
           low: "No están presentes todos los componentes y no se observan interacciones claras."
           medium: "Existen todos los componentes, pero sin un diseño que los haga interactuar de forma clara. Interacciones parciales."
           high: "Están todos los componentes dentro de un diseño que establece interacciones concretas y beneficiosas."
       soil_management:
         name: "Manejo ecológico del suelo"
+        chart_label: "Manejo del suelo"
         scoring:
           low: "No existen prácticas de conservación de suelo ni adiciones sistemáticas de materia orgánica."
           medium: "Existen practicas limitadas de conservación de suelo y aplicaciones esporádicas de materia orgánica."
           high: "Existe estructura definidas de protección y conservación de suelo y aplicaciones permanentes de materia orgánica."
       pest_management:
         name: "Manejo ecológico de plagas y enfermedades"
+        chart_label: "Plagas y enfermedades"
         scoring:
           low: "No existen prácticas ecológicas de manejo y control."
           medium: "Existe un nivel medio de prácticas ecológicas de control y en ocasiones se usan pesticidas de forma combinada."
           high: "El control de plagas se basa completamente en base a una estrategia agroecológica."
       traditional_knowledge:
         name: "Bases culturales y conocimiento tradicional en el manejo del sistema"
+        chart_label: "Conocimiento tradicional"
         scoring:
           low: "No existen prácticas tradicionales identificables en el sistema."
           medium: "Existe un nivel mediano de prácticas tradicionales que se corresponde con principios agroecológicos."

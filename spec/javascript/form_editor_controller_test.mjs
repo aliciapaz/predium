@@ -61,7 +61,7 @@ for (const principles of [true, false]) {
       progressBarTarget: { style: {} },
       dimensionNavTarget: { innerHTML: "", querySelector: () => null },
       completeButtonTarget: { classList: { toggle: noop } },
-      saveStateTarget: { textContent: "" },
+      saveStateTarget: { textContent: "", dataset: {} },
       prevButtonTarget: { disabled: false },
       nextButtonTarget: { classList: { toggle: noop } },
       refreshCompleteState: noop

@@ -10,6 +10,9 @@ import { currentUserId, OWNER_CHANGED, ownsDevice, snapshotOwnedForm, whileOwner
 let syncing = false
 let paused = false
 
+// A rejected (422) entry stays queued but must not stop the drain.
+const SKIPPED = "skipped"
+
 // A pull that reads the queue just after a push was acknowledged would prune
 // or roll back the form that push synced, so pulls and drains take turns.
 let turn = Promise.resolve()
@@ -124,12 +127,14 @@ export async function syncNow() {
 async function drain() {
   if (!(await ownsDevice())) return
   notify("started")
+  let synced = 0
   for (const entry of await queueEntries()) {
     const done = await pushEntry(entry)
     if (!done) break
+    if (done !== SKIPPED) synced++
   }
   localStorage.setItem("predium:last_sync", new Date().toISOString())
-  notify("finished", { pending: await pendingCount() })
+  notify("finished", { synced, pending: await pendingCount() })
 }
 
 async function pushEntry(entry, force = false) {
@@ -182,7 +187,7 @@ async function pushEntry(entry, force = false) {
 
   await markAttempt(entry.id, `HTTP ${response.status}`)
   notify("error", { httpStatus: response.status, name: form.name })
-  return response.status === 422 ? true : false
+  return response.status === 422 ? SKIPPED : false
 }
 
 function buildPayload(form, responses, force) {

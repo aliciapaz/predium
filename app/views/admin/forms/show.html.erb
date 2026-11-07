@@ -1,0 +1,4 @@
+<% content_for(:title, t("titles.form_show")) %>
+<% content_for(:page_title, @form.name) %>
+
+<%= render "forms/results", client_id: @form.client_id, form: @embedded_form, back_label: t("buttons.back"), back_path: @back_path %>

@@ -1,0 +1,43 @@
+<%# Results shell (KTD-4): farm info, scores, and charts hydrate client-side
+    via lib/scoring.js, from IndexedDB for the owner so results render offline
+    too, or from the embedded form for anyone else allowed to read it. %>
+<div class="max-w-2xl mx-auto flex flex-col gap-8" data-controller="results" data-results-client-id-value="<%= client_id %>" <%= tag.attributes(data: { results_form_value: form }) %>>
+  <div class="flex flex-col gap-4">
+    <%= link_to back_path, class: "back-link" do %>
+      <%= icon(:chevron_left) %>
+      <%= back_label %>
+    <% end %>
+
+    <%= alert_box t("offline.results_unavailable"), tone: :warning, class: "hidden", data: { results_target: "missing" } %>
+    <%= alert_box t("offline.results_load_failed"), tone: :warning, class: "hidden", data: { results_target: "loadFailed" } %>
+
+    <div data-results-target="farmInfo">
+      <p class="text-muted"><%= t("offline.loading") %></p>
+    </div>
+  </div>
+
+  <section>
+    <h2 class="section-title mb-3"><%= t("results.category_overview") %></h2>
+    <div class="card" data-results-target="radar"></div>
+  </section>
+
+  <section>
+    <h2 class="section-title mb-3"><%= t("results.dimension_scores") %></h2>
+    <div class="card-flush divide-y divide-line-soft" data-results-target="dimensions"></div>
+  </section>
+
+  <section>
+    <h2 class="section-title mb-3"><%= t("results.all_indicators") %></h2>
+    <div class="flex flex-col gap-3" data-results-target="indicators"></div>
+  </section>
+
+  <div class="pt-6 border-t border-line flex flex-wrap items-center justify-between gap-3">
+    <%= link_to back_label, back_path, class: "btn-quiet" %>
+    <% unless form %>
+      <%= link_to edit_form_path(client_id), class: "btn-primary", hidden: true, data: { results_target: "continue" } do %>
+        <%= t("questionnaire.continue") %>
+        <%= icon(:chevron_right) %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

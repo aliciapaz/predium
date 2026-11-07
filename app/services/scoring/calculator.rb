@@ -15,15 +15,23 @@ module Scoring
     def call
       responses = form.form_responses.index_by(&:indicator_key)
       indicator_scores = build_indicator_scores(responses)
+      l2_scores = build_l2_scores(indicator_scores)
 
       {
         indicator_scores: indicator_scores,
-        l2_scores: build_l2_scores(indicator_scores),
+        l2_scores: l2_scores,
         l1_scores: build_l1_scores(responses),
+        overall: build_overall(l2_scores),
       }
     end
 
     private
+
+    # The equal-weight mean of the scored dimensions; weighting is open in #43.
+    def build_overall(l2_scores)
+      scored = l2_scores.values.select(&:positive?)
+      (scored.sum.to_f / scored.size).round(1) if scored.any?
+    end
 
     def build_l1_scores(responses)
       QuestionnaireConfig.principle_keys.index_with { |key| responses[key]&.value }

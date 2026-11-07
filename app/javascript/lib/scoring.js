@@ -35,5 +35,11 @@ export function calculateScores(config, responses, territoryKey) {
     l1Scores[principle.key] = value === undefined ? null : value
   })
 
-  return { indicatorScores, l2Scores, l1Scores }
+  return { indicatorScores, l2Scores, l1Scores, overall: overallScore(l2Scores) }
+}
+
+// The equal-weight mean of the scored dimensions; weighting is open in #43.
+function overallScore(l2Scores) {
+  const scored = Object.values(l2Scores).filter((score) => score > 0)
+  return scored.length ? round1(scored.reduce((a, b) => a + b, 0) / scored.length) : null
 }

@@ -12,6 +12,15 @@ RSpec.describe("Forms", type: :request) do
   end
 
   describe "GET /forms" do
+    it "deletes from the whole page, so the list does not lose the card's frame" do
+      form = create(:form, user: user)
+      get forms_path
+
+      delete_form = page.at("form[data-turbo-confirm]")
+      expect(delete_form["data-turbo-frame"]).to(eq("_top"))
+      expect(delete_form["data-offline-forms-client-id-param"]).to(eq(form.client_id))
+    end
+
     it "tells the offline layer whose session it is, so unsynced work stays with its owner" do
       get forms_path
 
@@ -112,15 +121,115 @@ RSpec.describe("Forms", type: :request) do
       expect(response.body).not_to(include("Generar PDF"))
     end
 
-    it "redirects a draft to the editor" do
+    it "shows a draft's partial results with a way back to the questionnaire" do
       form = create(:form, user: user)
       get form_path(form)
-      expect(response).to(redirect_to(edit_form_path(form)))
+
+      expect(response).to(have_http_status(:ok))
+      expect(page.at("[data-results-target='continue']")["href"]).to(eq(edit_form_path(form)))
     end
 
     it "renders the shell for a form that only exists client-side" do
       get form_path(SecureRandom.uuid)
       expect(response).to(have_http_status(:ok))
+    end
+
+    it "leaves the owner's form to IndexedDB instead of embedding it" do
+      form = create(:form, :completed, user: user)
+      get form_path(form)
+
+      expect(page.at("[data-controller=results]")["data-results-form-value"]).to(be_nil)
+      expect(page.at("a.back-link")["href"]).to(eq(forms_path))
+    end
+
+    context "when another user owns the form" do
+      let(:organization) { create(:organization) }
+      let(:member) { create(:user) }
+      let(:form) { create(:form, :completed, user: member, name: "Los Andes") }
+
+      before do
+        create(:membership, user: member, organization: organization)
+        create(:form_response, form: form, indicator_key: "biodiversity", value: 7)
+      end
+
+      def embedded_form
+        JSON.parse(page.at("[data-controller=results]")["data-results-form-value"])
+      end
+
+      context "with the viewer an admin of the owner's organization" do
+        before { create(:membership, :admin, user: user, organization: organization) }
+
+        it "embeds the form and its responses in the results shell" do
+          get form_path(form)
+
+          expect(response).to(have_http_status(:ok))
+          expect(embedded_form).to(include("client_id" => form.client_id, "name" => "Los Andes", "state" => "completed"))
+          expect(embedded_form["responses"]).to(eq([
+            { "indicator_key" => "biodiversity", "value" => 7, "is_extension" => false },
+          ]))
+        end
+
+        it "shows a draft as read-only results instead of redirecting to the editor" do
+          draft = create(:form, user: member)
+          get form_path(draft)
+
+          expect(response).to(have_http_status(:ok))
+          expect(embedded_form).to(include("client_id" => draft.client_id, "state" => "draft"))
+          expect(page.at("[data-results-target='continue']")).to(be_nil)
+        end
+
+        it "links back to the organization's forms" do
+          get form_path(form)
+
+          expect(page.at("a.back-link")["href"]).to(eq(organization_forms_path(organization)))
+        end
+
+        it "denies a form the member made before joining the organization" do
+          earlier = create(:form, :completed, user: member, created_at: 1.day.ago)
+          get form_path(earlier)
+
+          expect(response).to(redirect_to(root_path))
+          expect(flash[:alert]).to(eq(I18n.t("flash.unauthorized")))
+        end
+      end
+
+      it "embeds the form for a super admin who is not in the organization" do
+        user.update!(platform_role: :super_admin)
+        get form_path(form)
+
+        expect(response).to(have_http_status(:ok))
+        expect(embedded_form).to(include("client_id" => form.client_id, "name" => "Los Andes"))
+      end
+
+      it "links a super admin back to the page they came from" do
+        user.update!(platform_role: :super_admin)
+        get form_path(form), headers: { "HTTP_REFERER" => "http://www.example.com/admin/users/7" }
+
+        expect(page.at("a.back-link")["href"]).to(eq("http://www.example.com/admin/users/7"))
+      end
+
+      it "never links a super admin back to another site" do
+        user.update!(platform_role: :super_admin)
+        get form_path(form), headers: { "HTTP_REFERER" => "https://evil.example/phish" }
+
+        expect(page.at("a.back-link")["href"]).to(eq(root_path))
+      end
+
+      it "denies an admin of a different organization" do
+        create(:membership, :admin, user: user, organization: create(:organization))
+        get form_path(form)
+
+        expect(response).to(redirect_to(root_path))
+        expect(flash[:alert]).to(eq(I18n.t("flash.unauthorized")))
+      end
+
+      it "denies a regular member of the same organization" do
+        create(:membership, user: user, organization: organization)
+        get form_path(form)
+
+        expect(response).to(redirect_to(root_path))
+        expect(flash[:alert]).to(eq(I18n.t("flash.unauthorized")))
+      end
     end
   end
 
