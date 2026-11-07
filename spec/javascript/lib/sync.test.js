@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { db, enqueue, getForm, getResponses, queueEntries, saveForm, saveResponse } from "lib/db"
+import { claimDevice } from "lib/device_owner"
 import { hydrateForm, resumeAfterLogin, seedFromServer, syncNow } from "lib/sync"
 import { clearDb } from "../support/db"
 import { resetHead, signIn } from "../support/dom"
@@ -11,6 +12,7 @@ beforeEach(async () => {
   localStorage.clear()
   resumeAfterLogin()
   signIn()
+  await claimDevice()
 })
 
 afterEach(() => {
@@ -388,6 +390,27 @@ describe("syncNow", () => {
     expect(fetch).toHaveBeenCalledTimes(1)
   })
 
+  // A pull that reads the queue just after a push was acknowledged would
+  // prune or roll back the form that push synced.
+  it("never runs a pull while a push is in flight", async () => {
+    await queueLocalForm()
+    const order = []
+    stubFetch(async (url, options = {}) => {
+      const request = `${options.method || "GET"} ${url}`
+      order.push(`start ${request}`)
+      await new Promise((resolve) => setTimeout(resolve, 5))
+      order.push(`end ${request}`)
+      return jsonResponse(url === "/api/forms" ? { forms: [] } : { form: serverForm() })
+    })
+
+    await Promise.all([syncNow(), seedFromServer()])
+
+    expect(order).toEqual([
+      "start PUT /api/forms/form-1", "end PUT /api/forms/form-1",
+      "start GET /api/forms", "end GET /api/forms"
+    ])
+  })
+
   it("does nothing when signed out or offline", async () => {
     await queueLocalForm()
     const fetch = stubFetch()
@@ -423,5 +446,27 @@ describe("sync finished event", () => {
     await syncNow()
 
     expect(events.at(-1)).toMatchObject({ status: "finished", synced: 0, pending: 1 })
+  })
+})
+
+// The service worker answers /api/ GETs from its cache when the network fails,
+// and an old cached form would roll back a clean local copy.
+describe("server pulls", () => {
+  const networkOnly = (fetch) => fetch.mock.calls[0][1].headers["X-Predium-Network-Only"]
+
+  it("tells the service worker not to fall back to a cached form list", async () => {
+    const fetch = stubFetch(async () => jsonResponse({ forms: [] }))
+
+    await seedFromServer()
+
+    expect(networkOnly(fetch)).toBe("1")
+  })
+
+  it("tells the service worker not to fall back to a cached form", async () => {
+    const fetch = stubFetch(async () => jsonResponse({ form: serverForm() }))
+
+    await hydrateForm("form-1")
+
+    expect(networkOnly(fetch)).toBe("1")
   })
 })

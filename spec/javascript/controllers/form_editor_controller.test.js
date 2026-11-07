@@ -456,6 +456,18 @@ describe("form editor controller", () => {
       expect(target("progressText").textContent).toBe("1 of 6 indicators")
     })
 
+    it("stops saving once another user owns the device", async () => {
+      await seedForm()
+      await mount(editor(), controllers)
+      await db.device_meta.put({ key: "owner", value: "someone-else" })
+
+      score("Recycling", 7)
+
+      await vi.waitFor(() => expect(target("saveState").textContent).toBe("Another session started on this device. Reload the page to keep working."))
+      expect(await getResponses(clientId)).toEqual({})
+      expect(await queueEntries()).toEqual([])
+    })
+
     it("stores a brand new form before its first response", async () => {
       await mount(editor({ id: "" }), controllers)
       const newId = window.location.pathname.split("/")[2]

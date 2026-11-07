@@ -3,6 +3,7 @@ import { newClientId, getForm, saveForm, getResponses, saveResponse, enqueue, pr
 import { cachedConfig, principles, territoryIndicators, dimensionIndicators, visibleDimensions } from "lib/config_cache"
 import { load as loadTranslations, t, has } from "lib/i18n"
 import { syncNow, hydrateForm, csrfToken } from "lib/sync"
+import { mayWrite } from "lib/device_owner"
 import { badge, band, escape, icon, iconButton } from "lib/ui"
 
 const HYDRATE_TIMEOUT_MS = 4000
@@ -180,6 +181,7 @@ export default class extends Controller {
   }
 
   async persistFarmInfo() {
+    if (!(await mayWrite())) return this.showSessionChanged()
     const territoryBefore = this.form.territory_key
 
     FARM_FIELDS.forEach((field) => {
@@ -216,6 +218,7 @@ export default class extends Controller {
 
   async persistResponse(key, value) {
     if (!value) return
+    if (!(await mayWrite())) return this.showSessionChanged()
     const isExtension = !this.isPrinciple(key)
     this.responses[key] = Number(value)
     if (!(await getForm(this.clientId))) await saveForm(this.form)
@@ -248,6 +251,10 @@ export default class extends Controller {
     this.saveStateTicket = (this.saveStateTicket || 0) + 1
     this.saveStateTarget.dataset.state = state
     this.saveStateTarget.textContent = t(state === "device" ? "offline.saved_locally" : "offline.saved_on_server")
+  }
+
+  showSessionChanged() {
+    this.saveStateTarget.textContent = t("offline.session_changed")
   }
 
   // ── Completion ─────────────────────────────────────────

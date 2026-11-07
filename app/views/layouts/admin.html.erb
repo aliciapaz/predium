@@ -8,6 +8,7 @@
 
     <% if user_signed_in? %>
       <meta name="predium-signed-in" content="true">
+      <meta name="predium-user" content="<%= current_user.id %>">
     <% end %>
 
     <%= yield :head %>
