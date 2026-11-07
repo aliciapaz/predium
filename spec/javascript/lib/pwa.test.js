@@ -3,7 +3,7 @@ import { db, enqueue, getForm, getResponses, queueEntries, saveForm, saveRespons
 import { resumeAfterLogin, syncNow } from "lib/sync"
 import "lib/pwa"
 import { clearDb } from "../support/db"
-import { resetHead, signInAs } from "../support/dom"
+import { resetHead, signIn, signInAs } from "../support/dom"
 import { jsonResponse, stubFetch } from "../support/fetch"
 
 beforeEach(async () => {
@@ -12,7 +12,10 @@ beforeEach(async () => {
   resetHead()
 })
 
-afterEach(() => resetHead())
+afterEach(() => {
+  resetHead()
+  delete navigator.serviceWorker
+})
 
 async function visit(event = "turbo:load") {
   const target = event === "load" ? window : document
@@ -196,5 +199,58 @@ describe("signing back in through Turbo after the session expired", () => {
     await visit()
 
     expect(fetch.mock.calls.some(([url, options]) => url === "/api/forms/offline-form" && options?.method === "PUT")).toBe(true)
+  })
+})
+
+describe("Turbo sign-in", () => {
+  function renderAssets() {
+    document.head.insertAdjacentHTML("beforeend", `
+      <link rel="stylesheet" href="/assets/tailwind-abc.css">
+      <link rel="modulepreload" href="/assets/application-abc.js">
+      <script type="importmap">{"imports": {"application": "/assets/application-abc.js", "lib/db": "/assets/lib/db-abc.js"}}</script>
+    `)
+  }
+
+  function stubServiceWorker() {
+    const postMessage = vi.fn()
+    navigator.serviceWorker = { ready: Promise.resolve({ active: { postMessage } }) }
+    return postMessage
+  }
+
+  function questionnaireFetches(fetch) {
+    return fetch.mock.calls.filter(([url]) => url === "/api/questionnaire?schema=2").length
+  }
+
+  // The module-level once-per-sign-in latch carries across tests, so the whole
+  // session lifecycle lives in one case.
+  it("hands the service worker the app shell and seeds once per sign-in", async () => {
+    await signedOutPage("turbo:load")
+    const fetch = stubFetch(async () => jsonResponse({ forms: [] }))
+    const postMessage = stubServiceWorker()
+    renderAssets()
+    signIn()
+
+    document.dispatchEvent(new Event("turbo:load"))
+    window.dispatchEvent(new Event("load"))
+
+    await vi.waitFor(() => expect(postMessage).toHaveBeenCalledWith({
+      type: "predium:precache",
+      assets: [
+        "http://localhost:3000/assets/tailwind-abc.css",
+        "http://localhost:3000/assets/application-abc.js",
+        "http://localhost:3000/assets/lib/db-abc.js"
+      ]
+    }))
+    await vi.waitFor(() => expect(questionnaireFetches(fetch)).toBe(1))
+    expect(postMessage).toHaveBeenCalledTimes(1)
+
+    resetHead()
+    document.dispatchEvent(new Event("turbo:load"))
+    renderAssets()
+    signIn()
+    document.dispatchEvent(new Event("turbo:load"))
+
+    await vi.waitFor(() => expect(postMessage).toHaveBeenCalledTimes(2))
+    await vi.waitFor(() => expect(questionnaireFetches(fetch)).toBe(2))
   })
 })
