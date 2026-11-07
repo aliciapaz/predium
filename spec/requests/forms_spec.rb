@@ -12,6 +12,18 @@ RSpec.describe("Forms", type: :request) do
   end
 
   describe "GET /forms" do
+    it "tells the offline layer whose session it is, so unsynced work stays with its owner" do
+      get forms_path
+
+      expect(page.at("meta[name='predium-user']")["content"]).to(eq(user.id.to_s))
+    end
+
+    it "warns before signing out with unsynced changes" do
+      get forms_path
+
+      expect(page.css("form[data-controller='sign-out']").size).to(eq(2))
+    end
+
     it "names the farm in the delete action and its confirmation" do
       create(:form, user: user, name: "La Esperanza")
       get forms_path
