@@ -45,7 +45,7 @@ RSpec.describe(DesignCheck) do
   end
 
   it "flags class names completed by interpolation, in Ruby and JS" do
-    expect(check("app/helpers/x_helper.rb", 'tag.span(class: "badge-#{tone}")')).to(include("token.dynamic-class"))
+    expect(check("app/helpers/x_helper.rb", 'tag.span(class: "badge-#{tone}")')).to(include("token.dynamic-class")) # rubocop:disable Lint/InterpolationCheck
     expect(check("app/javascript/x.js", "const c = `badge-${tone}`")).to(include("token.dynamic-class"))
     expect(check("app/javascript/y.js", "getPropertyValue(`--color-${name}`)")).to(be_empty)
   end
