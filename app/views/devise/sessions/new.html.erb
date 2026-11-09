@@ -19,7 +19,7 @@
 
       <% if devise_mapping.rememberable? %>
         <label class="flex items-center gap-3 min-h-11 text-ink-soft cursor-pointer">
-          <%= f.check_box :remember_me %>
+          <%= f.check_box :remember_me, checked: f.object.remember_me != "0" %>
           <%= t("activerecord.attributes.user.remember_me", default: "Remember me") %>
         </label>
       <% end %>
