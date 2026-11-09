@@ -36,6 +36,11 @@ export function csrfToken() {
   return document.querySelector('meta[name="csrf-token"]')?.content
 }
 
+function replaceCsrfToken(token) {
+  const meta = document.querySelector('meta[name="csrf-token"]')
+  if (meta) meta.content = token
+}
+
 function notify(status, detail = {}) {
   document.dispatchEvent(new CustomEvent("predium:sync-status", { detail: { status, ...detail } }))
 }
@@ -137,7 +142,7 @@ async function drain() {
   notify("finished", { synced, pending: await pendingCount() })
 }
 
-async function pushEntry(entry, force = false) {
+async function pushEntry(entry, force = false, tokenRefreshed = false) {
   const snapshot = await snapshotOwnedForm(entry.form_client_id)
   if (snapshot === OWNER_CHANGED) return false
   if (!snapshot) {
@@ -177,6 +182,14 @@ async function pushEntry(entry, force = false) {
 
   if (response.status === 409) {
     return handleConflict(entry, form, (await response.json()).conflict)
+  }
+
+  if (response.status === 403 && !tokenRefreshed) {
+    const { csrf_token: freshToken } = await response.json().catch(() => ({}))
+    if (freshToken) {
+      replaceCsrfToken(freshToken)
+      return pushEntry(entry, force, true)
+    }
   }
 
   if (response.status === 401) {
