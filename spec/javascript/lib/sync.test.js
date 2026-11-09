@@ -329,6 +329,31 @@ describe("syncNow", () => {
     expect(fetch).toHaveBeenCalledTimes(2)
   })
 
+  it("retries once with the fresh CSRF token when the page's token is stale", async () => {
+    await queueLocalForm()
+    const fetch = stubFetch(async (_url, options) => options.headers["X-CSRF-Token"] === "fresh-token"
+      ? jsonResponse({ form: serverForm() })
+      : jsonResponse({ error: "invalid_csrf_token", csrf_token: "fresh-token" }, 403))
+
+    await syncNow()
+
+    expect(fetch).toHaveBeenCalledTimes(2)
+    expect(await queueEntries()).toHaveLength(0)
+    expect(document.querySelector('meta[name="csrf-token"]').content).toBe("fresh-token")
+  })
+
+  it("gives up after one CSRF refresh and keeps the entry queued", async () => {
+    await queueLocalForm()
+    const fetch = stubFetch(async () => jsonResponse({ error: "invalid_csrf_token", csrf_token: "fresh-token" }, 403))
+
+    await syncNow()
+
+    expect(fetch).toHaveBeenCalledTimes(2)
+    expect(await queueEntries()).toEqual([
+      expect.objectContaining({ form_client_id: "form-1", last_error: "HTTP 403" })
+    ])
+  })
+
   it("records a 422 rejection and moves on to the next entry", async () => {
     await queueLocalForm()
     await queueLocalForm({ client_id: "form-2" })
