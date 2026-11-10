@@ -7,7 +7,7 @@ gem "rails", "~> 8.1.4"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use postgresql as the database for Active Record
-gem "pg", "~> 1.1"
+gem "pg", "~> 1.7"
 # Pin json to the 2.x line: 3.x changes JSON.parse's signature and breaks
 # Rails request parameter parsing. 2.19.9 clears the known advisories.
 gem "json", ">= 2.19.9", "< 4.0"
