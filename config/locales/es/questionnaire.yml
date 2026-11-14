@@ -54,20 +54,25 @@ es:
 
     # ── Dimensiones ───────────────────────────────────────
     dimensions:
-      soil_health: "Salud del suelo"
-      soil_management: "Manejo del suelo"
+      soil_health: "Calidad de suelo"
+      soil_management: "Manejo ecológico de suelo"
       water_availability: "Disponibilidad de agua"
       water_quality: "Calidad del agua"
       water_management: "Gestión del agua"
       crop_diversity: "Diversidad de cultivos"
-      ecosystem_diversity: "Diversidad del ecosistema"
-      farm_planning: "Planificación del predio"
-      input_management: "Gestión de insumos"
-      animal_management: "Manejo animal"
+      ecosystem_diversity: "Biodiversidad"
+      farm_planning: "Decisión para agroecología"
+      input_management: "Manejo sanitario e insumos"
+      animal_management: "Alimentación animal de origen predial"
       economic_viability: "Viabilidad económica"
       social_wellbeing: "Bienestar social"
       climate_adaptation: "Adaptación climática"
-      system_resilience: "Resiliencia del sistema"
+      system_resilience: "Salud de los cultivos"
+
+    # Etiquetas cortas para el radar de dimensiones; sin etiqueta, usa el nombre.
+    dimension_chart_labels:
+      water_availability: "Agua disponible"
+      animal_management: "Alimentación animal"
 
     # ── Indicadores L2 (extension Chile; nombre y pistas por rango de puntaje) ──
     indicators:
