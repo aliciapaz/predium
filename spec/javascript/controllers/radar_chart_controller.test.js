@@ -45,20 +45,20 @@ describe("radar chart controller", () => {
     expect(lines.join(" ")).toBe(label)
   })
 
-  it("keeps the regular label size for a radar with a handful of axes", async () => {
-    const labels = ["A", "B", "C", "D", "E", "F"]
+  it("keeps the regular label size up to eight axes", async () => {
+    const labels = Array.from({ length: 8 }, (_, index) => `Axis ${index}`)
     await mount(fixture.replace('["Soil","Water"]', JSON.stringify(labels)), { "radar-chart": RadarChartController })
 
     const [, options] = Chart.mock.calls[0]
     expect(options.options.scales.r.pointLabels.font.size).toBe(12)
   })
 
-  it("shrinks the labels of a many-axis radar while keeping each one whole", async () => {
-    const labels = Array.from({ length: 11 }, (_, index) => `Diversidad del ecosistema ${index}`)
+  it("shrinks the labels past eight axes while keeping each one whole", async () => {
+    const labels = Array.from({ length: 9 }, (_, index) => `Diversidad del ecosistema ${index}`)
     await mount(fixture.replace('["Soil","Water"]', JSON.stringify(labels)), { "radar-chart": RadarChartController })
 
     const [, options] = Chart.mock.calls[0]
-    expect(options.options.scales.r.pointLabels.font.size).toBeLessThan(12)
+    expect(options.options.scales.r.pointLabels.font.size).toBe(10)
     options.data.labels.forEach((lines, index) => {
       expect([lines].flat().join(" ")).toBe(labels[index])
     })
