@@ -325,7 +325,7 @@ describe("results controller", () => {
       const card = target("dimensionRadar")
       const radar = card.querySelector('[data-controller="radar-chart"]')
       expect(card.classList).not.toContain("hidden")
-      expect(JSON.parse(radar.dataset.radarChartLabelsValue)).toEqual(["Structure", "Fertility", "Supply"])
+      expect(JSON.parse(radar.dataset.radarChartLabelsValue)).toEqual(["Structure", "Fert.", "Supply"])
       expect(JSON.parse(radar.dataset.radarChartScoresValue)).toEqual([3, 9, 0])
       expect(radar.querySelector('canvas[data-radar-chart-target="canvas"]')).not.toBeNull()
     })

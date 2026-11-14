@@ -110,6 +110,13 @@ export default class extends Controller {
     return t(has(key) ? key : `${principle.i18n_key}.name`)
   }
 
+  // A dimension's name is a plain string, so it cannot nest a chart_label the
+  // way a principle does; its short label lives in a sibling namespace.
+  dimensionChartLabel(dimension) {
+    const key = `questionnaire.dimension_chart_labels.${dimension.key}`
+    return t(has(key) ? key : dimension.i18n_key)
+  }
+
   fact(label, value, wide = false) {
     return `<div class="${wide ? "col-span-2 " : ""}rounded-lg bg-canvas px-4 py-3">
               <dt class="text-sm text-muted">${escape(label)}</dt>
@@ -142,7 +149,7 @@ export default class extends Controller {
     const dimensions = visibleDimensions(this.config, this.form.territory_key)
     if (dimensions.length < 3) return
 
-    const labels = dimensions.map((dimension) => t(dimension.i18n_key))
+    const labels = dimensions.map((dimension) => this.dimensionChartLabel(dimension))
     const scores = dimensions.map((dimension) => this.scores.l2Scores[dimension.key] || 0)
     this.dimensionRadarTarget.replaceChildren(radarMount(labels, scores))
     this.dimensionRadarTarget.classList.remove("hidden")
