@@ -2,6 +2,10 @@ import { Controller } from "@hotwired/stimulus"
 import "chart.js"
 import { tokenColor } from "lib/ui"
 
+// Past this many axes the labels ring a phone-width radar so tightly that the
+// plot shrinks to a dot; smaller labels give the polygon back its room.
+const CROWDED_AXES = 8
+
 export default class extends Controller {
   static targets = ["canvas"]
   static values = { labels: Array, scores: Array }
@@ -11,6 +15,7 @@ export default class extends Controller {
     const primary = tokenColor("primary")
     const line = tokenColor("line")
     const font = getComputedStyle(document.body).fontFamily
+    const crowded = this.labelsValue.length > CROWDED_AXES
 
     this.chart = new Chart(this.canvasTarget, {
       type: "radar",
@@ -48,7 +53,7 @@ export default class extends Controller {
             angleLines: { color: line },
             pointLabels: {
               color: tokenColor("ink-soft"),
-              font: { family: font, size: 12, weight: "600" }
+              font: { family: font, size: crowded ? 10 : 12, weight: "600" }
             }
           }
         }

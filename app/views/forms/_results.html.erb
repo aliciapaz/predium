@@ -23,7 +23,10 @@
 
   <section>
     <h2 class="section-title mb-3"><%= t("results.dimension_scores") %></h2>
-    <div class="card-flush divide-y divide-line-soft" data-results-target="dimensions"></div>
+    <div class="flex flex-col gap-3">
+      <div class="card hidden" data-results-target="dimensionRadar"></div>
+      <div class="card-flush divide-y divide-line-soft" data-results-target="dimensions"></div>
+    </div>
   </section>
 
   <section>

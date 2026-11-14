@@ -51,6 +51,7 @@ export const translations = {
   "dimensions.structure": "Structure",
   "dimensions.fertility": "Fertility",
   "dimensions.supply": "Supply",
+  "questionnaire.dimension_chart_labels.fertility": "Fert.",
   "extensions.andes": "Andes extension",
   "extensions.coast": "Coast extension",
   "extensions.puna": "Puna extension",

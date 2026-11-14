@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { applyServerForm, db, saveResponse } from "lib/db"
+import { applyServerForm, db, putConfig, saveResponse } from "lib/db"
 import { hydrateForm } from "lib/sync"
 import ResultsController from "controllers/results_controller"
 import { clearDb } from "../support/db"
-import { seedQuestionnaire } from "../support/questionnaire"
+import { config, seedQuestionnaire } from "../support/questionnaire"
 import { mount, unmount } from "../support/stimulus"
 
 vi.mock("lib/sync", async (importOriginal) => ({
@@ -19,6 +19,7 @@ const shell = (attributes = "") => `
     <div data-results-target="loadFailed" class="hidden">Could not load</div>
     <div data-results-target="farmInfo"><p>Loading</p></div>
     <div data-results-target="radar"></div>
+    <div data-results-target="dimensionRadar" class="hidden"></div>
     <div data-results-target="dimensions"></div>
     <div data-results-target="indicators"></div>
     <a data-results-target="continue" href="/forms/${clientId}/edit" hidden>Continue</a>
@@ -132,6 +133,8 @@ describe("results controller", () => {
       expect(target("missing").classList).toContain("hidden")
       expect(target("farmInfo").querySelector("h1").textContent).toBe("La Esperanza")
       expect(indicatorRow("Compaction").lastElementChild.textContent).toBe("2")
+      const dimensionRadar = target("dimensionRadar").querySelector('[data-controller="radar-chart"]')
+      expect(JSON.parse(dimensionRadar.dataset.radarChartScoresValue)).toEqual([3, 9, 0])
       expect(await db.forms.count()).toBe(0)
       expect(await db.form_responses.count()).toBe(0)
     })
@@ -314,6 +317,52 @@ describe("results controller", () => {
       expect(JSON.parse(radar.dataset.radarChartLabelsValue)).toEqual(["Diversity", "Reuse"])
       expect(JSON.parse(radar.dataset.radarChartScoresValue)).toEqual([6, 0])
       expect(radar.querySelector('canvas[data-radar-chart-target="canvas"]')).not.toBeNull()
+    })
+
+    it("mounts the dimension radar with translated dimension labels and dimension scores", async () => {
+      await mount(fixture, { results: ResultsController })
+
+      const card = target("dimensionRadar")
+      const radar = card.querySelector('[data-controller="radar-chart"]')
+      expect(card.classList).not.toContain("hidden")
+      expect(JSON.parse(radar.dataset.radarChartLabelsValue)).toEqual(["Structure", "Fert.", "Supply"])
+      expect(JSON.parse(radar.dataset.radarChartScoresValue)).toEqual([3, 9, 0])
+      expect(radar.querySelector('canvas[data-radar-chart-target="canvas"]')).not.toBeNull()
+    })
+
+    it("draws no dimension radar for a territory with a single dimension, but keeps its bar", async () => {
+      await applyServerForm(serverForm({ territory_key: "puna", responses: [] }))
+
+      await mount(fixture, { results: ResultsController })
+
+      expect(target("dimensionRadar").classList).toContain("hidden")
+      expect(target("dimensionRadar").querySelector('[data-controller="radar-chart"]')).toBeNull()
+      expect(target("dimensions").children).toHaveLength(1)
+    })
+
+    it("draws no dimension radar for a territory with only two dimensions", async () => {
+      await putConfig({
+        ...config,
+        extensions: {
+          ...config.extensions,
+          delta: {
+            territory: "delta",
+            i18n_key: "extensions.delta",
+            extends: null,
+            indicators: [
+              { key: "frost", i18n_key: "indicators.frost", dimension: "structure", extension: "delta" },
+              { key: "irrigation", i18n_key: "indicators.irrigation", dimension: "supply", extension: "delta" }
+            ]
+          }
+        }
+      })
+      await applyServerForm(serverForm({ territory_key: "delta", responses: [] }))
+
+      await mount(fixture, { results: ResultsController })
+
+      expect(target("dimensions").children).toHaveLength(2)
+      expect(target("dimensionRadar").classList).toContain("hidden")
+      expect(target("dimensionRadar").querySelector('[data-controller="radar-chart"]')).toBeNull()
     })
 
     it("labels a draft as a draft", async () => {

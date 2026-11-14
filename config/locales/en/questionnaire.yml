@@ -54,20 +54,20 @@ en:
 
     # ── Dimensions ────────────────────────────────────────
     dimensions:
-      soil_health: "Soil health"
-      soil_management: "Soil management"
+      soil_health: "Soil quality"
+      soil_management: "Ecological soil management"
       water_availability: "Water availability"
       water_quality: "Water quality"
       water_management: "Water management"
       crop_diversity: "Crop diversity"
-      ecosystem_diversity: "Ecosystem diversity"
-      farm_planning: "Farm planning"
-      input_management: "Input management"
-      animal_management: "Animal management"
+      ecosystem_diversity: "Biodiversity"
+      farm_planning: "Decision for agroecology"
+      input_management: "Sanitary management and inputs"
+      animal_management: "On-farm animal feed"
       economic_viability: "Economic viability"
       social_wellbeing: "Social wellbeing"
       climate_adaptation: "Climate adaptation"
-      system_resilience: "System resilience"
+      system_resilience: "Crop health"
 
     # ── L2 indicators (Chile extension; range hints are provisional translations of the Spanish) ──
     indicators:

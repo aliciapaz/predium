@@ -134,6 +134,13 @@ RSpec.describe("Forms", type: :request) do
       expect(response).to(have_http_status(:ok))
     end
 
+    it "ships the dimension radar slot hidden until the results controller fills it" do
+      form = create(:form, :completed, user: user)
+      get form_path(form)
+
+      expect(page.at("[data-results-target='dimensionRadar']")["class"].split).to(include("hidden"))
+    end
+
     it "leaves the owner's form to IndexedDB instead of embedding it" do
       form = create(:form, :completed, user: user)
       get form_path(form)

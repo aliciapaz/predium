@@ -10,7 +10,7 @@ import { averageBand, badge, band, escape, icon } from "lib/ui"
 // the server embedded when the viewer does not own it. Scores and charts
 // always compute client-side via lib/scoring.js, online and offline.
 export default class extends Controller {
-  static targets = ["missing", "loadFailed", "farmInfo", "radar", "dimensions", "indicators", "continue"]
+  static targets = ["missing", "loadFailed", "farmInfo", "radar", "dimensionRadar", "dimensions", "indicators", "continue"]
   static values = { clientId: String, form: Object }
 
   async connect() {
@@ -31,6 +31,7 @@ export default class extends Controller {
     this.renderFarmInfo()
     if (this.hasContinueTarget) this.continueTarget.hidden = this.form.state !== "draft"
     this.renderRadar()
+    this.renderDimensionRadar()
     this.renderDimensions()
     this.renderIndicators()
   }
@@ -109,6 +110,13 @@ export default class extends Controller {
     return t(has(key) ? key : `${principle.i18n_key}.name`)
   }
 
+  // A dimension's name is a plain string, so it cannot nest a chart_label the
+  // way a principle does; its short label lives in a sibling namespace.
+  dimensionChartLabel(dimension) {
+    const key = `questionnaire.dimension_chart_labels.${dimension.key}`
+    return t(has(key) ? key : dimension.i18n_key)
+  }
+
   fact(label, value, wide = false) {
     return `<div class="${wide ? "col-span-2 " : ""}rounded-lg bg-canvas px-4 py-3">
               <dt class="text-sm text-muted">${escape(label)}</dt>
@@ -121,17 +129,7 @@ export default class extends Controller {
     const names = items.map((principle) => t(`${principle.i18n_key}.name`))
     const labels = items.map((principle) => this.chartLabel(principle))
     const scores = items.map((principle) => this.scores.l1Scores[principle.key] || 0)
-
-    // Built via DOM APIs: the JSON attribute values contain double quotes,
-    // which an innerHTML template would need attribute-escaping for.
-    const mount = document.createElement("div")
-    mount.className = "max-w-md mx-auto"
-    mount.dataset.controller = "radar-chart"
-    mount.setAttribute("data-radar-chart-labels-value", JSON.stringify(labels))
-    mount.setAttribute("data-radar-chart-scores-value", JSON.stringify(scores))
-    const canvas = document.createElement("canvas")
-    canvas.setAttribute("data-radar-chart-target", "canvas")
-    mount.appendChild(canvas)
+    const mount = radarMount(labels, scores)
 
     const list = document.createElement("ul")
     list.className = "mt-4 divide-y divide-line-soft border-t border-line-soft"
@@ -143,6 +141,18 @@ export default class extends Controller {
               </li>`
     }).join("")
     this.radarTarget.replaceChildren(mount, list)
+  }
+
+  // The dimension bars below carry the same scores, so this radar gets no
+  // list of its own. Under three axes a radar is a line or a dot, not a shape.
+  renderDimensionRadar() {
+    const dimensions = visibleDimensions(this.config, this.form.territory_key)
+    if (dimensions.length < 3) return
+
+    const labels = dimensions.map((dimension) => this.dimensionChartLabel(dimension))
+    const scores = dimensions.map((dimension) => this.scores.l2Scores[dimension.key] || 0)
+    this.dimensionRadarTarget.replaceChildren(radarMount(labels, scores))
+    this.dimensionRadarTarget.classList.remove("hidden")
   }
 
   renderDimensions() {
@@ -187,4 +197,18 @@ export default class extends Controller {
               </details>`
     }).join("")
   }
+}
+
+// Built via DOM APIs: the JSON attribute values contain double quotes, which
+// an innerHTML template would need attribute-escaping for.
+function radarMount(labels, scores) {
+  const mount = document.createElement("div")
+  mount.className = "max-w-md mx-auto"
+  mount.dataset.controller = "radar-chart"
+  mount.setAttribute("data-radar-chart-labels-value", JSON.stringify(labels))
+  mount.setAttribute("data-radar-chart-scores-value", JSON.stringify(scores))
+  const canvas = document.createElement("canvas")
+  canvas.setAttribute("data-radar-chart-target", "canvas")
+  mount.appendChild(canvas)
+  return mount
 }
