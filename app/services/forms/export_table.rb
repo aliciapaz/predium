@@ -81,13 +81,16 @@ module Forms
     end
 
     def system_types(form)
-      form.system_types.map { |type| t("farm_info.system_#{type}") }.join(SYSTEM_TYPE_SEPARATOR).presence
+      Array(form.system_types).map { |type| t("farm_info.system_#{type}") }.join(SYSTEM_TYPE_SEPARATOR).presence
     end
 
+    # A form keeps its key if its territory has since left the questionnaire,
+    # as scoring does, rather than failing the whole export.
     def territory(form)
-      return if form.territory_key.blank?
+      key = form.territory_key
+      return key unless QuestionnaireConfig.extension_keys.include?(key)
 
-      t(QuestionnaireConfig.extension(form.territory_key)[:i18n_key])
+      t(QuestionnaireConfig.extension(key)[:i18n_key])
     end
 
     def timestamp(time)

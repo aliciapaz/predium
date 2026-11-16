@@ -31,9 +31,15 @@ module Forms
     def xlsx
       package = Axlsx::Package.new
       package.workbook.add_worksheet(name: I18n.t("navigation.forms")) do |sheet|
-        table.each { |row| sheet.add_row(row) }
+        table.each { |row| sheet.add_row(row, types: cell_types(row)) }
       end
       package.to_stream.read
+    end
+
+    # caxlsx turns any numeric-looking text into a number, so an ID like
+    # "001234" would lose its zeros. Only real numbers are left to it.
+    def cell_types(row)
+      row.map { |value| :string unless value.is_a?(Numeric) }
     end
 
     def neutralize_formula(value)
