@@ -587,8 +587,11 @@
     font-variant-numeric: tabular-nums;
   }
 
+  /* Steps back by color, not opacity: faded text fell below 3:1, and these
+     rows are the definition of each score. */
   [data-question]:has(input:checked) & {
-    opacity: 0.5;
+    color: var(--color-muted);
+    background-color: var(--color-surface);
   }
 
   [data-question]:has(input[data-band="low"]:checked) &[data-band="low"] {
