@@ -244,7 +244,8 @@ es:
     latitude: "Latitud"
     longitude: "Longitud"
     use_gps: "Usar GPS"
-    territory_extension: "Territorio (extensión opcional)"
+    territory_extension: "Territorio"
+    territory_hint: "Define qué indicadores se evalúan. Sin territorio solo se responden los principios. Elígelo antes de empezar: al cambiarlo se descartan los puntajes que ya no aplican."
     genders:
       not_specified: "No especificado"
       male: "Masculino"
