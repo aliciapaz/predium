@@ -277,6 +277,10 @@ en:
       other: "Average of %{count} dimensions."
     highest: "Highest: %{name}."
     lowest: "Lowest: %{name}."
+    bands:
+      low: "Low"
+      mid: "Mid"
+      high: "High"
 
   # ── Admin ──────────────────────────────────────────────
   admin:

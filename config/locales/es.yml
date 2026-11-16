@@ -277,6 +277,10 @@ es:
       other: "Promedio de %{count} dimensiones."
     highest: "Más alto: %{name}."
     lowest: "Más bajo: %{name}."
+    bands:
+      low: "Bajo"
+      mid: "Medio"
+      high: "Alto"
 
   # ── Admin ──────────────────────────────────────────────
   admin:

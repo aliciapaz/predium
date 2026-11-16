@@ -65,7 +65,7 @@
                 <td>
                   <%= link_to form.name, admin_form_path(form), class: "link" %>
                 </td>
-                <td><%= badge(form.state.titleize, tone: form.completed? ? :success : :warning) %></td>
+                <td><%= badge(form.state.titleize, tone: form.completed? ? :success : :neutral) %></td>
                 <td><%= form.country %></td>
                 <td><%= format_admin_date(form.created_at) %></td>
               </tr>

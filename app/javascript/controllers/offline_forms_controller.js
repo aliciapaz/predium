@@ -40,7 +40,7 @@ export default class extends Controller {
     }
 
     this.listTarget.innerHTML = `
-      ${this.section(t("forms.drafts"), await cards(drafts), drafts.length, "warning", t("forms.no_drafts"))}
+      ${this.section(t("forms.drafts"), await cards(drafts), drafts.length, "neutral", t("forms.no_drafts"))}
       ${this.section(t("forms.completed"), await cards(completed), completed.length, "success", t("forms.no_completed"))}`
   }
 
@@ -99,7 +99,7 @@ export default class extends Controller {
                 <div class="flex items-start justify-between gap-3">
                   <h3 class="text-lg leading-snug min-w-0 break-words">${escape(form.name || "")}</h3>
                   <span class="flex flex-wrap justify-end gap-1">
-                    ${badge(t(draft ? "states.draft" : "states.completed"), draft ? "warning" : "success")}
+                    ${badge(t(draft ? "states.draft" : "states.completed"), draft ? "neutral" : "success")}
                     ${isPending ? badge(t("offline.pending_sync"), "neutral") : ""}
                   </span>
                 </div>

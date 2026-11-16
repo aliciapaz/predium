@@ -49,7 +49,7 @@
                     <% end %>
                   </td>
                   <td data-label="<%= t("labels.status") %>">
-                    <%= badge(t("states.#{form.state}"), tone: form.state == "completed" ? :success : :warning) %>
+                    <%= badge(t("states.#{form.state}"), tone: form.state == "completed" ? :success : :neutral) %>
                   </td>
                   <td data-label="<%= t("labels.location") %>"><%= [form.locality, form.region].compact_blank.join(", ").presence || "-" %></td>
                   <td data-label="<%= t("labels.date") %>" class="text-muted"><%= form_date(form) %></td>

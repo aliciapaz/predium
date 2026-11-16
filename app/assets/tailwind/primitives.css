@@ -644,6 +644,55 @@
   }
 }
 
+/* The headline score: the chip at headline size, with its scale so the value
+   never reads without "out of 10". Doubled selector so it wins over the
+   score-chip base regardless of utility order. */
+@utility score-chip-lg {
+  &:is(.score-chip-lg) {
+    align-items: baseline;
+    width: auto;
+    height: auto;
+    padding: 0.625rem 0.75rem;
+    font-size: 1.75rem;
+    line-height: 1;
+  }
+
+  & small {
+    margin-inline-start: 0.125rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+}
+
+/* Key for the score colors: a band swatch beside each band's name. */
+@utility score-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  padding: 0;
+  list-style: none;
+  font-size: 0.875rem;
+  color: var(--color-ink-soft);
+
+  & li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  & li::before {
+    content: "";
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 9999px;
+    background-color: var(--color-muted);
+  }
+
+  & li[data-band="low"]::before { background-color: var(--color-score-low-mark); }
+  & li[data-band="mid"]::before { background-color: var(--color-score-mid-mark); }
+  & li[data-band="high"]::before { background-color: var(--color-score-high-mark); }
+}
+
 @utility score-bar {
   height: 100%;
   background-color: var(--color-muted);
