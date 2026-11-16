@@ -10,7 +10,13 @@ export default class extends Controller {
   static targets = ["link", "trigger", "offlineNote", "failedNote"]
   static values = { busy: String, failed: String, offline: String }
 
+  // A page restored from the Turbo cache can carry the busy state of a
+  // download that was still running when it was snapshotted; nothing is in
+  // flight for a controller that just connected.
   connect() {
+    this.linkTargets.forEach((link) => {
+      if (link.getAttribute("aria-busy") === "true") this.setBusy(link, false)
+    })
     this.refresh()
   }
 

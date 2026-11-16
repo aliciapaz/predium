@@ -41,7 +41,7 @@ module Forms
         t("farm_info.workforce_people"), t("farm_info.land_area_ha"), t("farm_info.system_types"),
         t("farm_info.country"), t("farm_info.region"), t("farm_info.locality"),
         t("farm_info.latitude"), t("farm_info.longitude"), t("exports.territory"), t("farm_info.observations"),
-        t("labels.created_at"), t("labels.updated_at"), t("exports.completed_at"),
+        *[t("labels.created_at"), t("labels.updated_at"), t("exports.completed_at")].map { |label| t("exports.utc", label:) },
       ]
     end
 

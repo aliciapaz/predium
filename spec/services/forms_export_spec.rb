@@ -65,12 +65,38 @@ RSpec.describe(Forms::Export) do
   end
 
   it "keeps a field agent's text from running as a formula in a spreadsheet" do
-    create(:form, user: user, name: "=HYPERLINK(\"http://evil.test\")", phone: "+56 9 1234 5678")
+    create(:form, user: user, name: "=HYPERLINK(\"http://evil.test\")", observations: "- comprar semillas")
 
     row = csv_rows.first
 
     expect(row["Nombre del predio"]).to(eq("'=HYPERLINK(\"http://evil.test\")"))
-    expect(row["Teléfono"]).to(eq("'+56 9 1234 5678"))
+    expect(row["Observaciones"]).to(eq("'- comprar semillas"))
+  end
+
+  it "leaves phone numbers and other plain numbers as they are, since they cannot hold a formula" do
+    create(:form, user: user, phone: "+56 (9) 1234 5678", national_id: "-12.345")
+
+    row = csv_rows.first
+
+    expect(row["Teléfono"]).to(eq("+56 (9) 1234 5678"))
+    expect(row["Identificación nacional"]).to(eq("-12.345"))
+  end
+
+  it "still quotes arithmetic, which a spreadsheet would compute in place of the value" do
+    ["+1+2", "-(1+2)", "+56-9-1234"].each_with_index do |value, index|
+      create(:form, user: user, name: "Predio #{index}", phone: value)
+    end
+
+    expect(csv_rows.map { |row| row["Teléfono"] }).to(contain_exactly("'+1+2", "'-(1+2)", "'+56-9-1234"))
+  end
+
+  it "says the timestamps are in UTC" do
+    create(:form, :completed, user: user, completed_at: Time.utc(2026, 11, 16, 1, 0))
+
+    row = csv_rows.first
+
+    expect(row.headers).to(include("Creado (UTC)", "Última actualización (UTC)", "Completado (UTC)"))
+    expect(row["Completado (UTC)"]).to(eq("2026-11-16 01:00"))
   end
 
   it "keeps numeric-looking text as text in Excel and scores as numbers" do

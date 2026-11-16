@@ -8,6 +8,10 @@ module Forms
     # A text cell opening with one of these runs as a formula when the CSV is
     # opened in a spreadsheet. caxlsx already escapes them in the xlsx.
     FORMULA_PREFIX = /\A[=+\-@\t\r]/
+    # One leading sign over digits and phone punctuation cannot call a function,
+    # reference a cell or do arithmetic, so phones like "+56 9 1234 5678" are
+    # left as typed. A second + or - would be computed, so it stays quoted.
+    PLAIN_NUMBER = /\A[+-]?[\d\s().]*\z/
 
     def initialize(forms, format:)
       @forms = forms
@@ -43,7 +47,11 @@ module Forms
     end
 
     def neutralize_formula(value)
-      value.is_a?(String) && value.match?(FORMULA_PREFIX) ? "'#{value}" : value
+      formula_like?(value) ? "'#{value}" : value
+    end
+
+    def formula_like?(value)
+      value.is_a?(String) && value.match?(FORMULA_PREFIX) && !value.match?(PLAIN_NUMBER)
     end
 
     def table

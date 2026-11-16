@@ -129,6 +129,22 @@ describe("download controller", () => {
     expect(panel().hidden).toBe(false)
   })
 
+  it("clears a busy state left in a page restored from the Turbo cache", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(fileResponse()))
+    const restored = fixture
+      .replace('data-action="download#save">', 'data-action="download#save" aria-busy="true" data-hint="Recommended.">')
+      .replace('<span class="menu-item-hint">Recommended.</span>', '<span class="menu-item-hint">Preparing file…</span>')
+    await mount(restored, { menu: MenuController, download: DownloadController })
+
+    expect(link().hasAttribute("aria-busy")).toBe(false)
+    expect(hint().textContent).toBe("Recommended.")
+
+    trigger().click()
+    tap(link())
+    await settle()
+    expect(saved).toEqual(["predium-2026-11-15.xlsx"])
+  })
+
   it("turns back on by itself when the connection returns", async () => {
     const onLine = vi.spyOn(navigator, "onLine", "get").mockReturnValue(false)
     await mountMenu()

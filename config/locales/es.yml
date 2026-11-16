@@ -221,6 +221,7 @@ es:
 
   # ── Exportacion de Formularios ─────────────────────────
   exports:
+    utc: "%{label} (UTC)"
     xlsx:
       name: "Excel"
       hint: "Recomendado. Se abre en Excel o Google Sheets."

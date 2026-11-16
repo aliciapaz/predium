@@ -197,6 +197,13 @@ RSpec.describe("Organizations", type: :request) do
       expect(response).to(redirect_to(root_path))
     end
 
+    it "offers nothing to export while the organization has no forms" do
+      sign_in org_admin
+      get organization_forms_path(organization)
+
+      expect(page.css(".menu")).to(be_empty)
+    end
+
     it "offers the downloads to an org admin only, counting every form and saying the filter does not apply" do
       create(:form, :completed, user: member)
       create(:form, user: member)

@@ -221,6 +221,7 @@ en:
 
   # ── Form Export ────────────────────────────────────────
   exports:
+    utc: "%{label} (UTC)"
     xlsx:
       name: "Excel"
       hint: "Recommended. Opens in Excel or Google Sheets."
