@@ -1,14 +1,22 @@
 # frozen_string_literal: true
 
 class FormsController < ApplicationController
+  include FormsExport
+
   before_action :authenticate_user!
   before_action :set_form, only: [:edit]
   before_action :ensure_draft, only: [:edit]
 
   def index
     forms = current_user.forms.recently_updated
-    @drafts = forms.draft
-    @completed = forms.completed
+
+    respond_to do |format|
+      format.html do
+        @drafts = forms.draft
+        @completed = forms.completed
+      end
+      format.any(:csv, :xlsx) { send_forms_export(forms, "predium") }
+    end
   end
 
   # Results shell: the owner's scores hydrate client-side from IndexedDB

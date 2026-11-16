@@ -35,6 +35,10 @@ gem "matrix" # Required by prawn, removed from Ruby stdlib in 4.0
 gem "prawn", require: false
 gem "prawn-table", require: false
 
+# Questionnaire exports. csv is a bundled gem, not a default one, since Ruby 3.4
+gem "csv", "~> 3.3"
+gem "caxlsx", "~> 4.5"
+
 # Authorization
 gem "action_policy"
 

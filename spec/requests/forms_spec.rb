@@ -11,6 +11,67 @@ RSpec.describe("Forms", type: :request) do
     Nokogiri::HTML(response.body)
   end
 
+  describe "GET /forms.csv and /forms.xlsx" do
+    it "downloads every one of the user's forms, drafts included, and nobody else's" do
+      create(:form, user: user, name: "Borrador Propio")
+      create(:form, :completed, user: user, name: "Completado Propio")
+      create(:form, :discarded, user: user, name: "Eliminado")
+      create(:form, name: "Ajeno")
+
+      get forms_path(format: :csv)
+
+      expect(response.media_type).to(eq("text/csv"))
+      expect(response.headers["Content-Disposition"]).to(include("attachment", "predium-#{Date.current.iso8601}.csv"))
+      farms = CSV.parse(response.body, headers: true).map { |row| row["Nombre del predio"] }
+      expect(farms).to(contain_exactly("Borrador Propio", "Completado Propio"))
+    end
+
+    it "writes the headers and values in the user's language" do
+      user.update!(locale: "en")
+      create(:form, user: user, name: "La Esperanza", gender: :female)
+
+      get forms_path(format: :csv)
+
+      row = CSV.parse(response.body, headers: true).first
+      expect(row.headers).to(include("Farm name", "Created by", "Principle: Biodiversity", "Overall score"))
+      expect(row.headers.grep(/Nombre|Principio|Dimensión|Indicador/)).to(be_empty)
+      expect(row["Status"]).to(eq("Draft"))
+      expect(row["Gender"]).to(eq("Female"))
+    end
+
+    it "follows a language picked in the URL over the user's setting" do
+      get forms_path(format: :csv, locale: "en")
+
+      expect(CSV.parse(response.body).first.first).to(eq("Farm name"))
+    end
+
+    it "downloads the same forms as an Excel workbook" do
+      get forms_path(format: :xlsx)
+
+      expect(response.media_type).to(eq(Mime[:xlsx].to_s))
+      expect(response.headers["Content-Disposition"]).to(include("predium-#{Date.current.iso8601}.xlsx"))
+      expect(response.body).to(start_with("PK"))
+    end
+
+    it "offers both downloads behind one export button once the user has a form" do
+      create(:form, user: user)
+      get forms_path
+
+      button = page.at("header .menu button")
+      expect(button.text.strip).to(eq("Exportar"))
+      expect(button["aria-expanded"]).to(eq("false"))
+      expect(page.at("##{button["aria-controls"]}")["hidden"]).not_to(be_nil)
+      expect(page.css(".menu-item").pluck("href")).to(eq([forms_path(format: :xlsx), forms_path(format: :csv)]))
+      expect(page.at(".menu-caption").text).to(eq("Tu único formulario, aunque sea un borrador."))
+    end
+
+    it "offers nothing to export before the first form" do
+      get forms_path
+
+      expect(page.css(".menu")).to(be_empty)
+    end
+  end
+
   describe "GET /forms" do
     it "deletes from the whole page, so the list does not lose the card's frame" do
       form = create(:form, user: user)
