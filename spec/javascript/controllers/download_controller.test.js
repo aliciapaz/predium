@@ -31,7 +31,8 @@ const tap = (element) => element.dispatchEvent(new MouseEvent("click", { bubbles
 const mountMenu = () => mount(fixture, { menu: MenuController, download: DownloadController })
 
 function fileResponse(type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
-  return new Response(new Blob(["PK"]), {
+  // A string body, not a jsdom Blob: Node 22 fetch rejects Blobs from jsdom.
+  return new Response("PK", {
     status: 200,
     headers: { "Content-Type": type, "Content-Disposition": 'attachment; filename="predium-2026-11-15.xlsx"' }
   })
