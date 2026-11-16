@@ -224,6 +224,17 @@ RSpec.describe("Organizations", type: :request) do
       post organization_invitations_path(organization), params: { invitation: { email: "nuevo@example.com" } }
 
       expect(organization.users.find_by(email: "nuevo@example.com")).to(be_present)
+      expect(ActionMailer::Base.deliveries.map(&:to)).to(include(["nuevo@example.com"]))
+    end
+
+    it "keeps the new member and warns when the invitation email fails" do
+      rejected = Net::SMTPFatalError.new(Net::SMTP::Response.parse("550 domain not verified"))
+      allow(Devise::Mailer).to(receive(:invitation_instructions).and_raise(rejected))
+
+      post organization_invitations_path(organization), params: { invitation: { email: "nuevo@example.com" } }
+
+      expect(organization.users.find_by(email: "nuevo@example.com")).to(be_present)
+      expect(flash[:alert]).to(eq(I18n.t("flash.member_invitation_not_sent")))
     end
 
     it "removes a member" do

@@ -62,17 +62,18 @@ Rails.application.configure do
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "app.prediumapp.org", protocol: "https" }
 
-  # No SMTP provider yet: invite links are handed out manually (see docs/deployment.md).
-  config.action_mailer.perform_deliveries = false
-
-  # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
-  # config.action_mailer.smtp_settings = {
-  #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
-  #   password: Rails.application.credentials.dig(:smtp, :password),
-  #   address: "smtp.example.com",
-  #   port: 587,
-  #   authentication: :plain
-  # }
+  # Without the key, deploys still work and invite links fall back to the console (see docs/deployment.md).
+  config.action_mailer.perform_deliveries = ENV["RESEND_API_KEY"].present?
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: "smtp.resend.com",
+    # DigitalOcean blocks outbound 25, 465 and 587 on Droplets; 2587 is Resend's STARTTLS alternate.
+    port: 2587,
+    user_name: "resend",
+    password: ENV["RESEND_API_KEY"],
+    authentication: :plain,
+    enable_starttls_auto: true,
+  }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

@@ -41,6 +41,7 @@ en:
     organization_created: "Organization created successfully."
     organization_updated: "Organization updated successfully."
     member_invited: "Member invited successfully."
+    member_invitation_not_sent: "Member added, but the invitation email could not be sent. Invite them again later."
     member_removed: "Member removed from the organization."
     profile_updated: "Profile updated successfully."
     name_updated: "Name updated."

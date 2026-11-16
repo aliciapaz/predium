@@ -17,8 +17,16 @@ en:
     mailer:
       confirmation_instructions:
         subject: "Confirmation instructions"
+        hello: "Hello %{email},"
+        confirm_below: "Confirm your email with the link below."
+        confirm: "Confirm my account"
       reset_password_instructions:
         subject: "Reset password instructions"
+        hello: "Hello %{email},"
+        someone_requested: "Someone requested a link to change your password. You can do this with the link below."
+        change_password: "Change my password"
+        ignore: "If you didn't request this, ignore this email."
+        unchanged: "Your password won't change until you open the link and create a new one."
       unlock_instructions:
         subject: "Unlock instructions"
       email_changed:

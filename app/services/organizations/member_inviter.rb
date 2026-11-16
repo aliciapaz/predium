@@ -9,6 +9,10 @@ module Organizations
 
     Result = Data.define(:status)
 
+    DELIVERY_ERRORS = [
+      Net::SMTPError, Net::OpenTimeout, Net::ReadTimeout, OpenSSL::SSL::SSLError, SocketError, SystemCallError, IOError,
+    ].freeze
+
     attr_accessor :organization, :email, :role, :invited_by
 
     def call
@@ -17,7 +21,7 @@ module Organizations
       return Result.new(:already_member) if confirmed_member?
 
       add_member
-      Result.new(:invited)
+      Result.new(send_invitation)
     end
 
     private
@@ -32,12 +36,24 @@ module Organizations
     end
 
     def add_member
-      @user = invite_user unless @user&.confirmed?
+      @invitation_needed = !@user&.confirmed?
+      @user = invite_user if @invitation_needed
       organization.memberships.create!(user: @user, role: role) unless member?(@user)
     end
 
     def invite_user
-      User.invite!({ email: email, first_name: "Invited", last_name: "User" }, invited_by)
+      User.invite!({ email: email, first_name: "Invited", last_name: "User" }, invited_by) do |user|
+        user.skip_invitation = true
+      end
+    end
+
+    # Sent after the membership exists, so a mail failure leaves the member listed and a re-invite resends it.
+    def send_invitation
+      @user.deliver_invitation if @invitation_needed
+      :invited
+    rescue *DELIVERY_ERRORS => error
+      Rails.logger.error("Invitation email to #{@user.id} failed: #{error.class}: #{error.message}")
+      :invitation_not_sent
     end
 
     def member?(user)
