@@ -23,12 +23,12 @@
          class="hidden fixed inset-0 bg-ink/50 z-40 md:hidden"></div>
 
     <aside data-admin-sidebar-target="sidebar"
-           class="hidden md:flex w-56 bg-deep text-deep-ink min-h-dvh flex-col flex-shrink-0 fixed inset-y-0 left-0 md:static z-50 transition-transform duration-200 -translate-x-full md:translate-x-0">
+           class="hidden md:flex w-56 bg-deep text-deep-ink min-h-dvh flex-col flex-shrink-0 fixed inset-y-0 left-0 md:sticky md:top-0 md:h-dvh z-50 transition-transform duration-200 -translate-x-full md:translate-x-0">
       <div class="px-4 pb-5 safe-top">
         <h1 class="font-display text-lg font-bold tracking-tight"><%= t("admin.predium_admin") %></h1>
       </div>
 
-      <nav class="flex-1 px-2 space-y-1">
+      <nav class="flex-1 overflow-y-auto px-2 space-y-1">
         <%= admin_sidebar_link t("admin.dashboard"), admin_root_path %>
         <%= admin_sidebar_link t("admin.organizations"), admin_organizations_path %>
         <%= admin_sidebar_link t("admin.users"), admin_users_path %>
