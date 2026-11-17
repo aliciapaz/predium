@@ -41,6 +41,7 @@ es:
     organization_created: "Organización creada exitosamente."
     organization_updated: "Organización actualizada exitosamente."
     member_invited: "Miembro invitado exitosamente."
+    member_invitation_not_sent: "Miembro agregado, pero no se pudo enviar el correo de invitación. Vuelve a invitarlo más tarde."
     member_removed: "Miembro quitado de la organización."
     profile_updated: "Perfil actualizado exitosamente."
     name_updated: "Nombre actualizado."

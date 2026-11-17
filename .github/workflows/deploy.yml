@@ -4,6 +4,7 @@ name: Deploy
 # boots Postgres), then "deploy" for every release. Run "proxy reboot -y" when
 # deploy reports kamal-proxy is too old after a Kamal upgrade.
 # Required repo secrets: SSH_PRIVATE_KEY, DEPLOY_HOST, SECRET_KEY_BASE, POSTGRES_PASSWORD.
+# Optional: RESEND_API_KEY turns on outgoing email (see docs/deployment.md).
 on:
   workflow_dispatch:
     inputs:
@@ -39,4 +40,5 @@ jobs:
           KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
           SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: bundle exec kamal ${{ inputs.command }}

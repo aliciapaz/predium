@@ -4,10 +4,10 @@ Kamal deploy of a single production environment to one DigitalOcean droplet, ser
 `https://app.prediumapp.org`. The apex `prediumapp.org` is the marketing page, served by
 GitHub Pages from the `gh-pages` branch.
 
-There is no self sign-up (`:registerable` is off) and production sends no email
-(`perform_deliveries = false`), so accounts exist only when an admin creates them and invite
-links are handed out manually; see [Accounts](#accounts) and
-[Turning on email](#turning-on-email-not-set-up-yet).
+There is no self sign-up (`:registerable` is off), so accounts exist only when an admin
+creates them. Invite and password-reset emails go out through Resend when the
+`RESEND_API_KEY` secret is set; without it production sends nothing and links come from the
+console. See [Accounts](#accounts) and [Email](#email).
 
 ## Releases
 
@@ -31,10 +31,11 @@ docker exec -it $(docker ps -q -f label=service=predium -f label=role=web) bin/r
 
 ## Accounts
 
-**Invite someone:** add them from an organization's members page in the app (this creates the
-pending account and membership but sends nothing), then generate their link in the console.
-Org admins reach the members page from the **Organización** tab; super admins open the
+**Invite someone:** add them from an organization's members page in the app. This creates the
+pending account and membership and emails the invite. Org admins reach the members page from the **Organización** tab; super admins open the
 organization under **Admin > Organizations** and click **Miembros**, without needing to join it.
+
+If email is off (no `RESEND_API_KEY`), generate the link in the console instead:
 
 ```ruby
 user = User.find_by!(email: "peer@example.com")
@@ -45,26 +46,31 @@ Rails.application.routes.url_helpers.accept_user_invitation_url(
 ```
 
 Send the printed URL directly. Running the snippet again issues a new link and invalidates
-the old one. Password resets also need the console, since reset emails are not sent.
+the old one. Without email, password resets also need the console.
 
-### Turning on email (not set up yet)
+## Email
 
-The console step exists only because there is no mail provider. The planned provider is
-[Resend](https://resend.com): its free tier covers invite and password-reset volume. Do not
+Mail goes through [Resend](https://resend.com) over SMTP from `Predium <hola@prediumapp.org>`
+(set in `ApplicationMailer`; Devise inherits it through `parent_mailer`). The free tier
+(3,000 emails a month, 100 a day) covers invite and password-reset volume. Do not
 self-host a mail server on the droplet: a new IP has no sending reputation, so mail lands in
-spam, and DigitalOcean blocks outbound port 25 by default. Amazon SES is the cheaper option at
+spam, and DigitalOcean blocks outbound ports 25, 465 and 587 by default (which is why the app
+uses Resend's alternate port 2587). Amazon SES is the cheaper option at
 scale but needs more setup (AWS account, sandbox exit); Postmark is the upgrade if
 deliverability becomes a problem.
 
-To enable it:
+To turn it on:
 
-1. Verify `prediumapp.org` in Resend and add the SPF, DKIM and DMARC records it lists.
-2. Add `SMTP_USERNAME` and `SMTP_PASSWORD` as GitHub Actions secrets, map them in
-   `.kamal/secrets`, and list them under `env.secret` in `config/deploy.yml`.
-3. In `config/environments/production.rb`, set `perform_deliveries = true` and point
-   `smtp_settings` at Resend's SMTP host using those variables. Set Devise's `mailer_sender`
-   to an address on the verified domain.
-4. Remove the console step above and the "sends no email" note at the top of this file.
+1. Add `prediumapp.org` in Resend (region São Paulo, Return-Path `send`, tracking off) and
+   create the records it lists under Namecheap **Advanced DNS > Host Records**: the
+   `resend._domainkey` TXT, the `rsend` and `send` CNAMEs, and the `_dmarc` TXT. None of them
+   is an MX record, so Mail Settings stay as they are and Namecheap's email forwarding keeps
+   working; forward `hola@` to a real inbox there to receive replies. Leave Resend's
+   receiving off.
+2. Create a sending-only API key in Resend and save it as the `RESEND_API_KEY` GitHub Actions
+   secret. It reaches the app through the Kamal secrets file and `env.secret` in
+   `config/deploy.yml`.
+3. Deploy. `perform_deliveries` turns on when the key is present.
 
 ## Operations
 
@@ -87,6 +93,7 @@ laptop, and there is no `RAILS_MASTER_KEY`: the app does not use Rails credentia
 | `DEPLOY_HOST` | Droplet IP. A secret only to keep it out of the public repo |
 | `SECRET_KEY_BASE` | Output of `bin/rails secret`. Rotating it signs everyone out |
 | `POSTGRES_PASSWORD` | Password for the `predium` Postgres role, shared by the accessory and the app |
+| `RESEND_API_KEY` | Optional. Sending-only Resend API key; when it is set, the app sends email (see [Email](#email)) |
 
 The registry login uses the workflow's own `GITHUB_TOKEN`, so GHCR needs no extra secret.
 `.kamal/secrets` only maps these environment variables through and must never hold literal
