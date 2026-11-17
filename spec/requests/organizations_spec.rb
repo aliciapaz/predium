@@ -237,6 +237,31 @@ RSpec.describe("Organizations", type: :request) do
       expect(flash[:alert]).to(eq(I18n.t("flash.member_invitation_not_sent")))
     end
 
+    it "resends the invitation when the admin invites again after a failed email" do
+      allow(Devise::Mailer).to(receive(:invitation_instructions).and_raise(Net::WriteTimeout))
+      post organization_invitations_path(organization), params: { invitation: { email: "nuevo@example.com" } }
+      expect(flash[:alert]).to(eq(I18n.t("flash.member_invitation_not_sent")))
+
+      allow(Devise::Mailer).to(receive(:invitation_instructions).and_call_original)
+      expect do
+        post organization_invitations_path(organization), params: { invitation: { email: "nuevo@example.com" } }
+      end.to(change { ActionMailer::Base.deliveries.count { |mail| mail.to == ["nuevo@example.com"] } }.by(1))
+
+      expect(flash[:notice]).to(eq(I18n.t("flash.member_invited")))
+      expect(organization.memberships.where(user: User.find_by(email: "nuevo@example.com")).count).to(eq(1))
+    end
+
+    it "adds an existing confirmed user without sending an invitation" do
+      create(:user, email: "confirmado@example.com")
+
+      expect do
+        post organization_invitations_path(organization), params: { invitation: { email: "confirmado@example.com" } }
+      end.not_to(change { ActionMailer::Base.deliveries.count })
+
+      expect(organization.users.find_by(email: "confirmado@example.com")).to(be_present)
+      expect(flash[:notice]).to(eq(I18n.t("flash.member_invited")))
+    end
+
     it "removes a member" do
       membership = organization.memberships.find_by!(user: member)
       delete organization_membership_path(organization, membership)

@@ -10,7 +10,7 @@ module Organizations
     Result = Data.define(:status)
 
     DELIVERY_ERRORS = [
-      Net::SMTPError, Net::OpenTimeout, Net::ReadTimeout, OpenSSL::SSL::SSLError, SocketError, SystemCallError, IOError,
+      Net::SMTPError, Timeout::Error, OpenSSL::SSL::SSLError, SocketError, SystemCallError, IOError,
     ].freeze
 
     attr_accessor :organization, :email, :role, :invited_by
