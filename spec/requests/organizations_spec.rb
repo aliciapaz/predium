@@ -141,6 +141,86 @@ RSpec.describe("Organizations", type: :request) do
     end
   end
 
+  describe "GET /organizations/:id/forms.csv and .xlsx" do
+    def exported_farms
+      CSV.parse(response.body, headers: true).map { |row| row["Nombre del predio"] }
+    end
+
+    it "gives an org admin every member's forms, drafts included" do
+      create(:form, user: member, name: "La Esperanza")
+      create(:form, :completed, user: org_admin, name: "Mi Finca")
+      create(:form, name: "Fuera de la organización")
+      sign_in org_admin
+      get organization_forms_path(organization, format: :csv)
+
+      expect(response.headers["Content-Disposition"]).to(include("predium-cooperativa-sur-#{Date.current.iso8601}.csv"))
+      expect(exported_farms).to(contain_exactly("La Esperanza", "Mi Finca"))
+    end
+
+    it "leaves out what a member made before joining, as the list does" do
+      create(:form, user: member, name: "Antes", created_at: 1.day.ago)
+      sign_in org_admin
+      get organization_forms_path(organization, format: :csv)
+
+      expect(exported_farms).to(be_empty)
+    end
+
+    it "writes the headers in the org admin's language" do
+      org_admin.update!(locale: "en")
+      sign_in org_admin
+      get organization_forms_path(organization, format: :csv)
+
+      expect(CSV.parse(response.body).first).to(include("Farm name", "Dimension: Soil quality"))
+    end
+
+    it "gives an org admin the same forms as an Excel workbook" do
+      sign_in org_admin
+      get organization_forms_path(organization, format: :xlsx)
+
+      expect(response.media_type).to(eq(Mime[:xlsx].to_s))
+      expect(response.body).to(start_with("PK"))
+    end
+
+    it "keeps the answers from a regular member, who only sees the list" do
+      create(:form, user: org_admin, name: "Mi Finca")
+      sign_in member
+      get organization_forms_path(organization, format: :csv)
+
+      expect(response).to(redirect_to(organization_forms_path(organization)))
+      expect(flash[:alert]).to(eq(I18n.t("flash.unauthorized")))
+    end
+
+    it "turns away someone outside the organization" do
+      sign_in create(:user)
+      get organization_forms_path(organization, format: :xlsx)
+
+      expect(response).to(redirect_to(root_path))
+    end
+
+    it "offers nothing to export while the organization has no forms" do
+      sign_in org_admin
+      get organization_forms_path(organization)
+
+      expect(page.css(".menu")).to(be_empty)
+    end
+
+    it "offers the downloads to an org admin only, counting every form and saying the filter does not apply" do
+      create(:form, :completed, user: member)
+      create(:form, user: member)
+      sign_in org_admin
+      get organization_forms_path(organization, state: "completed")
+      admin_links = page.css("header .menu-item").pluck("href")
+      caption = page.at("header .menu-caption").text
+
+      sign_in member
+      get organization_forms_path(organization)
+
+      expect(admin_links).to(eq([organization_forms_path(organization, format: :xlsx), organization_forms_path(organization, format: :csv)]))
+      expect(caption).to(eq("Los 2 formularios de la organización, borradores incluidos. No aplica el filtro."))
+      expect(page.css(".menu")).to(be_empty)
+    end
+  end
+
   describe "GET /organizations/:id/memberships" do
     it "puts the invitation as the primary action for an org admin" do
       sign_in org_admin

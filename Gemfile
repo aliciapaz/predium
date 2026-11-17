@@ -35,6 +35,10 @@ gem "matrix" # Required by prawn, removed from Ruby stdlib in 4.0
 gem "prawn", require: false
 gem "prawn-table", require: false
 
+# Questionnaire exports. csv is a bundled gem, not a default one, since Ruby 3.4
+gem "csv", "~> 3.3"
+gem "caxlsx", "~> 4.5"
+
 # Authorization
 gem "action_policy"
 
@@ -59,7 +63,7 @@ gem "thruster", require: false
 gem "tailwindcss-rails"
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-gem "image_processing", "~> 1.2"
+gem "image_processing", "~> 2.2"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

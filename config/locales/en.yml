@@ -220,6 +220,32 @@ en:
     delete_named: "Delete the diagnosis of %{name}"
     confirm_delete: "Delete the diagnosis of %{name}?"
 
+  # ── Form Export ────────────────────────────────────────
+  exports:
+    utc: "%{label} (UTC)"
+    xlsx:
+      name: "Excel"
+      hint: "Recommended. Opens in Excel or Google Sheets."
+    csv:
+      name: "CSV"
+      hint: "Plain text, for importing into other programs."
+    scope:
+      own:
+        one: "Your only form, even if it is a draft."
+        other: "Your %{count} forms, drafts included."
+      organization:
+        one: "The organization's only form, even if it is a draft. The filter does not apply."
+        other: "The organization's %{count} forms, drafts included. The filter does not apply."
+    busy: "Preparing file…"
+    failed: "Could not download. Check your signal and try again."
+    offline: "Offline. You can export once the signal is back; this turns on by itself."
+    created_by: "Created by"
+    completed_at: "Completed"
+    territory: "Territory"
+    principle: "Principle: %{name}"
+    dimension: "Dimension: %{name}"
+    indicator: "Indicator: %{name}"
+
   # ── Farm Info Form ─────────────────────────────────────
   farm_info:
     section_title: "Farm details"

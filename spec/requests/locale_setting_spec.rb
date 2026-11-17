@@ -53,6 +53,29 @@ RSpec.describe("Locale precedence", type: :request) do
 
         expect(response.body).to(include("Drafts"))
       end
+
+      it "keeps Spanish picked in the switch on the page's links, even though it is the default" do
+        get root_path(locale: "es")
+
+        page = Nokogiri::HTML(response.body)
+        expect(page.at("a[href^='/profile']")["href"]).to(include("locale=es"))
+      end
+
+      it "exports in Spanish when Spanish is the language on screen" do
+        create(:form, user: user)
+        get root_path(locale: "es")
+        export_link = Nokogiri::HTML(response.body).at("a.menu-item[href*='.csv']")["href"]
+
+        get export_link
+
+        expect(CSV.parse(response.body).first.first).to(eq("Nombre del predio"))
+      end
+
+      it "leaves the locale out of links when it matches the stored preference" do
+        get root_path
+
+        expect(Nokogiri::HTML(response.body).at("a[href^='/profile']")["href"]).not_to(include("locale="))
+      end
     end
   end
 end

@@ -220,6 +220,32 @@ es:
     delete_named: "Eliminar el diagnóstico de %{name}"
     confirm_delete: "¿Eliminar el diagnóstico de %{name}?"
 
+  # ── Exportacion de Formularios ─────────────────────────
+  exports:
+    utc: "%{label} (UTC)"
+    xlsx:
+      name: "Excel"
+      hint: "Recomendado. Se abre en Excel o Google Sheets."
+    csv:
+      name: "CSV"
+      hint: "Texto simple, para importar en otros programas."
+    scope:
+      own:
+        one: "Tu único formulario, aunque sea un borrador."
+        other: "Tus %{count} formularios, borradores incluidos."
+      organization:
+        one: "El único formulario de la organización, aunque sea un borrador. No aplica el filtro."
+        other: "Los %{count} formularios de la organización, borradores incluidos. No aplica el filtro."
+    busy: "Preparando archivo…"
+    failed: "No se pudo descargar. Revisa la señal e inténtalo de nuevo."
+    offline: "Sin conexión. Podrás exportar cuando vuelva la señal; se activa sola."
+    created_by: "Creado por"
+    completed_at: "Completado"
+    territory: "Territorio"
+    principle: "Principio: %{name}"
+    dimension: "Dimensión: %{name}"
+    indicator: "Indicador: %{name}"
+
   # ── Formulario de Info del Predio ──────────────────────
   farm_info:
     section_title: "Datos del predio"
