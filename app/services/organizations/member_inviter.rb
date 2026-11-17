@@ -37,7 +37,7 @@ module Organizations
     end
 
     def invite_user
-      User.invite!({ email: email, first_name: "Invited", last_name: "User" }, invited_by)
+      User.invite!({ email: email, **User::PLACEHOLDER_NAME }, invited_by)
     end
 
     def member?(user)
