@@ -271,7 +271,8 @@ en:
     latitude: "Latitude"
     longitude: "Longitude"
     use_gps: "Use GPS"
-    territory_extension: "Territory (optional extension)"
+    territory_extension: "Territory"
+    territory_hint: "Sets which indicators are scored. Without a territory, only the principles are answered. Choose it before you start: changing it later discards scores that no longer apply."
     genders:
       not_specified: "Not specified"
       male: "Male"
@@ -304,6 +305,10 @@ en:
       other: "Average of %{count} dimensions."
     highest: "Highest: %{name}."
     lowest: "Lowest: %{name}."
+    bands:
+      low: "Low"
+      mid: "Mid"
+      high: "High"
 
   # ── Admin ──────────────────────────────────────────────
   admin:

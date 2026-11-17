@@ -70,7 +70,7 @@ export default class extends Controller {
     this.farmInfoTarget.innerHTML = `
       <div class="flex flex-wrap items-start justify-between gap-3">
         <h1 class="page-title min-w-0 break-words">${escape(form.name)}</h1>
-        ${badge(t(completed ? "states.completed" : "states.draft"), completed ? "success" : "warning")}
+        ${badge(t(completed ? "states.completed" : "states.draft"), completed ? "success" : "neutral")}
       </div>
       <p class="mt-1 text-muted">${escape([location, completedOn].filter(Boolean).join(", "))}</p>
       ${this.overallSummary()}
@@ -94,11 +94,15 @@ export default class extends Controller {
       notes.push(t("results.lowest", { name: namesAt(Math.min(...values)) }))
     }
 
+    const legend = ["low", "mid", "high"]
+      .map((level) => `<li data-band="${level}">${escape(t(`results.bands.${level}`))}</li>`).join("")
+
     return `<div class="mt-5 flex items-center gap-4 rounded-lg bg-canvas px-4 py-3" data-overall>
-              <span class="score-chip" data-band="${averageBand(overall)}">${overall.toFixed(1)}</span>
+              <span class="score-chip score-chip-lg" data-band="${averageBand(overall)}">${overall.toFixed(1)}<small>/10</small></span>
               <div class="min-w-0">
                 <p class="font-semibold text-ink">${escape(t("results.overall_score"))}</p>
                 <p class="text-sm text-muted">${escape(notes.join(" "))}</p>
+                <ul class="score-legend mt-2">${legend}</ul>
               </div>
             </div>`
   }
