@@ -99,7 +99,7 @@ function isDocument(request) {
 async function documentStrategy(request, url) {
   try {
     const response = await fetch(request)
-    if (response.ok) {
+    if (response.ok && isHtml(response)) {
       const cache = await caches.open(SHELL_CACHE)
       cache.put(stripParams(url), response.clone())
     }
@@ -109,6 +109,12 @@ async function documentStrategy(request, url) {
     if (cached) return cached
     return shellFallback(url)
   }
+}
+
+// A download link (the CSV and Excel exports) is a navigation too, but its
+// file must not be kept as the page's offline copy.
+function isHtml(response) {
+  return (response.headers.get("Content-Type") || "").includes("text/html")
 }
 
 async function shellFallback(url) {

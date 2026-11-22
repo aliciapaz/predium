@@ -1,7 +1,16 @@
 <% content_for(:title, "#{@organization.name} | #{t('navigation.forms')}") %>
 
 <div>
-  <%= page_header(@organization.name) %>
+  <% if @export_count&.positive? %>
+    <%= page_header(@organization.name) do %>
+      <%= render "forms/export_menu",
+          csv_path: organization_forms_path(@organization, format: :csv),
+          xlsx_path: organization_forms_path(@organization, format: :xlsx),
+          scope: t("exports.scope.organization", count: @export_count) %>
+    <% end %>
+  <% else %>
+    <%= page_header(@organization.name) %>
+  <% end %>
   <%= render "organizations/tabs", organization: @organization %>
 
   <div class="flex flex-col gap-6">

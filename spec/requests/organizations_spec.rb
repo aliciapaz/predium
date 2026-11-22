@@ -141,6 +141,86 @@ RSpec.describe("Organizations", type: :request) do
     end
   end
 
+  describe "GET /organizations/:id/forms.csv and .xlsx" do
+    def exported_farms
+      CSV.parse(response.body, headers: true).map { |row| row["Nombre del predio"] }
+    end
+
+    it "gives an org admin every member's forms, drafts included" do
+      create(:form, user: member, name: "La Esperanza")
+      create(:form, :completed, user: org_admin, name: "Mi Finca")
+      create(:form, name: "Fuera de la organización")
+      sign_in org_admin
+      get organization_forms_path(organization, format: :csv)
+
+      expect(response.headers["Content-Disposition"]).to(include("predium-cooperativa-sur-#{Date.current.iso8601}.csv"))
+      expect(exported_farms).to(contain_exactly("La Esperanza", "Mi Finca"))
+    end
+
+    it "leaves out what a member made before joining, as the list does" do
+      create(:form, user: member, name: "Antes", created_at: 1.day.ago)
+      sign_in org_admin
+      get organization_forms_path(organization, format: :csv)
+
+      expect(exported_farms).to(be_empty)
+    end
+
+    it "writes the headers in the org admin's language" do
+      org_admin.update!(locale: "en")
+      sign_in org_admin
+      get organization_forms_path(organization, format: :csv)
+
+      expect(CSV.parse(response.body).first).to(include("Farm name", "Dimension: Soil quality"))
+    end
+
+    it "gives an org admin the same forms as an Excel workbook" do
+      sign_in org_admin
+      get organization_forms_path(organization, format: :xlsx)
+
+      expect(response.media_type).to(eq(Mime[:xlsx].to_s))
+      expect(response.body).to(start_with("PK"))
+    end
+
+    it "keeps the answers from a regular member, who only sees the list" do
+      create(:form, user: org_admin, name: "Mi Finca")
+      sign_in member
+      get organization_forms_path(organization, format: :csv)
+
+      expect(response).to(redirect_to(organization_forms_path(organization)))
+      expect(flash[:alert]).to(eq(I18n.t("flash.unauthorized")))
+    end
+
+    it "turns away someone outside the organization" do
+      sign_in create(:user)
+      get organization_forms_path(organization, format: :xlsx)
+
+      expect(response).to(redirect_to(root_path))
+    end
+
+    it "offers nothing to export while the organization has no forms" do
+      sign_in org_admin
+      get organization_forms_path(organization)
+
+      expect(page.css(".menu")).to(be_empty)
+    end
+
+    it "offers the downloads to an org admin only, counting every form and saying the filter does not apply" do
+      create(:form, :completed, user: member)
+      create(:form, user: member)
+      sign_in org_admin
+      get organization_forms_path(organization, state: "completed")
+      admin_links = page.css("header .menu-item").pluck("href")
+      caption = page.at("header .menu-caption").text
+
+      sign_in member
+      get organization_forms_path(organization)
+
+      expect(admin_links).to(eq([organization_forms_path(organization, format: :xlsx), organization_forms_path(organization, format: :csv)]))
+      expect(caption).to(eq("Los 2 formularios de la organización, borradores incluidos. No aplica el filtro."))
+      expect(page.css(".menu")).to(be_empty)
+    end
+  end
+
   describe "GET /organizations/:id/memberships" do
     it "puts the invitation as the primary action for an org admin" do
       sign_in org_admin
@@ -224,6 +304,42 @@ RSpec.describe("Organizations", type: :request) do
       post organization_invitations_path(organization), params: { invitation: { email: "nuevo@example.com" } }
 
       expect(organization.users.find_by(email: "nuevo@example.com")).to(be_present)
+      expect(ActionMailer::Base.deliveries.map(&:to)).to(include(["nuevo@example.com"]))
+    end
+
+    it "keeps the new member and warns when the invitation email fails" do
+      rejected = Net::SMTPFatalError.new(Net::SMTP::Response.parse("550 domain not verified"))
+      allow(Devise::Mailer).to(receive(:invitation_instructions).and_raise(rejected))
+
+      post organization_invitations_path(organization), params: { invitation: { email: "nuevo@example.com" } }
+
+      expect(organization.users.find_by(email: "nuevo@example.com")).to(be_present)
+      expect(flash[:alert]).to(eq(I18n.t("flash.member_invitation_not_sent")))
+    end
+
+    it "resends the invitation when the admin invites again after a failed email" do
+      allow(Devise::Mailer).to(receive(:invitation_instructions).and_raise(Net::WriteTimeout))
+      post organization_invitations_path(organization), params: { invitation: { email: "nuevo@example.com" } }
+      expect(flash[:alert]).to(eq(I18n.t("flash.member_invitation_not_sent")))
+
+      allow(Devise::Mailer).to(receive(:invitation_instructions).and_call_original)
+      expect do
+        post organization_invitations_path(organization), params: { invitation: { email: "nuevo@example.com" } }
+      end.to(change { ActionMailer::Base.deliveries.count { |mail| mail.to == ["nuevo@example.com"] } }.by(1))
+
+      expect(flash[:notice]).to(eq(I18n.t("flash.member_invited")))
+      expect(organization.memberships.where(user: User.find_by(email: "nuevo@example.com")).count).to(eq(1))
+    end
+
+    it "adds an existing confirmed user without sending an invitation" do
+      create(:user, email: "confirmado@example.com")
+
+      expect do
+        post organization_invitations_path(organization), params: { invitation: { email: "confirmado@example.com" } }
+      end.not_to(change { ActionMailer::Base.deliveries.count })
+
+      expect(organization.users.find_by(email: "confirmado@example.com")).to(be_present)
+      expect(flash[:notice]).to(eq(I18n.t("flash.member_invited")))
     end
 
     it "removes a member" do

@@ -84,6 +84,14 @@ or icon, a field without a label) so the mistake surfaces in development.
 - **`disclosure`**: a `<details>` group with a 56px summary row and a `disclosure-chevron`.
 - **`field-group`**: a `<fieldset>` with a `legend` for related fields.
 - **`popover`**: help text anchored to its trigger.
+- **`menu`**: one button that opens a short list of links (`menu-panel` of `menu-item`s, each a `menu-item-name` and a
+  `menu-item-hint`), driven by the `menu` controller. It is a disclosure (`aria-expanded`, `aria-controls`), not an
+  ARIA menu, so its links stay links. Use it when choices are alternatives of one action (export as Excel or CSV),
+  never to hide unrelated actions. `menu-caption` says what the choices cover; `menu-note` (a live region, hidden
+  while empty; add `menu-note-danger` for failures) says why they are off or what went wrong. A menu whose choices
+  are file downloads adds the `download` controller: it fetches the file in the page with a busy hint, reports a
+  failed or signed-out download in the note, and while offline marks the menu `data-state="unavailable"` so the
+  trigger reads as off before it is tapped.
 - **`auth-panel`**: the centered column for sign in and other account forms.
 - **`data-table`**: tables, always inside `card-flush overflow-x-auto` so they scroll sideways on phones.
   Add `data-table-stacked` when status or actions sit in the last columns: below `sm` each row stacks

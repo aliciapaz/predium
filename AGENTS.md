@@ -37,7 +37,7 @@ app/
   controllers/    # thin; accounts/, admin/, api/, forms/, organizations/, users/ namespaces
   form_builders/  # PrediumFormBuilder: default builder, applies design-system primitives
   models/         # 6 domain models, no concerns
-  services/       # forms/serializer, forms/sync_upsert, admin/dashboard_report, organizations/member_inviter, questionnaire_config, scoring/calculator
+  services/       # forms/serializer, forms/sync_upsert, forms/export (+ export_table), admin/dashboard_report, organizations/member_inviter, questionnaire_config, scoring/calculator
   policies/       # ActionPolicy: application, admin/base, form, organization
   jobs/           # only ApplicationJob (no background jobs yet)
   mailers/        # devise mailers
@@ -49,7 +49,7 @@ app/
 
 ## External Integrations
 
-No third-party HTTP APIs. Authentication is fully local via Devise. The only "external" surface is the browser PWA runtime (service worker, IndexedDB) driven from `app/javascript/lib/`.
+No third-party HTTP APIs. Authentication is fully local via Devise. Outgoing email (Devise invites, resets, confirmations) goes through Resend over SMTP, and only when `RESEND_API_KEY` is set (see `docs/deployment.md#email`). The only "external" surface is the browser PWA runtime (service worker, IndexedDB) driven from `app/javascript/lib/`.
 
 ## Project-Specific Deviations
 

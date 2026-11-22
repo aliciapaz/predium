@@ -33,6 +33,7 @@ env:
   secret:
     - SECRET_KEY_BASE
     - PREDIUM_DATABASE_PASSWORD:POSTGRES_PASSWORD
+    - RESEND_API_KEY
 
 volumes:
   - "predium_storage:/rails/storage"
