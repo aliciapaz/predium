@@ -25,7 +25,10 @@ module LocaleSetting
     loc if loc.present? && I18n.available_locales.map(&:to_s).include?(loc.to_s)
   end
 
+  # Links carry the locale only when it differs from the one the next request
+  # would fall back to, so a language picked in the switch survives every link,
+  # downloads included, even when it is the default and the user saved another.
   def default_url_options
-    { locale: I18n.locale == I18n.default_locale ? nil : I18n.locale }
+    { locale: I18n.locale.to_s == (locale_from_user || I18n.default_locale).to_s ? nil : I18n.locale }
   end
 end

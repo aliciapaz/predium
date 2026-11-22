@@ -235,6 +235,127 @@
   box-shadow: var(--shadow-pop);
 }
 
+/* Dropdown of links behind one button: a disclosure (`aria-expanded` on the
+   button), not an ARIA menu, so links stay links for screen readers. The
+   panel opens under the trigger and the menu controller lines it up with the
+   trigger's right edge (`data-align="end"`) when the trigger sits on the
+   right half of the screen. */
+@utility menu {
+  position: relative;
+  display: inline-block;
+
+  & [aria-expanded] > .menu-chevron {
+    transition: transform 200ms;
+  }
+
+  & [aria-expanded="true"] > .menu-chevron {
+    transform: rotate(180deg);
+  }
+
+  /* Its choices cannot be used right now (offline): the trigger still opens
+     to say why, but reads as off before anyone taps it. */
+  &[data-state="unavailable"] > [aria-expanded] {
+    color: var(--color-muted);
+    border-color: var(--color-line);
+  }
+}
+
+@utility menu-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 30;
+  width: min(18rem, calc(100vw - 2rem));
+  margin-top: 0.5rem;
+  padding: 0.375rem;
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-pop);
+
+  &[data-align="end"] {
+    right: 0;
+    left: auto;
+  }
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+/* One choice in a menu-panel: a bold name and, under it, what it is for. */
+@utility menu-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  padding: 0.625rem 0.75rem;
+  color: var(--color-ink);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+
+  & > svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0.125rem;
+    flex-shrink: 0;
+    color: var(--color-muted);
+  }
+
+  @media (hover: hover) {
+    &:hover:not([aria-disabled="true"]) {
+      background-color: var(--color-primary-soft);
+    }
+  }
+
+  &:focus-visible {
+    background-color: var(--color-primary-soft);
+  }
+
+  &[aria-disabled="true"] {
+    color: var(--color-muted);
+    cursor: not-allowed;
+  }
+}
+
+@utility menu-item-name {
+  display: block;
+  font-weight: 700;
+  line-height: 1.375rem;
+}
+
+@utility menu-item-hint {
+  display: block;
+  font-size: 0.9375rem;
+  line-height: 1.375rem;
+  color: var(--color-muted);
+}
+
+/* A line above the choices saying what they cover. */
+@utility menu-caption {
+  margin: 0.375rem 0.75rem 0.25rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  color: var(--color-ink-soft);
+}
+
+/* A line under the choices saying why they are off or what went wrong. It is
+   a live region, so it stays in the DOM and only its text changes. */
+@utility menu-note {
+  margin: 0.25rem 0.75rem 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.5rem;
+  color: var(--color-warning);
+
+  &:empty {
+    display: none;
+  }
+}
+
+@utility menu-note-danger {
+  color: var(--color-danger);
+}
+
 /* Centered single-column page for sign in and other account forms. */
 @utility auth-panel {
   width: 100%;

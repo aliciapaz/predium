@@ -23,8 +23,11 @@ module Organizations
     private
 
     def flash_for(result)
-      if result.status == :already_member
+      case result.status
+      when :already_member
         { alert: t("flash.member_already_exists", default: "User is already a member of this organization.") }
+      when :invitation_not_sent
+        { alert: t("flash.member_invitation_not_sent") }
       else
         { notice: t("flash.member_invited") }
       end

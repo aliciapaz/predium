@@ -17,8 +17,16 @@ es:
     mailer:
       confirmation_instructions:
         subject: "Instrucciones de confirmación"
+        hello: "Hola, %{email}:"
+        confirm_below: "Confirma tu correo con el enlace de abajo."
+        confirm: "Confirmar mi cuenta"
       reset_password_instructions:
         subject: "Instrucciones para restablecer tu contraseña"
+        hello: "Hola, %{email}:"
+        someone_requested: "Alguien pidió un enlace para cambiar tu contraseña. Puedes hacerlo con el enlace de abajo."
+        change_password: "Cambiar mi contraseña"
+        ignore: "Si no lo pediste, ignora este correo."
+        unchanged: "Tu contraseña no cambiará hasta que abras el enlace y crees una nueva."
       unlock_instructions:
         subject: "Instrucciones para desbloquear tu cuenta"
       email_changed:

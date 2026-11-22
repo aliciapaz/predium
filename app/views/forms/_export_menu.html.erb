@@ -1,0 +1,27 @@
+<%# locals: (csv_path:, xlsx_path:, scope:) %>
+<div class="menu" data-controller="menu download"
+     data-download-busy-value="<%= t("exports.busy") %>"
+     data-download-failed-value="<%= t("exports.failed") %>"
+     data-download-offline-value="<%= t("exports.offline") %>"
+     data-action="keydown->menu#keydown focusout->menu#leave click@window->menu#closeOutside turbo:before-cache@document->menu#close download:saved->menu#choose online@window->download#refresh offline@window->download#refresh">
+  <button type="button" class="btn-secondary" aria-expanded="false" aria-controls="export-menu"
+          data-menu-target="button" data-download-target="trigger" data-action="menu#toggle">
+    <%= icon(:download) %>
+    <%= t("buttons.export") %>
+    <%= icon(:chevron_down, css: "menu-chevron") %>
+  </button>
+  <div class="menu-panel" id="export-menu" data-menu-target="panel" hidden>
+    <p class="menu-caption"><%= scope %></p>
+    <% [[:xlsx, xlsx_path, :table], [:csv, csv_path, :document]].each do |format, path, format_icon| %>
+      <%= link_to path, class: "menu-item", data: { menu_target: "item", download_target: "link", action: "download#save" } do %>
+        <%= icon(format_icon) %>
+        <span>
+          <span class="menu-item-name"><%= t("exports.#{format}.name") %></span>
+          <span class="menu-item-hint"><%= t("exports.#{format}.hint") %></span>
+        </span>
+      <% end %>
+    <% end %>
+    <p class="menu-note" id="export-offline-note" role="status" data-download-target="offlineNote"></p>
+    <p class="menu-note menu-note-danger" role="alert" data-download-target="failedNote"></p>
+  </div>
+</div>
