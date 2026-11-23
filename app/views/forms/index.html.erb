@@ -18,7 +18,7 @@
     <section>
       <div class="flex items-center gap-2 mb-4">
         <h2 class="section-title"><%= t("forms.drafts") %></h2>
-        <%= badge(@drafts.size, tone: :warning) %>
+        <%= badge(@drafts.size, tone: :neutral) %>
       </div>
 
       <% if @drafts.any? %>

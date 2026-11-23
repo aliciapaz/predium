@@ -36,7 +36,7 @@ Tailwind's default palette is reset. `bg-gray-100`, `text-rose-600` or
 | `accent` | Brand seed yellow; the current step's done mark |
 | `focus` | Focus outline only (applied globally; at least 3:1 on `surface`) |
 | `deep`, `deep-ink`, `deep-soft`, `deep-line`, `deep-hover` | The admin sidebar |
-| `warning*`, `danger*` | Status: drafts, pending sync and offline / errors and destructive actions |
+| `warning*`, `danger*` | Status: pending sync and offline / errors and destructive actions. A draft is not a warning: it takes `badge-neutral` |
 | `score-low*`, `score-mid*`, `score-high*` | 1-10 scores and their summaries only |
 | `white` | Text on `primary` |
 
@@ -64,7 +64,7 @@ Canvas code reads tokens with `tokenColor("primary")` from `lib/ui.js`.
 | Progress | `meter` + `meter-fill` with an inline width | same |
 | Connectivity | `status-pill` with `data-state` online, pending, expired or offline (offline is warning, not danger) | same |
 | 1-10 score | n/a | `score-scale` of `score-option` labels around radios with `data-band`; the checked one is a solid band fill with white digits |
-| Score value / bar | n/a | `score-chip` / `score-bar` with `data-band` from `band()` |
+| Score value / bar | n/a | `score-chip` / `score-bar` with `data-band` from `band()`; the headline adds `score-chip-lg` and a `/10` scale, with a `score-legend` key beside it |
 | Inline link | `link` | `link` |
 
 Primitives carry state in attributes, never in toggled classes:
@@ -114,7 +114,7 @@ The coding agent MUST:
 3. Use 16px or larger text in any control that opens the keyboard (the `field` primitive does), so iOS does not zoom.
 4. Put a screen's persistent actions in one `action-bar`. A screen MUST NOT add other fixed or sticky bottom elements.
 5. Show one primary button per view state. In the questionnaire, the primary action moves the agent forward: "Continuar" until the last section, then "Completar cuestionario". Everything else is `btn-secondary`, `btn-quiet` or an icon button.
-6. Use score colors only for scores. Status uses `warning` (drafts, pending sync, offline) and `danger` (errors, delete). Offline is the field agent's normal state, never an error.
+6. Use score colors only for scores. Status uses `warning` (pending sync, offline) and `danger` (errors, delete). Drafts are neutral: amber shares its hue with the mid score band, so a draft badge would read as a mid score. Offline is the field agent's normal state, never an error.
 7. Name every icon-only control (`icon_button` / `iconButton` enforce it).
 8. Write every user-facing string through I18n with correct Spanish orthography (accents, ñ, ¿ ¡). Spanish is the default locale.
 9. Use sentence case for buttons and headings, and name buttons by what they do ("Completar cuestionario", not "Enviar").
