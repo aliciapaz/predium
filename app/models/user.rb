@@ -8,6 +8,10 @@ class User < ApplicationRecord
     :confirmable,
     :invitable
 
+  # Names are required in the database, but an organization invite only knows
+  # the email; the invitee replaces this when accepting.
+  PLACEHOLDER_NAME = { first_name: "Invited", last_name: "User" }.freeze
+
   enum :platform_role, { regular: 0, super_admin: 1 }
 
   has_one :profile, dependent: :destroy
@@ -24,6 +28,10 @@ class User < ApplicationRecord
 
   def administered_organization
     organizations.merge(Membership.admin).first
+  end
+
+  def clear_placeholder_name
+    assign_attributes(first_name: nil, last_name: nil) if slice(*PLACEHOLDER_NAME.keys) == PLACEHOLDER_NAME.stringify_keys
   end
 
   # Joining an organization must not hand its admins the member's earlier work.

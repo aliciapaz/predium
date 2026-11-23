@@ -42,7 +42,7 @@ module Organizations
     end
 
     def invite_user
-      User.invite!({ email: email, first_name: "Invited", last_name: "User" }, invited_by) do |user|
+      User.invite!({ email: email, **User::PLACEHOLDER_NAME }, invited_by) do |user|
         user.skip_invitation = true
       end
     end
