@@ -334,6 +334,22 @@ describe("form editor controller", () => {
       expect(cardTitles()).toEqual(["Organic matter"])
     })
 
+    it("centers the current section tab within the strip, wherever the strip sits on the page", async () => {
+      await seedForm({}, [response("diversity", 4), response("recycling", 6), response("compaction", 5, true), response("erosion", 6, true)])
+      // The strip starts 400px into the page; the current tab sits 500px into the strip's content.
+      const rects = vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(function () {
+        const nav = target("dimensionNav")
+        if (this === nav) return { left: 400, width: 300 }
+        if (nav?.contains(this) && this.matches('[aria-current="step"]')) return { left: 900 - nav.scrollLeft, width: 100 }
+        return { left: 0, width: 0 }
+      })
+
+      await mount(editor(), controllers)
+
+      expect(target("dimensionNav").scrollLeft).toBe(400)
+      rects.mockRestore()
+    })
+
     it("opens a fully scored draft on the last section, where it completes", async () => {
       await seedForm({}, allScored)
 

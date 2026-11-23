@@ -344,10 +344,14 @@ export default class extends Controller {
                       data-action="form-editor#jump" data-index="${index}"><span class="section-tab-mark">${done ? icon("check") : ""}</span>${escape(t(dimension.i18n_key))}</button>`
     }).join("")
     // Center the current tab by scrolling the strip itself; scrollIntoView
-    // would also scroll the page.
+    // would also scroll the page. Measured against the strip's own box:
+    // offsetLeft counts from the page, which overshoots on wide screens.
     const nav = this.dimensionNavTarget
     const current = nav.querySelector('[aria-current="step"]')
-    if (current) nav.scrollLeft = current.offsetLeft - (nav.clientWidth - current.clientWidth) / 2
+    if (!current) return
+    const strip = nav.getBoundingClientRect()
+    const tab = current.getBoundingClientRect()
+    nav.scrollLeft += tab.left - strip.left - (strip.width - tab.width) / 2
   }
 
   jump(event) {

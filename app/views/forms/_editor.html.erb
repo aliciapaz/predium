@@ -36,6 +36,11 @@
     </summary>
 
     <div class="px-5 pt-5 pb-6 flex flex-col gap-8">
+      <%= labeled_field id: "farm_territory_key", label: t("farm_info.territory_extension"), as: :select,
+          hint: t("farm_info.territory_hint"),
+          options: [[t("farm_info.select_placeholder"), ""]] + QuestionnaireConfig.extension_keys.map { |key| [key.humanize, key] },
+          data: { farm_field: "territory_key" } %>
+
       <fieldset class="field-group">
         <legend><%= t("farm_info.farmer_information") %></legend>
         <%= labeled_field id: "farm_name", label: t("farm_info.farm_farmer_name"),
@@ -99,9 +104,6 @@
           </button>
           <p class="field-error hidden" role="alert" data-geolocation-target="error"></p>
         </div>
-        <%= labeled_field id: "farm_territory_key", label: t("farm_info.territory_extension"), as: :select,
-            options: [[t("farm_info.select_placeholder"), ""]] + QuestionnaireConfig.extension_keys.map { |key| [key.humanize, key] },
-            data: { farm_field: "territory_key" } %>
       </fieldset>
     </div>
   </details>

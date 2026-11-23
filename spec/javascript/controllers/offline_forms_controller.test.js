@@ -170,6 +170,15 @@ describe("offline forms controller", () => {
       ])
     })
 
+    it("badges drafts as neutral so amber stays a score color", async () => {
+      await seedForm("draft-1", { name: "Draft farm" })
+
+      await mount(fixture, { "offline-forms": OfflineFormsController })
+
+      expect(cardFor("Draft farm").querySelector(".badge-neutral").textContent.trim()).toBe("Draft")
+      expect(document.querySelector(".badge-warning")).toBeNull()
+    })
+
     it("links drafts to the editor and completed forms to their results", async () => {
       await seedForm("draft-1", { name: "Draft farm" })
       await seedForm("done-1", { name: "Done farm", state: "completed" })

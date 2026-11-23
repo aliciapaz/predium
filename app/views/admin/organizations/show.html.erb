@@ -68,7 +68,7 @@
                 <td>
                   <%= form.user.first_name %> <%= form.user.last_name %>
                 </td>
-                <td><%= badge(form.state.titleize, tone: form.completed? ? :success : :warning) %></td>
+                <td><%= badge(form.state.titleize, tone: form.completed? ? :success : :neutral) %></td>
                 <td><%= format_admin_date(form.completed_at) %></td>
               </tr>
             <% end %>

@@ -266,7 +266,7 @@ describe("results controller", () => {
 
       const overall = target("farmInfo").querySelector("[data-overall]")
       const chip = overall.querySelector(".score-chip")
-      expect(chip.textContent).toBe("6.0")
+      expect(chip.textContent).toBe("6.0/10")
       expect(chip.dataset.band).toBe("mid")
       expect(overall.textContent).toContain("Overall score")
       expect(overall.textContent).toContain("Average of 2 dimensions.")
@@ -274,12 +274,28 @@ describe("results controller", () => {
       expect(overall.textContent).toContain("Lowest: Structure.")
     })
 
+    it("names what each score color means under the headline", async () => {
+      await mount(fixture, { results: ResultsController })
+
+      const legend = Array.from(target("farmInfo").querySelectorAll("[data-overall] .score-legend li"))
+      expect(legend.map((item) => [item.dataset.band, item.textContent.trim()]))
+        .toEqual([["low", "Low"], ["mid", "Mid"], ["high", "High"]])
+    })
+
+    it("badges a draft as neutral so amber stays a score color", async () => {
+      await applyServerForm(serverForm({ state: "draft", completed_at: null }))
+
+      await mount(fixture, { results: ResultsController })
+
+      expect(target("farmInfo").querySelector(".badge-neutral").textContent).toBe("Draft")
+    })
+
     it("leaves the principle answers out of the headline", async () => {
       await saveResponse(clientId, "recycling", 1)
 
       await mount(fixture, { results: ResultsController })
 
-      expect(target("farmInfo").querySelector("[data-overall] .score-chip").textContent).toBe("6.0")
+      expect(target("farmInfo").querySelector("[data-overall] .score-chip").textContent).toBe("6.0/10")
     })
 
     it("averages only the dimensions a draft has scored so far", async () => {
@@ -288,7 +304,7 @@ describe("results controller", () => {
       await mount(fixture, { results: ResultsController })
 
       const overall = target("farmInfo").querySelector("[data-overall]")
-      expect(overall.querySelector(".score-chip").textContent).toBe("5.0")
+      expect(overall.querySelector(".score-chip").textContent).toBe("5.0/10")
       expect(overall.textContent).toContain("Average of 1 dimension.")
       expect(overall.textContent).not.toContain("Highest")
     })
