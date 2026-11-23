@@ -4,6 +4,11 @@ module Users
   class InvitationsController < Devise::InvitationsController
     before_action :require_super_admin, only: [:new, :create]
 
+    def edit
+      resource.clear_placeholder_name
+      super
+    end
+
     private
 
     def require_super_admin
